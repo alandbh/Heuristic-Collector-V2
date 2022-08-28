@@ -1,31 +1,35 @@
 import React from "react";
 import { useQuery, gql } from "@apollo/client";
+import Debug from "../lib/debug";
 
 // import { Container } from './styles';
+
 const heuristicQuery = gql`
-    query heuristics {
-        name
-        group {
+    query Heuristics {
+        heuristics {
             name
+            group {
+                name
+            }
         }
     }
 `;
 
-function HeuristicList() {
-    const { data, loading, error } = useQuery(heuristicQuery);
+function HeuristicList({ query, variable }) {
+    const { data, loading, error } = useQuery(query);
 
-    // console.log(data);
+    console.log(data);
 
-    // if (loading) {
-    //     return <h2>Loading</h2>;
-    // }
+    if (loading) {
+        return <h2>Loading</h2>;
+    }
 
-    // if (error) {
-    //     // console.error(error);
-    //     return null;
-    // }
+    if (error) {
+        console.error(error);
+        return <h2>Error: {error.message}</h2>;
+    }
 
-    return <div>asaas</div>;
+    return <Debug data={data} />;
 }
 
 export default HeuristicList;
