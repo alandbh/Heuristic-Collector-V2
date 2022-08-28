@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import ClientOnly from "../lib/ClientOnly";
 import HeuristicList from "../components/HeuristicList";
+import Card from "../components/Card";
 
 const GET_PLAYERS = gql`
     query MyQuery($playerSlug: String) {
@@ -43,8 +44,8 @@ const playersQuery = gql`
     }
 `;
 const heuristicQuery = gql`
-    query Heuristics {
-        heuristics {
+    query {
+        heuristics(where: { group: { name: "1. Need Recognition" } }) {
             name
             group {
                 name
@@ -53,11 +54,29 @@ const heuristicQuery = gql`
     }
 `;
 
+const QUERY_PROJECTS = gql`
+    query {
+        projects {
+            id
+            name
+            slug
+            thumbnail {
+                url
+            }
+        }
+    }
+`;
+
 export default function Home(props) {
+    const { data, loading, error } = useQuery(QUERY_PROJECTS);
+    console.log(data?.projects);
     return (
         <>
             <ClientOnly>
-                <HeuristicList query={playersQuery} />
+                {/* <HeuristicList query={heuristicQuery} /> */}
+                {data?.projects?.map((proj) => (
+                    <Card key={proj.id} data={proj} />
+                ))}
             </ClientOnly>
         </>
     );
