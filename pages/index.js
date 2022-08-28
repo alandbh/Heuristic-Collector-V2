@@ -1,10 +1,12 @@
 import Head from "next/head";
 import Image from "next/image";
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import client from "../lib/apollo";
 import { useEffect } from "react";
 import { fetchAPI } from "../lib/fetch";
 import Debug from "../lib/debug";
+import ClientOnly from "../lib/ClientOnly";
+import HeuristicList from "../components/HeuristicList";
 
 const GET_PLAYERS = gql`
     query MyQuery($playerSlug: String) {
@@ -23,42 +25,6 @@ const GET_PLAYERS = gql`
         }
     }
 `;
-
-export default function Home(props) {
-    // useEffect(() => {
-    //     client
-    //         .query({
-    //             query: GET_PLAYERS,
-    //         })
-    //         .then((response) => {
-    //             console.log(response);
-    //         });
-    // }, []);
-
-    console.log(props.countries);
-    return (
-        <>
-            <h1 className="text-3xl font-bold underline">Hello world!</h1>
-            <Debug data={props.countries} />
-        </>
-    );
-}
-
-// export async function getStaticProps() {
-//   const data = await fetchAPI(`
-//   {
-//     posts {
-//       slug
-//     }
-//   }
-// `)
-
-//     return {
-//         props: {
-//             countries: data,
-//         },
-//     };
-// }
 
 const playersQuery = gql`
     query {
@@ -80,7 +46,7 @@ const playersQuery = gql`
     }
 `;
 const heuristicQuery = gql`
-    query {
+    query Heuristics {
         heuristics {
             name
             group {
@@ -90,9 +56,55 @@ const heuristicQuery = gql`
     }
 `;
 
+export default function Home(props) {
+    // useEffect(() => {
+    //     client
+    //         .query({
+    //             query: GET_PLAYERS,
+    //         })
+    //         .then((response) => {
+    //             console.log(response);
+    //         });
+    // }, []);
+
+    // const { data, loading, error } = useQuery(heuristicQuery);
+
+    // console.log(data);
+
+    // if (error) {
+    //     console.error(error);
+    //     return null;
+    // }
+    return (
+        <>
+            <ClientOnly>
+                <h1 className="text-3xl font-bold underline">Hello world!</h1>
+                <Debug data={props.countries} />
+                {/* <HeuristicList /> */}
+            </ClientOnly>
+        </>
+    );
+}
+
+// export async function getStaticProps() {
+//   const data = await fetchAPI(`
+//   {
+//     posts {
+//       slug
+//     }
+//   }
+// `)
+
+//     return {
+//         props: {
+//             countries: data,
+//         },
+//     };
+// }
+
 export async function getStaticProps() {
     const { data } = await client.query({
-        query: playersQuery,
+        query: heuristicQuery,
     });
 
     return {
