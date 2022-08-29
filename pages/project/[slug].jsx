@@ -8,6 +8,7 @@ import Link from "next/link";
 import Dashboard from "../../components/Dashboard";
 import Evaluation from "../../components/Evaluation";
 import Header from "../../components/Header";
+import { ProjectWrapper } from "../../context/project";
 
 const QUERY_PROJECTS = gql`
     query Projects($slug: String) {
@@ -52,12 +53,17 @@ function Project() {
     }
 
     return (
-        <>
-            <Header routes={{ slug, tab: "dash" }} />
-            <h1>PROJECT NAME: {data?.project.name}</h1>
-            {tab === "dash" ? <Dashboard /> : <Evaluation />}
-            <footer>FOOTER</footer>
-        </>
+        <div className="bg-slate-50">
+            <ProjectWrapper data={data}>
+                <Header
+                    // project={data?.project.name}
+                    routes={{ slug, tab: "dash" }}
+                />
+                <h1>PROJECT NAME: {data?.project.name}</h1>
+                {tab === "dash" ? <Dashboard /> : <Evaluation />}
+                <footer>FOOTER</footer>
+            </ProjectWrapper>
+        </div>
     );
 }
 
