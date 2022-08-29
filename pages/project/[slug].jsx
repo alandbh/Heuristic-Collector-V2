@@ -10,8 +10,8 @@ import Evaluation from "../../components/Evaluation";
 import Header from "../../components/Header";
 
 const QUERY_PROJECTS = gql`
-    query {
-        project(where: { slug: "retail-30" }) {
+    query Projects($slug: String) {
+        project(where: { slug: $slug }) {
             slug
             name
         }
@@ -22,10 +22,30 @@ function Project() {
     const router = useRouter();
     const { slug, tab } = router.query || "";
 
-    const { data, loading, error } = useQuery(QUERY_PROJECTS);
+    const { data, loading, error } = useQuery(QUERY_PROJECTS, {
+        variables: {
+            slug,
+        },
+    });
 
     // console.log("url", router.asPath.split("#").pop());
-    console.log("data", slug);
+    console.log("data", data);
+
+    if (slug === undefined) {
+        return <div>UNDEFINED</div>;
+    }
+
+    if (loading) {
+        return <div>LOADING</div>;
+    }
+
+    if (error) {
+        return <div>DEU ERRO: {error.message}</div>;
+    }
+
+    if (data?.project === null) {
+        return <div>PROJECT NOT FOUND</div>;
+    }
 
     if (data?.project.slug !== slug) {
         return <div>NOT FOUND</div>;
@@ -33,7 +53,7 @@ function Project() {
 
     return (
         <>
-            <Header router={{ slug, tab: "dash" }} />
+            <Header routes={{ slug, tab: "dash" }} />
             <h1>PROJECT NAME: {data?.project.name}</h1>
             {tab === "dash" ? <Dashboard /> : <Evaluation />}
             <footer>FOOTER</footer>
