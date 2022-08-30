@@ -47,7 +47,6 @@ function PlayerSelect() {
             projectSlug: project.slug,
         },
     });
-    const [modalOpen, setModalOpen] = useState(false);
 
     const modalRef = useRef(null);
     // const [modalOpen, setModalOpen] = useDetectOutsideClick(modalRef, true);
@@ -76,8 +75,6 @@ function PlayerSelect() {
     }, []);
 
     function handleModal(modal) {
-        console.log("clicou", modal);
-        // setModalOpen(!modalOpen);
         openModal(modal);
     }
 
@@ -148,15 +145,18 @@ function PlayerSelect() {
             </div>
 
             <div
-                className="w-full h-full fixed top-0 left-0 bg-white/90 items-center justify-center transition-all opacity-0 hidden"
+                className="w-full h-full fixed top-0 left-0 bg-white/90 items-center justify-center transition-all opacity-0 hidden py-5"
                 ref={modalRef}
-                onClick={() => setModalOpen(false)}
+                onClick={() => closeModal(modalRef)}
             >
-                <ul className="bg-white flex flex-wrap max-w-2xl justify-around">
+                <ul
+                    className="bg-white flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5"
+                    style={{ maxHeight: "calc(100vh - 40px)" }}
+                >
                     {data?.project?.players?.map((player) => (
                         <li className="flex-1 min-w-[200px]" key={player.slug}>
                             <button
-                                className="border border-gray-200 hover:border-primary p-8 w-full flex justify-center opacity-60 hover:opacity-100 transition-all"
+                                className="border border-gray-200 hover:border-primary p-8 w-full flex justify-center grayscale hover:grayscale-0 opacity-50 hover:opacity-100 transition-all"
                                 onClick={() => handleSelectPlayer(player)}
                             >
                                 <picture className="h-6 block">
