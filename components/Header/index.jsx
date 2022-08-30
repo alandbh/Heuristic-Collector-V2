@@ -102,11 +102,8 @@ function Header({ routes }) {
                         />
                     </svg>
 
-                    <b className="text-3xl">
-                        {isDash ? "Dashboard" : "Evaluation"}
-                    </b>
+                    <PlayerSelect />
                 </div>
-                <PlayerSelect />
             </div>
         </header>
     );
