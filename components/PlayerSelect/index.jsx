@@ -65,10 +65,10 @@ function PlayerSelect() {
                     Select a Player
                 </label>
                 <div className="flex gap-2 items-center content-center">
-                    <picture className="h-7 block">
+                    <picture className="h-6 block">
                         <source srcSet={selected?.logo.url} type="image/webp" />
                         <img
-                            className="object-cover max-h-7"
+                            className="object-cover max-h-6"
                             src={selected?.logo.url}
                             alt=""
                         />
@@ -106,18 +106,17 @@ function PlayerSelect() {
                 >
                     {data?.players?.map((player) => (
                         <li className="flex-1 min-w-[200px]" key={player.slug}>
-                            {/* {player.name} */}
                             <button
                                 className="border border-gray-200 hover:border-primary p-8 w-full flex justify-center opacity-60 hover:opacity-100 transition-all"
                                 onClick={() => handleSelectPlayer(player)}
                             >
-                                <picture className="h-7 block">
+                                <picture className="h-6 block">
                                     <source
                                         srcSet={player.logo.url}
                                         type="image/webp"
                                     />
                                     <img
-                                        className="object-cover max-h-7"
+                                        className="object-cover max-h-6"
                                         src={player.logo.url}
                                         alt=""
                                     />
