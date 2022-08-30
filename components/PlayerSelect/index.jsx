@@ -1,16 +1,22 @@
 import { gql, useQuery } from "@apollo/client";
 import { useCallback, useEffect, useState, useRef } from "react";
+import { useProjectContext } from "../../context/project";
+import { useRouter } from "next/router";
+
 // import { useDetectOutsideClick } from "../../lib/useDetectOutsideClick";
 import Debug from "../../lib/debug";
 
 const QUERY_PLAYERS = gql`
-    query {
-        players {
-            id
-            name
+    query Projects($projectSlug: String) {
+        project(where: { slug: $projectSlug }) {
             slug
-            logo {
-                url
+            players {
+                id
+                name
+                slug
+                logo {
+                    url
+                }
             }
         }
     }
@@ -25,29 +31,76 @@ const modal_style = {
     },
     hidden: {
         transition: "0.5s",
+        display: "none",
         opacity: 0,
         transform: "translateX(100px)",
+        zIndex: 9,
     },
 };
 
 function PlayerSelect() {
     const [selected, setSelected] = useState(null);
-    const { data, loading, error } = useQuery(QUERY_PLAYERS);
+    const router = useRouter();
+    const { project } = useProjectContext();
+    const { data, loading, error } = useQuery(QUERY_PLAYERS, {
+        variables: {
+            projectSlug: project.slug,
+        },
+    });
     const [modalOpen, setModalOpen] = useState(false);
-    // const modalRef = useRef(null);
+
+    const modalRef = useRef(null);
     // const [modalOpen, setModalOpen] = useDetectOutsideClick(modalRef, true);
 
     useEffect(() => {
-        setSelected(data?.players[0]);
-    }, [data]);
+        if (router.query.player) {
+            const selected = data?.project?.players.find(
+                (player) => player.slug === router.query.player
+            );
+            console.log("selected", router.query.player);
+            setSelected(selected);
+        } else {
+            setSelected(data?.project?.players[0]);
+        }
+    }, [data, router]);
 
     const handleSelectPlayer = useCallback((player) => {
+        router.replace({
+            query: {
+                ...router.query,
+                player: player.slug,
+            },
+        });
         setSelected(player);
+        closeModal(modalRef);
     }, []);
 
-    function handleModal() {
-        console.log("clicou", modalOpen);
-        setModalOpen(!modalOpen);
+    function handleModal(modal) {
+        console.log("clicou", modal);
+        // setModalOpen(!modalOpen);
+        openModal(modal);
+    }
+
+    function openModal(_modal) {
+        const modal = _modal.current;
+        modal.style.transition = "0.4s";
+        modal.style.display = "flex";
+        setTimeout(() => {
+            modal.style.opacity = 0;
+            modal.style.opacity = 1;
+            modal.style.zIndex = 9;
+            modal.style.transform = "translateY(0px)";
+        });
+    }
+
+    function closeModal(_modal) {
+        const modal = _modal.current;
+        modal.style.transition = "0.3s";
+        modal.style.transform = "translateY(-100px)";
+        modal.style.opacity = 0;
+        setTimeout(() => {
+            modal.style.display = "none";
+        }, 300);
     }
 
     if (loading) {
@@ -73,7 +126,10 @@ function PlayerSelect() {
                             alt=""
                         />
                     </picture>
-                    <button id="openModal" onClick={() => handleModal()}>
+                    <button
+                        id="openModal"
+                        onClick={() => handleModal(modalRef)}
+                    >
                         <svg
                             width="25"
                             height="24"
@@ -92,19 +148,12 @@ function PlayerSelect() {
             </div>
 
             <div
-                className="w-full h-full fixed top-0 left-0 bg-white/90 flex items-center justify-center"
-                style={
-                    modalOpen
-                        ? { opacity: 1, zIndex: 9 }
-                        : { opacity: 0, zIndex: -1 }
-                }
+                className="w-full h-full fixed top-0 left-0 bg-white/90 items-center justify-center transition-all opacity-0 hidden"
+                ref={modalRef}
                 onClick={() => setModalOpen(false)}
             >
-                <ul
-                    className="bg-white flex flex-wrap max-w-2xl justify-around"
-                    style={modalOpen ? modal_style.enter : modal_style.exit}
-                >
-                    {data?.players?.map((player) => (
+                <ul className="bg-white flex flex-wrap max-w-2xl justify-around">
+                    {data?.project?.players?.map((player) => (
                         <li className="flex-1 min-w-[200px]" key={player.slug}>
                             <button
                                 className="border border-gray-200 hover:border-primary p-8 w-full flex justify-center opacity-60 hover:opacity-100 transition-all"
