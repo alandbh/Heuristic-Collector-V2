@@ -1,7 +1,9 @@
+import { gql } from "@apollo/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useProjectContext } from "../../context/project";
+import PlayerSelect from "../PlayerSelect";
 
 function Header({ routes }) {
     const router = useRouter();
@@ -10,7 +12,7 @@ function Header({ routes }) {
 
     const { project } = useProjectContext();
 
-    console.log("PROJECT", project);
+    // console.log("PROJECT", project);
 
     const LINK_CLASSES = `border flex gap-2 align-middle items-center py-1 px-5 rounded-full transition-all text-sm `;
     return (
@@ -104,6 +106,7 @@ function Header({ routes }) {
                         {isDash ? "Dashboard" : "Evaluation"}
                     </b>
                 </div>
+                <PlayerSelect />
             </div>
         </header>
     );

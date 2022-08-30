@@ -30,7 +30,7 @@ function Project() {
     });
 
     // console.log("url", router.asPath.split("#").pop());
-    console.log("data", data);
+    // console.log("data", data);
 
     if (slug === undefined) {
         return <div>UNDEFINED</div>;
@@ -59,7 +59,6 @@ function Project() {
                     // project={data?.project.name}
                     routes={{ slug, tab: "dash" }}
                 />
-                <h1>PROJECT NAME: {data?.project.name}</h1>
                 {tab === "dash" ? <Dashboard /> : <Evaluation />}
                 <footer>FOOTER</footer>
             </ProjectWrapper>
