@@ -63,16 +63,19 @@ function PlayerSelect() {
         }
     }, [data, router]);
 
-    const handleSelectPlayer = useCallback((player) => {
-        router.replace({
-            query: {
-                ...router.query,
-                player: player.slug,
-            },
-        });
-        setSelected(player);
-        closeModal(modalRef);
-    }, []);
+    const handleSelectPlayer = useCallback(
+        (player) => {
+            router.replace({
+                query: {
+                    ...router.query,
+                    player: player.slug,
+                },
+            });
+            setSelected(player);
+            closeModal(modalRef);
+        },
+        [router]
+    );
 
     function handleModal(modal) {
         openModal(modal);
