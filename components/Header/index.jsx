@@ -25,7 +25,7 @@ function Header({ routes }) {
     const LINK_CLASSES = `border flex gap-2 align-middle items-center py-1 px-4 md:px-5 rounded-full transition-all text-xs md:text-sm `;
     return (
         <header>
-            <div className="bg-primary flex justify-between px-5 items-center h-10">
+            <div className="bg-primary flex justify-between px-5 items-center h-12">
                 <Link href={`/`}>
                     <a>
                         <div className="py-1 hidden sm:block">
@@ -122,8 +122,14 @@ function Header({ routes }) {
                         />
                     </svg>
 
-                    <PlayerSelect />
-                    <JourneySelect />
+                    {router.query.tab !== "dash" ? (
+                        <>
+                            <PlayerSelect />
+                            <JourneySelect />
+                        </>
+                    ) : (
+                        <h2 className="text-2xl font-bold">Dashboard</h2>
+                    )}
                 </div>
             </div>
         </header>
