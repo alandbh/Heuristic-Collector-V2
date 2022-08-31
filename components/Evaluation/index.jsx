@@ -1,5 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
+import { ScoresWrapper } from "../../context/scores";
 
 import { useProjectContext } from "../../context/project";
 import HeuristicGroup from "../HeuristicGroup";
@@ -50,13 +51,13 @@ function Evaluation() {
     }
 
     return (
-        <>
+        <ScoresWrapper>
             <div>
                 {data.groups.map((group) => (
                     <HeuristicGroup group={group} key={group.id} />
                 ))}
             </div>
-        </>
+        </ScoresWrapper>
     );
 }
 

@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { useScoresContext } from "../../context/scores";
 import Range from "../Range";
 
 function HeuristicItem({ heuristic }) {
     const [score, setScore] = useState(0);
-    function handleChangeRange(ev) {
-        console.log(ev.target.value);
+    const [isPending, startTransition] = useTransition();
+    const { scores } = useScoresContext();
 
-        setScore(Number(ev.target.value));
+    const currentScore = scores.find(
+        (score) => score.heuristic.heuristicNumber === heuristic.heuristicNumber
+    );
+
+    useEffect(() => {
+        console.log("CONTEXTP", currentScore);
+        if (currentScore !== undefined) {
+            setScore(currentScore.scoreValue);
+        } else {
+            setScore(0);
+        }
+    }, [currentScore]);
+
+    function handleChangeRange(ev) {
+        startTransition(() => {
+            console.log(ev.target.value);
+            console.log("PENDING", isPending);
+
+            setScore(Number(ev.target.value));
+        });
     }
+
     return (
         <li className="flex">
             <div>
