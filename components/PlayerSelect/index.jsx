@@ -60,6 +60,12 @@ function PlayerSelect() {
             setSelected(selected);
         } else {
             setSelected(data?.project?.players[0]);
+            router.replace({
+                query: {
+                    ...router.query,
+                    player: data?.project?.players[0].slug,
+                },
+            });
         }
     }, [data, router]);
 
@@ -121,7 +127,7 @@ function PlayerSelect() {
                     <picture className="h-6 block">
                         <source srcSet={selected?.logo.url} type="image/webp" />
                         <img
-                            className="object-cover max-h-6"
+                            className="object-cover max-h-5"
                             src={selected?.logo.url}
                             alt=""
                         />
