@@ -37,8 +37,6 @@ function Evaluation() {
         },
     });
 
-    console.log(data?.groups);
-
     if (loading) {
         return <div>LOADING</div>;
     }

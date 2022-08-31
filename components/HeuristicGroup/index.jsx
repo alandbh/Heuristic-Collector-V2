@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, useTransition } from "react";
+import {
+    useDeferredValue,
+    useEffect,
+    useMemo,
+    useState,
+    useTransition,
+} from "react";
 import { useScoresContext } from "../../context/scores";
 import Range from "../Range";
 
@@ -21,12 +27,11 @@ function HeuristicItem({ heuristic }) {
     }, [currentScore]);
 
     function handleChangeRange(ev) {
-        startTransition(() => {
-            console.log(ev.target.value);
-            console.log("PENDING", isPending);
+        console.log(ev.target.value);
+        // let value = useDeferredValue(ev.target.value)
+        console.log("PENDING", isPending);
 
-            setScore(Number(ev.target.value));
-        });
+        setScore(Number(ev.target.value));
     }
 
     return (
