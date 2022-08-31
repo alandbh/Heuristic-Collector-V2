@@ -115,7 +115,9 @@ function JourneySelect() {
                     Select a Journey
                 </label>
                 <div className="flex gap-2 items-center content-center">
-                    <h2 className="text-xl font-bold">{selected?.name}</h2>
+                    <h2 className="text-lg h-6 block font-bold leading-none">
+                        {selected?.name}
+                    </h2>
                     <button
                         id="openModal"
                         onClick={() => handleModal(modalRef)}

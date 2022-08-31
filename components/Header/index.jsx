@@ -103,7 +103,7 @@ function Header({ routes }) {
                 </nav>
             </div>
             <div className="bg-white shadow-md px-5 py-3">
-                <div className="flex items-center gap-5 justify-between">
+                <div className="flex items-center gap-8 justify-between sm:justify-start">
                     <b className="hidden sm:inline">{project.name}</b>
                     <svg
                         className="hidden sm:inline"
