@@ -66,10 +66,7 @@ async function doPublic(variables) {
 
 function HeuristicItem({ heuristic }) {
     const [score, setScore] = useState(0);
-    const [hasChanged, setHasChanged] = useState(false);
     const { scores } = useScoresContext();
-
-    const defeScore = useDeferredValue(score);
 
     const currentScore = scores.find(
         (score) => score.heuristic.heuristicNumber === heuristic.heuristicNumber
@@ -92,84 +89,12 @@ function HeuristicItem({ heuristic }) {
 
     function handleChangeRange(ev) {
         setScore(Number(ev.target.value));
-        setHasChanged(true);
         processChange({
             scoreId: currentScore.id,
             scoreValue: Number(ev.target.value),
             scoreNote: "nota interna2",
         });
     }
-
-    /**
-     *
-     * Saving the score to Database
-     */
-
-    const [setScoreOnDb, { data, loading, error }] =
-        useMutation(MUTATION_SCORE);
-
-    // if (data) {
-    //     console.log(data);
-    // }
-    const defChange = useDeferredValue(hasChanged);
-    const defCurrentScore = useDeferredValue(currentScore);
-    // const memoSave = useMemo(() => {
-
-    // }, [hasChanged, currentScore, defeScore]);
-
-    function save() {
-        // console.log("mudou");
-        if (hasChanged && currentScore && defeScore && !loading) {
-            console.log("mudou");
-            setScoreOnDb({
-                variables: {
-                    scoreId: currentScore.id,
-                    scoreValue: defeScore,
-                    scoreNote: "nota interna2",
-                },
-            });
-        }
-    }
-
-    // const [updateScore, { data, loading, error }] =
-    //     useMutation(MUTATION_PUBLIC);
-    // const debScore = useDebounce(score, 1000);
-
-    // useMemo(() => {
-    //     if (defChange && defCurrentScore && defeScore && !loading) {
-    //         console.log("EFFEct", debScore);
-
-    //         setScoreOnDb({
-    //             variables: {
-    //                 scoreId: currentScore.id,
-    //                 scoreValue: defeScore,
-    //                 scoreNote: "nota interna2",
-    //             },
-    //         });
-    //     }
-
-    //     return null;
-    // }, [
-    //     defChange,
-    //     defeScore,
-    //     defCurrentScore,
-    //     setScoreOnDb,
-    //     loading,
-    //     debScore,
-    // ]);
-
-    // useEffect(() => {
-    // }, [debScore]);
-
-    // useEffect(() => {
-
-    //     if (currentScore !== undefined) {
-
-    //     }
-    // }, [defeScore, currentScore, setScoreOnDb]);
-
-    // if (currentScore !== undefined) {
-    // }
 
     return (
         <li className="flex">
@@ -192,28 +117,6 @@ function HeuristicItem({ heuristic }) {
             </div>
         </li>
     );
-}
-
-// Hook
-function useDebounce(value, delay) {
-    // State and setters for debounced value
-    const [debouncedValue, setDebouncedValue] = useState(value);
-    useEffect(
-        () => {
-            // Update debounced value after delay
-            const handler = setTimeout(() => {
-                setDebouncedValue(value);
-            }, delay);
-            // Cancel the timeout if value changes (also on delay change or unmount)
-            // This is how we prevent debounced value from updating if value is changed ...
-            // .. within the delay period. Timeout gets cleared and restarted.
-            return () => {
-                clearTimeout(handler);
-            };
-        },
-        [value, delay] // Only re-call effect if value or delay changes
-    );
-    return debouncedValue;
 }
 
 export default HeuristicItem;
