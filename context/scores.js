@@ -16,6 +16,7 @@ const QUERY_SCORES = gql`
                 journey: { slug: $journeySlug }
             }
         ) {
+            id
             scoreValue
             note
             heuristic {
