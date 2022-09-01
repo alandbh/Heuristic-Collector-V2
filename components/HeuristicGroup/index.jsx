@@ -8,10 +8,18 @@ import {
 import { useScoresContext } from "../../context/scores";
 import Range from "../Range";
 
+/**
+ *
+ * HEURISTIC ITEM
+ *
+ */
+
 function HeuristicItem({ heuristic }) {
     const [score, setScore] = useState(0);
     const [isPending, startTransition] = useTransition();
     const { scores } = useScoresContext();
+
+    const rangeValue = useDeferredValue(score);
 
     const currentScore = scores.find(
         (score) => score.heuristic.heuristicNumber === heuristic.heuristicNumber
@@ -26,13 +34,29 @@ function HeuristicItem({ heuristic }) {
         }
     }, [currentScore]);
 
+    /**
+     *
+     * Setting the Score
+     *
+     * @param {*event} ev
+     */
+
     function handleChangeRange(ev) {
-        console.log(ev.target.value);
-        // let value = useDeferredValue(ev.target.value)
-        console.log("PENDING", isPending);
+        // console.log(ev.target.value);
 
         setScore(Number(ev.target.value));
+        // console.log("PENDING", isPending);
     }
+
+    useEffect(() => {
+        setScoreOnDb(rangeValue);
+    }, [rangeValue]);
+
+    function setScoreOnDb(value) {
+        console.log("DEFER", ((value * 1000000000) / 8) * 5432);
+    }
+
+    console.log("NORMAL", rangeValue);
 
     return (
         <li className="flex">
@@ -56,6 +80,12 @@ function HeuristicItem({ heuristic }) {
         </li>
     );
 }
+
+/**
+ *
+ * HEURISTIC GROUP
+ *
+ */
 
 function HeuristicGroup({ group }) {
     return (
