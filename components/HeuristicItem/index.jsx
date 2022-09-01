@@ -3,47 +3,12 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useScoresContext } from "../../context/scores";
 import Range from "../Range";
 import client from "../../lib/apollo";
+import { debounce } from "../../lib/utils";
 
-function debounce(func, wait = 1000, immediate) {
-    var timeout;
-    return function () {
-        var context = this,
-            args = arguments;
-        var later = function () {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        var callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    };
-}
-
-// Returns a function, that, as long as it continues to be invoked, will only
-// trigger every N milliseconds. If <code>immediate</code> is passed, trigger the
-// function on the leading edge, instead of the trailing.
-// function throttle(func, wait, immediate) {
-//     var timeout;
-//     return function () {
-//         var context = this,
-//             args = arguments;
-//         var later = function () {
-//             timeout = null;
-//             if (!immediate) func.apply(context, args);
-//         };
-//         var callNow = immediate && !timeout;
-//         if (!timeout) timeout = setTimeout(later, wait);
-//         if (callNow) func.apply(context, args);
-//     };
-// }
-
-function saveInput(variables) {
-    console.log("Saving data");
-    doMutate(variables);
-}
-const processChange = debounce(saveInput, 1000, false);
-
+/**
+ *
+ * GRAPHQL CONSTANTS
+ */
 const MUTATION_SCORE = gql`
     mutation setScores($scoreId: ID, $scoreValue: Int, $scoreNote: String) {
         updateScore(
@@ -65,6 +30,20 @@ const MUTATION_PUBLIC = gql`
         }
     }
 `;
+
+/**
+ *
+ * Debounced function for processing changes on Range
+ */
+const processChange = debounce(
+    (variables) => {
+        console.log("Saving data func");
+        doMutate(variables);
+    },
+    1000,
+    false
+);
+
 async function doMutate(variables) {
     const { data } = await client.mutate({
         mutation: MUTATION_SCORE,
