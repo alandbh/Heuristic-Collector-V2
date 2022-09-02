@@ -1,9 +1,29 @@
 import { gql, useMutation } from "@apollo/client";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useScoresContext } from "../../context/scores";
+import { useRouter } from "next/router";
 import Range from "../Range";
 import client from "../../lib/apollo";
-import { debounce } from "../../lib/utils";
+import { debounce, throttle } from "../../lib/utils";
+import Debug from "../../lib/debug";
+
+const initialScore = {};
+
+function standById() {
+    return new Promise((resolve, reject) => {
+        const intervalGetItd = setInterval(() => {
+            if (initialScore.id) {
+                resolve(initialScore.id);
+
+                stopListening();
+            }
+        }, 1000);
+
+        function stopListening() {
+            clearInterval(intervalGetItd);
+        }
+    });
+}
 
 /**
  *
@@ -28,6 +48,33 @@ const MUTATION_PUBLIC = gql`
             id
             scoreValue
             note
+            heuristic {
+                heuristicNumber
+            }
+        }
+    }
+`;
+
+const MUTATION_CREATE_SCORE = gql`
+    mutation createNewScore(
+        $projectSlug: String
+        $playerSlug: String
+        $journeySlug: String
+        $scoreValue: Int!
+        $heuristicId: ID
+    ) {
+        createScore(
+            data: {
+                scoreValue: $scoreValue
+                project: { connect: { slug: $projectSlug } }
+                player: { connect: { slug: $playerSlug } }
+                journey: { connect: { slug: $journeySlug } }
+                evidenceUrl: "uuu"
+                heuristic: { connect: { id: $heuristicId } }
+            }
+        ) {
+            scoreValue
+            id
         }
     }
 `;
@@ -37,31 +84,46 @@ const MUTATION_PUBLIC = gql`
  * Debounced function for processing changes on Range
  */
 const processChange = debounce(
-    (variables) => {
+    async (variables, gqlString, isCreate = false) => {
         console.log("Saving data func");
-        doMutate(variables);
+        return doMutate(variables, gqlString, isCreate);
     },
     2000,
     false
 );
 
-async function doMutate(variables) {
+const processChangeInital = debounce(
+    async (variables, gqlString, isCreate = false) => {
+        console.log("Saving data Initally");
+        doMutate(variables, gqlString, isCreate);
+    },
+    2000,
+    false
+);
+
+async function doMutate(variables, gqlString, isCreate) {
     const { data } = await client.mutate({
-        mutation: MUTATION_SCORE,
+        mutation: gqlString,
         variables,
     });
+
     if (data) {
-        doPublic(data);
+        console.log("doMutate", data);
+        const newId = isCreate ? data.createScore.id : data.updateScore.id;
+        return doPublic(newId);
     }
 }
 
-async function doPublic(variables) {
-    console.log(variables?.updateScore);
+async function doPublic(newId) {
+    console.log("varr", newId);
     const { data } = await client.mutate({
         mutation: MUTATION_PUBLIC,
-        variables: { scoreId: variables?.updateScore.id },
+        variables: { scoreId: newId },
     });
     console.log("resopp", data);
+
+    initialScore.id = await data.publishScore.id;
+    initialScore.scoreValue = await data.publishScore.scoreValue;
     return data;
 }
 
@@ -77,20 +139,25 @@ async function doPublic(variables) {
 
 function HeuristicItem({ heuristic }) {
     const [score, setScore] = useState(0);
-    const [text, setText] = useState(currentScore?.note);
+    const [empty, setEmpty] = useState(false);
+    const [text, setText] = useState(currentScore?.note || "");
     const { scores } = useScoresContext();
     const [boxOpen, setBoxOpen] = useState(false);
+    const router = useRouter();
 
     const currentScore = scores.find(
         (score) => score.heuristic.heuristicNumber === heuristic.heuristicNumber
     );
 
     useEffect(() => {
+        // debugger;
         if (currentScore !== undefined) {
             setScore(currentScore.scoreValue);
             setText(currentScore.note);
         } else {
             setScore(0);
+            setEmpty(true);
+            console.log("Undefined????");
         }
     }, [currentScore]);
 
@@ -101,24 +168,56 @@ function HeuristicItem({ heuristic }) {
      * @param {*event} ev
      */
 
-    function handleChangeRange(ev) {
+    async function handleChangeRange(ev) {
         setScore(Number(ev.target.value));
-        processChange({
-            scoreId: currentScore.id,
-            scoreValue: Number(ev.target.value),
-            scoreNote: currentScore.note,
-        });
+
+        if (empty) {
+            await processChangeInital(
+                {
+                    projectSlug: router.query.slug,
+                    playerSlug: router.query.player,
+                    journeySlug: router.query.journey,
+                    heuristicId: heuristic.id,
+                    scoreValue: Number(ev.target.value),
+                },
+                MUTATION_CREATE_SCORE,
+                true
+            );
+        } else {
+            await processChange(
+                {
+                    scoreId: currentScore.id,
+                    scoreValue: Number(ev.target.value),
+                    scoreNote: currentScore.note,
+                },
+                MUTATION_SCORE
+            );
+        }
     }
 
-    function handleChangeText(newText) {
+    async function handleChangeText(newText) {
         setText(newText);
-        console.log(text);
 
-        processChange({
-            scoreId: currentScore.id,
-            scoreValue: currentScore.scoreValue,
-            scoreNote: newText,
-        });
+        let scoreId, scoreValue;
+
+        if (empty) {
+            scoreId = await standById();
+            scoreValue = score;
+        } else {
+            scoreId = currentScore.id;
+            scoreValue = score;
+        }
+
+        console.log("standById", scoreId);
+
+        processChange(
+            {
+                scoreId,
+                scoreValue,
+                scoreNote: newText,
+            },
+            MUTATION_SCORE
+        );
     }
 
     return (
@@ -138,8 +237,11 @@ function HeuristicItem({ heuristic }) {
                     onChange={(ev) => handleChangeRange(ev)}
                 />
                 <button
-                    className="font-bold py-1 pr-3 text-sm text-primary flex gap-2"
+                    className={`font-bold py-1 pr-3 text-sm text-primary flex gap-2 ${
+                        score ? "opacity-100" : "opacity-40"
+                    }`}
                     onClick={() => setBoxOpen(!boxOpen)}
+                    disabled={!score}
                 >
                     <svg
                         width="20"
@@ -153,7 +255,7 @@ function HeuristicItem({ heuristic }) {
                             fill="#1E77FC"
                         />
                     </svg>
-                    Add Note
+                    Add Note {text && "*"}
                 </button>
                 <Note
                     openBox={boxOpen}
@@ -174,7 +276,7 @@ function Note({ openBox, text, onChangeText }) {
             <textarea
                 className="w-full border border-slate-300"
                 rows="4"
-                value={text}
+                value={text || ""}
                 onChange={(ev) => {
                     onChangeText(ev.target.value);
                 }}
