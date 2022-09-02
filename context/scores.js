@@ -15,10 +15,12 @@ const QUERY_SCORES = gql`
                 project: { slug: $projectSlug }
                 journey: { slug: $journeySlug }
             }
+            first: 1000
         ) {
             id
             scoreValue
             note
+            evidenceUrl
             heuristic {
                 heuristicNumber
             }
@@ -48,6 +50,8 @@ export function ScoresWrapper({ children }) {
     if (data === undefined) {
         return null;
     }
+
+    console.log("SCORES", data);
 
     return (
         <ScoresContext.Provider value={data}>{children}</ScoresContext.Provider>
