@@ -9,11 +9,36 @@ import Debug from "../../lib/debug";
 
 const initialScore = {};
 
-function standById() {
+class Deferred {
+    constructor() {
+        this.promise = new Promise((resolve, reject) => {
+            this.reject = reject;
+            this.resolve = resolve;
+        });
+    }
+}
+
+const deferredPromise = {
+    run: null,
+};
+
+async function waitForNewData() {
+    deferredPromise.run = new Deferred();
+
+    function standByDataT() {
+        return deferredPromise.run.promise;
+    }
+
+    let dataNew = await standByDataT();
+
+    return dataNew;
+}
+
+function standByData() {
     return new Promise((resolve, reject) => {
         const intervalGetItd = setInterval(() => {
             if (initialScore.id) {
-                resolve(initialScore.id);
+                resolve(initialScore);
 
                 stopListening();
             }
@@ -21,6 +46,7 @@ function standById() {
 
         function stopListening() {
             clearInterval(intervalGetItd);
+            initialScore.isNew = false;
         }
     });
 }
@@ -86,6 +112,7 @@ const MUTATION_CREATE_SCORE = gql`
 const processChange = debounce(
     async (variables, gqlString, isCreate = false) => {
         console.log("Saving data func");
+
         return doMutate(variables, gqlString, isCreate);
     },
     2000,
@@ -95,6 +122,7 @@ const processChange = debounce(
 const processChangeInital = debounce(
     async (variables, gqlString, isCreate = false) => {
         console.log("Saving data Initally");
+
         doMutate(variables, gqlString, isCreate);
     },
     2000,
@@ -116,15 +144,23 @@ async function doMutate(variables, gqlString, isCreate) {
 
 async function doPublic(newId) {
     console.log("varr", newId);
+
     const { data } = await client.mutate({
         mutation: MUTATION_PUBLIC,
         variables: { scoreId: newId },
     });
+
     console.log("resopp", data);
 
     initialScore.id = await data.publishScore.id;
     initialScore.scoreValue = await data.publishScore.scoreValue;
-    return data;
+    initialScore.note = await data.publishScore.note;
+    initialScore.heuristic = await data.publishScore.heuristic;
+    initialScore.now = Date.now();
+
+    deferredPromise.run.resolve(data.publishScore);
+
+    // return _data;
 }
 
 /**
@@ -154,6 +190,9 @@ function HeuristicItem({ heuristic }) {
         if (currentScore !== undefined) {
             setScore(currentScore.scoreValue);
             setText(currentScore.note);
+            if (currentScore.note || currentScore.scoreValue) {
+                setEnable(true);
+            }
         } else {
             setScore(0);
             setEmpty(true);
@@ -168,11 +207,14 @@ function HeuristicItem({ heuristic }) {
      * @param {*event} ev
      */
 
+    const [enable, setEnable] = useState(false);
+    const [toast, setToast] = useState({ open: false, text: "" });
+
     async function handleChangeRange(ev) {
         setScore(Number(ev.target.value));
 
         if (empty) {
-            await processChangeInital(
+            processChangeInital(
                 {
                     projectSlug: router.query.slug,
                     playerSlug: router.query.player,
@@ -184,7 +226,7 @@ function HeuristicItem({ heuristic }) {
                 true
             );
         } else {
-            await processChange(
+            processChange(
                 {
                     scoreId: currentScore.id,
                     scoreValue: Number(ev.target.value),
@@ -193,22 +235,39 @@ function HeuristicItem({ heuristic }) {
                 MUTATION_SCORE
             );
         }
+
+        let dataNew = await waitForNewData();
+
+        console.log("NOVA PROMESSA", dataNew);
+        setEnable(true);
+
+        setToast({
+            open: true,
+            text: `Heuristic ${dataNew.heuristic.heuristicNumber} updated!`,
+        });
+        setTimeout(() => {
+            setToast({
+                open: false,
+                text: "",
+            });
+        }, 4000);
     }
 
     async function handleChangeText(newText) {
         setText(newText);
 
-        let scoreId, scoreValue;
+        let scoreId, scoreValue, scoreData;
 
         if (empty) {
-            scoreId = await standById();
+            scoreData = await standByData();
+            console.log("standById", scoreData);
+
+            scoreId = scoreData.id;
             scoreValue = score;
         } else {
             scoreId = currentScore.id;
             scoreValue = score;
         }
-
-        console.log("standById", scoreId);
 
         processChange(
             {
@@ -218,6 +277,20 @@ function HeuristicItem({ heuristic }) {
             },
             MUTATION_SCORE
         );
+
+        let dataNew = await waitForNewData();
+
+        setToast({
+            open: true,
+            text: `Note for Heuristic ${dataNew.heuristic.heuristicNumber} updated!`,
+        });
+        console.log("toastText", toast.text);
+        setTimeout(() => {
+            setToast({
+                open: false,
+                text: "",
+            });
+        }, 4000);
     }
 
     return (
@@ -238,10 +311,10 @@ function HeuristicItem({ heuristic }) {
                 />
                 <button
                     className={`font-bold py-1 pr-3 text-sm text-primary flex gap-2 ${
-                        score ? "opacity-100" : "opacity-40"
+                        enable ? "opacity-100" : "opacity-40"
                     }`}
                     onClick={() => setBoxOpen(!boxOpen)}
-                    disabled={!score}
+                    disabled={!enable}
                 >
                     <svg
                         width="20"
@@ -257,6 +330,15 @@ function HeuristicItem({ heuristic }) {
                     </svg>
                     Add Note {text && "*"}
                 </button>
+
+                <div
+                    className={`transition fixed right-5 bottom-40 bg-green-600 text-white/80 flex items-center p-3 w-80 font-bold ${
+                        toast.open ? "translate-y-20" : "translate-y-60"
+                    }`}
+                >
+                    {toast.text}
+                </div>
+
                 <Note
                     openBox={boxOpen}
                     currentScore={currentScore}
