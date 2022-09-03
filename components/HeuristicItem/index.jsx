@@ -115,17 +115,7 @@ const processChange = debounce(
 
         return doMutate(variables, gqlString, isCreate);
     },
-    2000,
-    false
-);
-
-const processChangeInital = debounce(
-    async (variables, gqlString, isCreate = false) => {
-        console.log("Saving data Initally");
-
-        doMutate(variables, gqlString, isCreate);
-    },
-    2000,
+    1000,
     false
 );
 
@@ -214,7 +204,7 @@ function HeuristicItem({ heuristic }) {
         setScore(Number(ev.target.value));
 
         if (empty) {
-            processChangeInital(
+            processChange(
                 {
                     projectSlug: router.query.slug,
                     playerSlug: router.query.player,
@@ -253,6 +243,13 @@ function HeuristicItem({ heuristic }) {
         }, 4000);
     }
 
+    /**
+     *
+     * Setting the Note
+     *
+     * @param {*newText} string
+     */
+
     async function handleChangeText(newText) {
         setText(newText);
 
@@ -284,7 +281,7 @@ function HeuristicItem({ heuristic }) {
             open: true,
             text: `Note for Heuristic ${dataNew.heuristic.heuristicNumber} updated!`,
         });
-        console.log("toastText", toast.text);
+        console.log("toastText", dataNew.note);
         setTimeout(() => {
             setToast({
                 open: false,
