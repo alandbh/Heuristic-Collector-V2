@@ -85,7 +85,9 @@ export default async function handler(req, res) {
         const journeys = {};
 
         allJourneys.data.journeys.map((jou) => {
-            journeys[jou.slug] = scores
+            journeys[jou.slug] = {};
+
+            const scoresByJourney = scores
                 .filter((score) => {
                     return score.journey.slug === jou.slug;
                 })
@@ -97,9 +99,10 @@ export default async function handler(req, res) {
                     heuObj["h_" + score.heuristic.heuristicNumber] = scoreObj;
                     return heuObj;
                 });
-        });
 
-        playerOb.journeys = journeys;
+            // journeys[jou.slug] = scoresByJourney[jou.slug];
+            playerOb[jou.slug] = scoresByJourney;
+        });
 
         return playerOb;
     });
