@@ -7,9 +7,11 @@ async function getData(query, variables) {
         ? {
               query: query,
               variables,
+              fetchPolicy: "network-only",
           }
         : {
               query: query,
+              fetchPolicy: "network-only",
           };
 
     let result = await client.query(queryString);
@@ -111,6 +113,7 @@ export default async function handler(req, res) {
         return playerOb;
     });
     serve(newPlayerArr);
+    // serve(allPlayers);
 
     function serve(data) {
         res.status(200).json(data);
