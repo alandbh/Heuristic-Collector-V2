@@ -46,30 +46,16 @@ const QUERY_JOURNEYS = gql`
     }
 `;
 
-const QUERY_SCORES = gql`
-    query GetScores(
-        $projectSlug: String
-        $journeySlug: String
-        $playerSlug: String
-    ) {
-        scores(
-            where: {
-                player: { slug: $playerSlug }
-                project: { slug: $projectSlug }
-                journey: { slug: $journeySlug }
-            }
-            first: 1000
-        ) {
-            id
-            scoreValue
-            note
-            evidenceUrl
-            heuristic {
-                heuristicNumber
-            }
-        }
-    }
-`;
+// scores": {
+//     "mobile": {
+//       "h_1_1": {
+//         "score": 5,
+//         "note": "Easy navigation"
+//       },
+//       "h_1_2": {
+//         "score": "5",
+//         "note": "n/a"
+//       },
 
 export default async function handler(req, res) {
     const allJourneys = await getData(QUERY_JOURNEYS);
@@ -79,8 +65,6 @@ export default async function handler(req, res) {
         const playerOb = {};
         playerOb.id = id;
         playerOb.name = name;
-
-        const scoresByJourney = [];
 
         const journeys = {};
 
@@ -92,16 +76,36 @@ export default async function handler(req, res) {
                     return score.journey.slug === jou.slug;
                 })
                 .map((score) => {
-                    const heuObj = {};
-                    const scoreObj = {};
-                    scoreObj.scoreValue = score.scoreValue;
-                    scoreObj.note = score.note;
-                    heuObj["h_" + score.heuristic.heuristicNumber] = scoreObj;
-                    return heuObj;
+                    return {
+                        journey: score.journey.slug,
+                        heuristic: "h_" + score.heuristic.heuristicNumber,
+                        scoreValue: score.scoreValue,
+                        note: score.note,
+                    };
                 });
 
-            // journeys[jou.slug] = scoresByJourney[jou.slug];
-            playerOb[jou.slug] = scoresByJourney;
+            scoresByJourney.sort((a, b) => {
+                const nameA = a.heuristic.toUpperCase(); // ignore upper and lowercase
+                const nameB = b.heuristic.toUpperCase(); // ignore upper and lowercase
+                if (nameA < nameB) {
+                    return -1;
+                }
+                if (nameA > nameB) {
+                    return 1;
+                }
+
+                // names must be equal
+                return 0;
+            });
+
+            scoresByJourney.map((score) => {
+                journeys[jou.slug][score.heuristic] = {};
+                journeys[jou.slug][score.heuristic].scoreValue =
+                    score.scoreValue;
+                journeys[jou.slug][score.heuristic].note = score.note;
+            });
+
+            playerOb.scores = journeys;
         });
 
         return playerOb;
