@@ -9,8 +9,9 @@ import HeuristicItem from "../HeuristicItem";
 function HeuristicGroup({ group }) {
     return (
         <section>
-            <header>
+            <header className="flex">
                 <h1>{group.name}</h1>
+                <div className="text-xl"></div>
             </header>
             <ul>
                 {group.heuristic.map((heuristicItem) => (

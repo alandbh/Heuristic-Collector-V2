@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import { gql, useQuery } from "@apollo/client";
@@ -23,6 +23,9 @@ const QUERY_SCORES = gql`
             evidenceUrl
             heuristic {
                 heuristicNumber
+                group {
+                    name
+                }
             }
         }
     }
@@ -31,6 +34,7 @@ const QUERY_SCORES = gql`
 const ScoresContext = createContext();
 
 export function ScoresWrapper({ children }) {
+    const [allScores, setAllScores] = useState(null);
     const router = useRouter();
     const { data, loading, error } = useQuery(QUERY_SCORES, {
         variables: {
@@ -40,7 +44,13 @@ export function ScoresWrapper({ children }) {
         },
     });
 
-    if (loading) {
+    useEffect(() => {
+        if (data) {
+            setAllScores(data.scores);
+        }
+    }, [data]);
+
+    if (loading || !allScores) {
         return <div>LOADING</div>;
     }
 
@@ -51,10 +61,13 @@ export function ScoresWrapper({ children }) {
         return null;
     }
 
-    console.log("SCORES", data);
+    // console.log("SCORES", data);
+    window.scores = data.scores;
 
     return (
-        <ScoresContext.Provider value={data}>{children}</ScoresContext.Provider>
+        <ScoresContext.Provider value={{ allScores, setAllScores }}>
+            {children}
+        </ScoresContext.Provider>
     );
 }
 

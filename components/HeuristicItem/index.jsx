@@ -113,7 +113,7 @@ const processChange = debounce(
     async (variables, gqlString, isCreate = false) => {
         console.log("Saving data func");
 
-        return doMutate(variables, gqlString, isCreate);
+        // return doMutate(variables, gqlString, isCreate);
     },
     1000,
     false
@@ -167,11 +167,14 @@ function HeuristicItem({ heuristic }) {
     const [score, setScore] = useState(0);
     const [empty, setEmpty] = useState(false);
     const [text, setText] = useState(currentScore?.note || "");
-    const { scores } = useScoresContext();
+    const { allScores, setAllScores } = useScoresContext();
     const [boxOpen, setBoxOpen] = useState(false);
     const router = useRouter();
 
-    const currentScore = scores.find(
+    // debugger;
+    console.log("scores", allScores);
+
+    const currentScore = allScores.find(
         (score) => score.heuristic.heuristicNumber === heuristic.heuristicNumber
     );
 
@@ -202,6 +205,16 @@ function HeuristicItem({ heuristic }) {
 
     async function handleChangeRange(ev) {
         setScore(Number(ev.target.value));
+        // let newScores = [...allScores];
+        // debugger;
+        let newScores = allScores.map((score) =>
+            score.heuristic.heuristicNumber === 1.3
+                ? { ...score, scoreValue: Number(ev.target.value) }
+                : score
+        );
+
+        setAllScores(newScores);
+        console.log("newScores", allScores);
 
         if (empty) {
             processChange(
