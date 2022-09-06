@@ -113,7 +113,7 @@ const processChange = debounce(
     async (variables, gqlString, isCreate = false) => {
         console.log("Saving data func");
 
-        // return doMutate(variables, gqlString, isCreate);
+        doMutate(variables, gqlString, isCreate);
     },
     1000,
     false
@@ -128,7 +128,7 @@ async function doMutate(variables, gqlString, isCreate) {
     if (data) {
         console.log("doMutate", data);
         const newId = isCreate ? data.createScore.id : data.updateScore.id;
-        return doPublic(newId);
+        doPublic(newId);
     }
 }
 
@@ -163,7 +163,7 @@ async function doPublic(newId) {
  * @returns Heuristic Item with Range and Note
  */
 
-function HeuristicItem({ heuristic }) {
+function HeuristicItem({ heuristic, id }) {
     const [score, setScore] = useState(0);
     const [empty, setEmpty] = useState(false);
     const [text, setText] = useState(currentScore?.note || "");
@@ -208,7 +208,7 @@ function HeuristicItem({ heuristic }) {
         // let newScores = [...allScores];
         // debugger;
         let newScores = allScores.map((score) =>
-            score.heuristic.heuristicNumber === 1.3
+            score.heuristic.heuristicNumber === heuristic.heuristicNumber
                 ? { ...score, scoreValue: Number(ev.target.value) }
                 : score
         );
@@ -216,27 +216,31 @@ function HeuristicItem({ heuristic }) {
         setAllScores(newScores);
         console.log("newScores", allScores);
 
-        if (empty) {
-            processChange(
-                {
-                    projectSlug: router.query.slug,
-                    playerSlug: router.query.player,
-                    journeySlug: router.query.journey,
-                    heuristicId: heuristic.id,
-                    scoreValue: Number(ev.target.value),
-                },
-                MUTATION_CREATE_SCORE,
-                true
-            );
-        } else {
-            processChange(
-                {
-                    scoreId: currentScore.id,
-                    scoreValue: Number(ev.target.value),
-                    scoreNote: currentScore.note,
-                },
-                MUTATION_SCORE
-            );
+        saveValue();
+
+        function saveValue() {
+            if (empty) {
+                processChange(
+                    {
+                        projectSlug: router.query.slug,
+                        playerSlug: router.query.player,
+                        journeySlug: router.query.journey,
+                        heuristicId: heuristic.id,
+                        scoreValue: Number(ev.target.value),
+                    },
+                    MUTATION_CREATE_SCORE,
+                    true
+                );
+            } else {
+                processChange(
+                    {
+                        scoreId: currentScore.id,
+                        scoreValue: Number(ev.target.value),
+                        scoreNote: currentScore.note,
+                    },
+                    MUTATION_SCORE
+                );
+            }
         }
 
         let dataNew = await waitForNewData();
@@ -314,6 +318,7 @@ function HeuristicItem({ heuristic }) {
 
                 <Range
                     type={"range"}
+                    id={id}
                     min={0}
                     max={5}
                     value={score}

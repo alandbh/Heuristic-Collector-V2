@@ -79,6 +79,7 @@ const Range = (props) => {
         >
             <input
                 style={inputStyle}
+                id={props.id}
                 type={props.type}
                 min={props.min}
                 max={props.max}
