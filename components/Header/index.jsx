@@ -6,7 +6,7 @@ import { useProjectContext } from "../../context/project";
 import JourneySelect from "../JourneySelect";
 import PlayerSelect from "../PlayerSelect";
 
-function Header({ routes }) {
+function Header({ routes, className }) {
     const router = useRouter();
     const { slug, tab } = router.query || "";
     const isDash = tab === "dash";

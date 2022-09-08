@@ -4,7 +4,6 @@ import { ScoresWrapper } from "../../context/scores";
 
 import { useProjectContext } from "../../context/project";
 import HeuristicGroup from "../HeuristicGroup";
-import Debug from "../../lib/debug";
 import GroupContainer from "../GroupContainer";
 
 const QUERY_GROUPS = gql`

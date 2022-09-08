@@ -1,5 +1,5 @@
 import HeuristicGroup from "../HeuristicGroup";
-import Debug from "../../lib/debug";
+import Debugg from "../../lib/Debugg";
 import { useScoresContext } from "../../context/scores";
 
 export default function GroupContainer({ data }) {
@@ -7,17 +7,15 @@ export default function GroupContainer({ data }) {
     console.log(allScores);
     return (
         <>
-            <div className="flex gap-5">
-                <div>
+            <div className="gap-5 max-w-3xl mx-auto md:grid grid-cols-3 bg-slate-100">
+                <div className="md:col-span-2">
                     {data.groups.map((group) => (
                         <HeuristicGroup group={group} key={group.id} />
                     ))}
                 </div>
                 <div>
-                    <h1 className="text-2xl">
-                        {allScores.map((score) => score.scoreValue)}
-                    </h1>
-                    <Debug data={allScores} />
+                    <h1 className="text-2xl">Categories</h1>
+                    {/* <Debugg data={allScores} /> */}
                 </div>
             </div>
         </>

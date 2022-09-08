@@ -1,6 +1,5 @@
 import React from "react";
 import { useQuery, gql } from "@apollo/client";
-import Debug from "../lib/debug";
 
 // import { Container } from './styles';
 
@@ -28,8 +27,6 @@ function HeuristicList({ query, variable }) {
         console.error(error);
         return <h2>Error: {error.message}</h2>;
     }
-
-    return <Debug data={data} />;
 }
 
 export default HeuristicList;

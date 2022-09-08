@@ -4,7 +4,6 @@ import { useProjectContext } from "../../context/project";
 import { useRouter } from "next/router";
 
 // import { useDetectOutsideClick } from "../../lib/useDetectOutsideClick";
-import Debug from "../../lib/debug";
 
 const QUERY_JOURNEYS = gql`
     query GetGroups($playerSlug: String, $projectSlug: String) {
@@ -111,7 +110,7 @@ function JourneySelect() {
     return (
         <div>
             <div className="flex flex-col gap-2">
-                <label className="text-gray-400 text-sm" htmlFor="openModal">
+                <label className="text-gray-400 text-xs" htmlFor="openModal">
                     Select a Journey
                 </label>
                 <div className="flex gap-2 items-center content-center">

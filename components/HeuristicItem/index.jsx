@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import Range from "../Range";
 import client from "../../lib/apollo";
 import { debounce, throttle } from "../../lib/utils";
-import Debug from "../../lib/debug";
 
 const initialScore = {};
 

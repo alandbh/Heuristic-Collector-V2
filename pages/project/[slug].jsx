@@ -53,13 +53,16 @@ function Project() {
     }
 
     return (
-        <div className="bg-slate-50">
+        <div className="bg-slate-100">
             <ProjectWrapper data={data}>
                 <Header
+                    className="mt-10"
                     // project={data?.project.name}
                     routes={{ slug, tab: "dash" }}
                 />
-                {tab === "dash" ? <Dashboard /> : <Evaluation />}
+                <main className="mt-10">
+                    {tab === "dash" ? <Dashboard /> : <Evaluation />}
+                </main>
                 <footer>FOOTER</footer>
             </ProjectWrapper>
         </div>
