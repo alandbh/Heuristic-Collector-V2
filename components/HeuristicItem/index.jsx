@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useScoresContext } from "../../context/scores";
 import { useRouter } from "next/router";
 import Range from "../Range";
@@ -115,6 +115,16 @@ const processChange = debounce(
 
         doMutate(variables, gqlString, isCreate);
     },
+    300,
+    false
+);
+
+const processChangeText = debounce(
+    async (variables, gqlString, isCreate = false) => {
+        console.log("Saving TEXT func");
+
+        doMutate(variables, gqlString, isCreate);
+    },
     1000,
     false
 );
@@ -133,7 +143,7 @@ async function doMutate(variables, gqlString, isCreate) {
 }
 
 async function doPublic(newId) {
-    console.log("varr", newId);
+    // console.log("varr", newId);
 
     const { data } = await client.mutate({
         mutation: MUTATION_PUBLIC,
@@ -172,7 +182,7 @@ function HeuristicItem({ heuristic, id }) {
     const router = useRouter();
 
     // debugger;
-    console.log("scores", allScores);
+    // console.log("scores", allScores);
 
     const currentScore = allScores.find(
         (score) => score.heuristic.heuristicNumber === heuristic.heuristicNumber
@@ -214,7 +224,7 @@ function HeuristicItem({ heuristic, id }) {
         );
 
         setAllScores(newScores);
-        console.log("newScores", allScores);
+        // console.log("newScores", allScores);
 
         saveValue();
 
@@ -283,7 +293,7 @@ function HeuristicItem({ heuristic, id }) {
             scoreValue = score;
         }
 
-        processChange(
+        processChangeText(
             {
                 scoreId,
                 scoreValue,
@@ -343,7 +353,7 @@ function HeuristicItem({ heuristic, id }) {
                             fill="#1E77FC"
                         />
                     </svg>
-                    Add Note {text && "*"}
+                    {boxOpen ? "Close" : "Add Note"} {text && "*"}
                 </button>
 
                 <div
@@ -368,15 +378,32 @@ function HeuristicItem({ heuristic, id }) {
 export default HeuristicItem;
 
 function Note({ openBox, text, onChangeText }) {
+    const textRef = useRef(null);
+
+    useEffect(() => {
+        if (openBox) {
+            textRef.current.focus();
+        }
+
+        return;
+    }, [openBox]);
     return (
-        <div className={`mt-3 ${openBox ? "flex" : "hidden"}`}>
+        <div
+            style={{
+                transition: "0.2s",
+                overflowY: "hidden",
+                height: openBox ? 150 : 0,
+            }}
+            className={`transition mt-3 flex `}
+        >
             <textarea
-                className="w-full border border-slate-300"
-                rows="4"
+                className="w-full border border-slate-300 p-2 h-32"
+                rows="3"
                 value={text || ""}
                 onChange={(ev) => {
                     onChangeText(ev.target.value);
                 }}
+                ref={textRef}
             ></textarea>
         </div>
     );
