@@ -3,14 +3,17 @@ import Debugg from "../../lib/Debugg";
 import { useScoresContext } from "../../context/scores";
 
 export default function GroupContainer({ data }) {
-    const { allScores } = useScoresContext();
-    console.log("all", allScores);
+    const { allScores, loading, error } = useScoresContext();
 
-    if (allScores.length === 0) {
+    if (!allScores) {
+        return null;
+    }
+
+    if (allScores?.length === 0) {
         return (
             <div className="h-[calc(100vh_-_126px)] flex flex-col items-center">
                 <h1 className="text-2xl mb-5">
-                    {`This player doens't have the selected journey (${data.groups[0].journeys[0].name}).`}
+                    {`This player doens't have the selected journey.`}
                 </h1>
                 <p>Please, select another journey / player</p>
             </div>

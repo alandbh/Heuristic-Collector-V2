@@ -10,7 +10,11 @@ import Donnut from "../Donnut";
 function HeuristicGroup({ group }) {
     const { allScores } = useScoresContext();
 
-    const groupSores = allScores.filter(
+    if (!allScores) {
+        return null;
+    }
+
+    const groupSores = allScores?.filter(
         (score) => score.heuristic.group.name === group.name
     );
     const groupTotalSore = groupSores.reduce(

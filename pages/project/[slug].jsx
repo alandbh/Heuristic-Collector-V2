@@ -41,13 +41,13 @@ function Project() {
     }
 
     if (loading) {
-        return null;
+        // return null;
         return (
             <header>
                 <div className="bg-primary flex justify-between px-5 items-center h-12"></div>
                 <div className="bg-white shadow-md px-5 py-3 h-20"></div>
-                <main className="mt-10 flex items-center h-96">
-                    Loading ptoject...
+                <main className="flex bg-slate-100 items-center h-[calc(100vh_-_126px)]">
+                    {/* Loading ptoject... */}
                 </main>
             </header>
         );
@@ -77,7 +77,7 @@ function Project() {
                     // project={data?.project.name}
                     routes={{ slug, tab: "dash" }}
                 />
-                <main className="mt-10">
+                <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
                     {tab === "dash" ? <Dashboard /> : <Evaluation />}
                 </main>
                 <footer>FOOTER</footer>

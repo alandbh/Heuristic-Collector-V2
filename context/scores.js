@@ -51,27 +51,33 @@ export function ScoresWrapper({ children }) {
         }
     }, [data]);
 
-    if (loading || !allScores) {
-        return (
-            <div className="h-[calc(100vh_-_126px)] flex flex-col items-center">
-                <Spinner radius={40} thick={6} />
-            </div>
-        );
-        return <div>LOADING SCORES OBJECT</div>;
-    }
+    // if (loading || !allScores) {
+    //     return (
+    //         <div className="h-[calc(100vh_-_126px)] flex flex-col items-center">
+    //             <Spinner radius={40} thick={6} />
+    //         </div>
+    //     );
+    //     return <div>LOADING SCORES OBJECT</div>;
+    // }
 
-    if (error) {
-        return <div>SOMETHING WENT WRONG: {error.message}</div>;
-    }
-    if (data === undefined) {
-        return null;
-    }
+    // if (error) {
+    //     return <div>SOMETHING WENT WRONG: {error.message}</div>;
+    // }
+    // if (data === undefined) {
+    //     return null;
+    // }
 
     // console.log("SCORES", data);
-    window.scores = data.scores;
+
+    if (!data) {
+        return null;
+    }
+    window.scores = data?.scores;
 
     return (
-        <ScoresContext.Provider value={{ allScores, setAllScores }}>
+        <ScoresContext.Provider
+            value={{ allScores, loading, error, setAllScores }}
+        >
             {children}
         </ScoresContext.Provider>
     );
