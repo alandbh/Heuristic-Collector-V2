@@ -4,7 +4,18 @@ import { useScoresContext } from "../../context/scores";
 
 export default function GroupContainer({ data }) {
     const { allScores } = useScoresContext();
-    console.log(allScores);
+    console.log("all", allScores);
+
+    if (allScores.length === 0) {
+        return (
+            <div>
+                <h1 className="text-2xl">
+                    This player doens`t have this selected journey.
+                </h1>
+                <p>Please, select another journey / player</p>
+            </div>
+        );
+    }
     return (
         <>
             <div className="gap-5 max-w-5xl mx-auto md:grid grid-cols-3 ">
