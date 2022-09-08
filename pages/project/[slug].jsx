@@ -53,7 +53,7 @@ function Project() {
     }
 
     return (
-        <div className="bg-slate-100">
+        <div className="bg-slate-100/70">
             <ProjectWrapper data={data}>
                 <Header
                     className="mt-10"

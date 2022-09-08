@@ -317,7 +317,7 @@ function HeuristicItem({ heuristic, id }) {
     }
 
     return (
-        <li className="flex mb-10 gap-5 max-w-lg">
+        <li className="flex mb-10 gap-5">
             <div>
                 <b className="text-xl">{heuristic.heuristicNumber}</b>
             </div>
@@ -392,11 +392,12 @@ function Note({ openBox, text, onChangeText }) {
                 transition: "0.2s",
                 overflowY: "hidden",
                 height: openBox ? 150 : 0,
+                opacity: openBox ? 1 : 0,
             }}
             className={`transition mt-3 flex `}
         >
             <textarea
-                className="w-full border border-slate-300 p-2 h-32"
+                className="w-full border border-slate-300 p-2 h-32 text-slate-500"
                 rows="3"
                 value={text || ""}
                 onChange={(ev) => {

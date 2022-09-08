@@ -7,8 +7,8 @@ export default function GroupContainer({ data }) {
     console.log(allScores);
     return (
         <>
-            <div className="gap-5 max-w-3xl mx-auto md:grid grid-cols-3 bg-slate-100">
-                <div className="md:col-span-2">
+            <div className="gap-5 max-w-5xl mx-auto md:grid grid-cols-3 ">
+                <div className="md:col-span-2 flex flex-col gap-20">
                     {data.groups.map((group) => (
                         <HeuristicGroup group={group} key={group.id} />
                     ))}
