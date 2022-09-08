@@ -2,6 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useProjectContext } from "../../context/project";
 import { useRouter } from "next/router";
+import Spinner from "../Spinner";
 
 // import { useDetectOutsideClick } from "../../lib/useDetectOutsideClick";
 
@@ -97,7 +98,11 @@ function JourneySelect() {
     }
 
     if (loading) {
-        return <div>LOADING JOURNEY SELECT</div>;
+        return (
+            <div className="pt-3">
+                <Spinner radius={10} thick={3} />
+            </div>
+        );
     }
 
     if (error) {

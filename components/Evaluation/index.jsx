@@ -1,5 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
+import Spinner from "../Spinner";
 import { ScoresWrapper } from "../../context/scores";
 
 import { useProjectContext } from "../../context/project";
@@ -42,6 +43,11 @@ function Evaluation() {
     });
 
     if (loading) {
+        return (
+            <div className="h-[calc(100vh_-_126px)] flex flex-col items-center">
+                <Spinner radius={50} thick={10} />
+            </div>
+        );
         return <div className="text-red-500">LOADING EVALUATION</div>;
     }
 

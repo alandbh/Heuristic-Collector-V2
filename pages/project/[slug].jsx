@@ -41,14 +41,13 @@ function Project() {
     }
 
     if (loading) {
+        return null;
         return (
             <header>
                 <div className="bg-primary flex justify-between px-5 items-center h-12"></div>
                 <div className="bg-white shadow-md px-5 py-3 h-20"></div>
-                <main className="mt-10 flex items-center">
-                    Loading ptoject...Loading ptoject...Loading
-                    ptoject...Loading ptoject...Loading ptoject...Loading
-                    ptoject...Loading ptoject...Loading ptoject...
+                <main className="mt-10 flex items-center h-96">
+                    Loading ptoject...
                 </main>
             </header>
         );

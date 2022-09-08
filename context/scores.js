@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Spinner from "../components/Spinner";
 
 import { gql, useQuery } from "@apollo/client";
 
@@ -51,6 +52,11 @@ export function ScoresWrapper({ children }) {
     }, [data]);
 
     if (loading || !allScores) {
+        return (
+            <div className="h-[calc(100vh_-_126px)] flex flex-col items-center">
+                <Spinner radius={40} thick={6} />
+            </div>
+        );
         return <div>LOADING SCORES OBJECT</div>;
     }
 
