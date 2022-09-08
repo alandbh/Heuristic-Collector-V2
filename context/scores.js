@@ -51,7 +51,7 @@ export function ScoresWrapper({ children }) {
     }, [data]);
 
     if (loading || !allScores) {
-        return <div>LOADING</div>;
+        return <div>LOADING SCORES OBJECT</div>;
     }
 
     if (error) {

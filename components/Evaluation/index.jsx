@@ -17,6 +17,9 @@ const QUERY_GROUPS = gql`
             id
             name
             description
+            journeys(where: { slug: $journeySlug }) {
+                name
+            }
             heuristic {
                 name
                 id
@@ -39,7 +42,7 @@ function Evaluation() {
     });
 
     if (loading) {
-        return <div>LOADING</div>;
+        return <div className="text-red-500">LOADING EVALUATION</div>;
     }
 
     if (error) {
@@ -48,6 +51,8 @@ function Evaluation() {
     if (data === undefined) {
         return null;
     }
+
+    console.log("Evaluation", data);
 
     return (
         <ScoresWrapper>

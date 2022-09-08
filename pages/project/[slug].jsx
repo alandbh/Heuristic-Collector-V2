@@ -33,15 +33,33 @@ function Project() {
     // console.log("data", data);
 
     if (slug === undefined) {
-        return <div>UNDEFINED</div>;
+        return (
+            <header>
+                <div className="bg-primary flex justify-between px-5 items-center h-12"></div>
+            </header>
+        );
     }
 
     if (loading) {
-        return <div>LOADING</div>;
+        return (
+            <header>
+                <div className="bg-primary flex justify-between px-5 items-center h-12"></div>
+                <div className="bg-white shadow-md px-5 py-3 h-20"></div>
+                <main className="mt-10 flex items-center">
+                    Loading ptoject...Loading ptoject...Loading
+                    ptoject...Loading ptoject...Loading ptoject...Loading
+                    ptoject...Loading ptoject...Loading ptoject...
+                </main>
+            </header>
+        );
     }
 
     if (error) {
-        return <div>DEU ERRO: {error.message}</div>;
+        return (
+            <div>
+                Something went wrong in loading this project {error.message}
+            </div>
+        );
     }
 
     if (data?.project === null) {

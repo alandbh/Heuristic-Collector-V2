@@ -97,7 +97,7 @@ function JourneySelect() {
     }
 
     if (loading) {
-        return <div>LOADING</div>;
+        return <div>LOADING JOURNEY SELECT</div>;
     }
 
     if (error) {
@@ -139,18 +139,21 @@ function JourneySelect() {
             </div>
 
             <div
-                className="w-full h-full fixed top-0 left-0 bg-white/90 items-center justify-center transition-all opacity-0 hidden py-5"
+                className="w-full h-full fixed top-0 left-0 bg-white/90 items-center justify-center transition-all opacity-0 hidden py-5 flex-col"
                 ref={modalRef}
                 onClick={() => closeModal(modalRef)}
             >
+                <h3 className="text-3xl text-center font-bold">
+                    Select a joourney
+                </h3>
                 <ul
-                    className="bg-white flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5"
+                    className="bg-white flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5 border-l-1 border border-y-0 border-r-0"
                     style={{ maxHeight: "calc(100vh - 40px)" }}
                 >
                     {data?.journeys?.map((journey) => (
                         <li className="flex-1 min-w-[200px]" key={journey.slug}>
                             <button
-                                className="border border-gray-200 hover:border-primary p-8 w-full flex justify-center grayscale hover:grayscale-0 opacity-50 hover:opacity-100 transition-all"
+                                className="border box-border border-l-0 border-gray-300 shadow-[inset_0px_0px_0px_1px_rgba(200,200,255,0.3)] font-bold text-slate-500 hover:text-primary hover:shadow-primary p-8 w-full flex justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all"
                                 onClick={() => handleSelectPlayer(journey)}
                             >
                                 {journey.name}

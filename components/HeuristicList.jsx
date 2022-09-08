@@ -20,7 +20,7 @@ function HeuristicList({ query, variable }) {
     console.log(data);
 
     if (loading) {
-        return <h2>Loading</h2>;
+        return <h2>Loading Heuristic List</h2>;
     }
 
     if (error) {

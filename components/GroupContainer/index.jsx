@@ -8,9 +8,9 @@ export default function GroupContainer({ data }) {
 
     if (allScores.length === 0) {
         return (
-            <div>
-                <h1 className="text-2xl">
-                    This player doens`t have this selected journey.
+            <div className="h-[calc(100vh_-_126px)] flex flex-col items-center">
+                <h1 className="text-2xl mb-5">
+                    {`This player doens't have the selected journey (${data.groups[0].journeys[0].name}).`}
                 </h1>
                 <p>Please, select another journey / player</p>
             </div>
