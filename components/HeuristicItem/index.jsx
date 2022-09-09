@@ -411,60 +411,63 @@ function HeuristicItem({ heuristic, id }) {
                 <h2 className="text-lg mb-2 font-bold">{heuristic.name}</h2>
                 <p className="text-sm">{heuristic.description}</p>
 
-                <Range
-                    type={"range"}
-                    id={id}
-                    min={0}
-                    max={5}
-                    value={score}
-                    onChange={(ev) => handleChangeRange(ev)}
-                />
-                <p
-                    className="text-sm text-slate-500"
-                    style={{ color: scoreDescription[score].color }}
-                >
-                    {scoreDescription[score].text}
-                </p>
-                <button
-                    className={`font-bold py-1 pr-3 text-sm text-primary flex gap-2 ${
-                        enable ? "opacity-100" : "opacity-40"
-                    }`}
-                    onClick={() => setBoxOpen(!boxOpen)}
-                    disabled={!enable}
-                >
-                    <svg
-                        width="20"
-                        height="23"
-                        viewBox="0 0 20 23"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M2 0.221802H18V12.2218H16V2.2218H2V18.2218H10V20.2218H0V0.221802H2ZM4 4.2218H14V6.2218H4V4.2218ZM14 8.2218H4V10.2218H14V8.2218ZM4 12.2218H11V14.2218H4V12.2218ZM17 17.2218H20V19.2218H17V22.2218H15V19.2218H12V17.2218H15V14.2218H17V17.2218Z"
-                            fill="#1E77FC"
+                <div className="flex flex-col gap-3 justify-between">
+                    <div>
+                        <Range
+                            type={"range"}
+                            id={id}
+                            min={0}
+                            max={5}
+                            value={score}
+                            onChange={(ev) => handleChangeRange(ev)}
                         />
-                    </svg>
-                    {boxOpen ? "Close" : "Add Evidence"}{" "}
-                    {(text || evidenceUrl) && "*"}
-                </button>
+                        <p
+                            className="text-sm text-slate-500"
+                            style={{ color: scoreDescription[score].color }}
+                        >
+                            {scoreDescription[score].text}
+                        </p>
+                    </div>
+                    <button
+                        className={`font-bold py-1 pr-3 text-sm text-primary flex gap-2 ${
+                            enable ? "opacity-100" : "opacity-40"
+                        }`}
+                        onClick={() => setBoxOpen(!boxOpen)}
+                        disabled={!enable}
+                    >
+                        <svg
+                            width="20"
+                            height="23"
+                            viewBox="0 0 20 23"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M2 0.221802H18V12.2218H16V2.2218H2V18.2218H10V20.2218H0V0.221802H2ZM4 4.2218H14V6.2218H4V4.2218ZM14 8.2218H4V10.2218H14V8.2218ZM4 12.2218H11V14.2218H4V12.2218ZM17 17.2218H20V19.2218H17V22.2218H15V19.2218H12V17.2218H15V14.2218H17V17.2218Z"
+                                fill="#1E77FC"
+                            />
+                        </svg>
+                        {boxOpen ? "Close" : "Add Evidence"}{" "}
+                        {(text || evidenceUrl) && "*"}
+                    </button>
 
-                <div
-                    className={`transition fixed right-5 bottom-40 bg-green-600 text-white/80 flex items-center p-3 w-80 font-bold z-10 ${
-                        toast.open ? "translate-y-20" : "translate-y-60"
-                    }`}
-                >
-                    {toast.text}
+                    <Note
+                        openBox={boxOpen}
+                        currentScore={currentScore}
+                        text={text}
+                        evidenceUrl={evidenceUrl}
+                        onChangeText={handleChangeText}
+                        onChangeEvidenceUrl={handleChangeEvidenceUrl}
+                        hid={heuristic.id}
+                    />
                 </div>
-
-                <Note
-                    openBox={boxOpen}
-                    currentScore={currentScore}
-                    text={text}
-                    evidenceUrl={evidenceUrl}
-                    onChangeText={handleChangeText}
-                    onChangeEvidenceUrl={handleChangeEvidenceUrl}
-                    hid={heuristic.id}
-                />
+            </div>
+            <div
+                className={`transition fixed right-5 bottom-40 bg-green-600 text-white/80 flex items-center p-3 w-80 font-bold z-10 ${
+                    toast.open ? "translate-y-20" : "translate-y-60"
+                }`}
+            >
+                {toast.text}
             </div>
         </li>
     );
@@ -481,56 +484,71 @@ function Note({
     hid,
 }) {
     const urlRef = useRef(null);
+    const collapseRef = useRef(null);
 
     useEffect(() => {
         if (openBox) {
+            collapseRef.current.style.display = "block";
+            collapseRef.current.style.transition = "0.3s";
             urlRef.current.focus();
+
+            setTimeout(() => {
+                collapseRef.current.style.height = "240px";
+                collapseRef.current.style.opacity = 1;
+            }, 10);
+        } else {
+            collapseRef.current.style.height = "0px";
+            collapseRef.current.style.opacity = 0;
+
+            setTimeout(() => {
+                collapseRef.current.style.display = "none";
+            }, 300);
         }
 
         return;
     }, [openBox]);
     return (
         <div
-            style={{
-                transition: "0.2s",
-                overflowY: "hidden",
-                height: openBox ? 240 : 0,
-                opacity: openBox ? 1 : 0,
-            }}
-            className={`transition mt-3 flex flex-col gap-5`}
+            className={`flex flex-col gap-3 overflow-hidden justify-between`}
+            ref={collapseRef}
         >
-            <div className="flex flex-col gap-1">
-                <label
-                    className="text-slate-500"
-                    htmlFor={"evidenceUrl_" + hid}
-                >
-                    Evidence URL
-                </label>
-                <input
-                    id={"evidenceUrl_" + hid}
-                    type="text"
-                    placeholder="https://"
-                    value={evidenceUrl || ""}
-                    onChange={(ev) => {
-                        onChangeEvidenceUrl(ev.target.value);
-                    }}
-                    ref={urlRef}
-                    className="w-full border border-slate-300 p-2 h-10 text-slate-500 rounded-md"
-                />
-            </div>
-            <div className="flex flex-col gap-1">
-                <label className="text-slate-500" htmlFor={"noteText_" + hid}>
-                    Note
-                </label>
-                <textarea
-                    id={"noteText_" + hid}
-                    className="w-full border border-slate-300 p-2 h-28 text-slate-500 rounded-md"
-                    rows="3"
-                    value={text || ""}
-                    onChange={(ev) => {
-                        onChangeText(ev.target.value);
-                    }}
-                ></textarea>
+            <div>
+                <div className="flex flex-col gap-1">
+                    <label
+                        className="text-slate-500"
+                        htmlFor={"evidenceUrl_" + hid}
+                    >
+                        Evidence URL
+                    </label>
+                    <input
+                        id={"evidenceUrl_" + hid}
+                        type="text"
+                        placeholder="https://"
+                        value={evidenceUrl || ""}
+                        onChange={(ev) => {
+                            onChangeEvidenceUrl(ev.target.value);
+                        }}
+                        ref={urlRef}
+                        className="w-full border border-slate-300 p-2 h-10 text-slate-500 rounded-md"
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label
+                        className="text-slate-500"
+                        htmlFor={"noteText_" + hid}
+                    >
+                        Note
+                    </label>
+                    <textarea
+                        id={"noteText_" + hid}
+                        className="w-full border border-slate-300 p-2 h-28 text-slate-500 rounded-md"
+                        rows="3"
+                        value={text || ""}
+                        onChange={(ev) => {
+                            onChangeText(ev.target.value);
+                        }}
+                    ></textarea>
+                </div>
             </div>
         </div>
     );
