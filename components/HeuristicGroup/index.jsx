@@ -23,8 +23,8 @@ function HeuristicGroup({ group }) {
     );
 
     return (
-        <section>
-            <header className="flex justify-between mb-6 items-center px-4">
+        <section className="mx-3">
+            <header className="flex justify-between mb-6 items-center px-4 gap-3">
                 <h1 className="text-xl font-bold">
                     <div className="h-[5px] bg-primary w-10 mb-1"></div>
                     {group.name}
@@ -42,7 +42,7 @@ function HeuristicGroup({ group }) {
                     ></Donnut>
                 </div>
             </header>
-            <ul className="bg-white py-8 px-4 pr-8 rounded-lg shadow-lg">
+            <ul className="bg-white pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
                 {group.heuristic.map((heuristicItem) => (
                     <HeuristicItem
                         key={heuristicItem.id}
