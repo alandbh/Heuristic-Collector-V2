@@ -209,9 +209,12 @@ function HeuristicItem({ heuristic, id }) {
     // debugger;
     // console.log("scores", allScores);
 
-    const currentScore = allScores.find(
-        (score) => score.heuristic.heuristicNumber === heuristic.heuristicNumber
-    );
+    const currentScore = useMemo(() => {
+        allScores.find(
+            (score) =>
+                score.heuristic.heuristicNumber === heuristic.heuristicNumber
+        );
+    }, [allScores, heuristic]);
 
     useEffect(() => {
         // debugger;
@@ -281,7 +284,7 @@ function HeuristicItem({ heuristic, id }) {
 
         let dataNew = await waitForNewData();
 
-        console.log("NOVA PROMESSA", dataNew);
+        console.log("NEW PROMISE", dataNew);
         setEnable(true);
 
         setToast({
@@ -334,7 +337,7 @@ function HeuristicItem({ heuristic, id }) {
             open: true,
             text: `Note for Heuristic ${dataNew.heuristic.heuristicNumber} updated!`,
         });
-        console.log("toastText", dataNew.note);
+        // console.log("toastText", dataNew.note);
         setTimeout(() => {
             setToast({
                 open: false,
@@ -421,7 +424,7 @@ function HeuristicItem({ heuristic, id }) {
                 </button>
 
                 <div
-                    className={`transition fixed right-5 bottom-40 bg-green-600 text-white/80 flex items-center p-3 w-80 font-bold ${
+                    className={`transition fixed right-5 bottom-40 bg-green-600 text-white/80 flex items-center p-3 w-80 font-bold z-10 ${
                         toast.open ? "translate-y-20" : "translate-y-60"
                     }`}
                 >
