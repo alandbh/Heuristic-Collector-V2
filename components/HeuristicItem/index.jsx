@@ -63,6 +63,19 @@ const MUTATION_SCORE = gql`
             id
             note
             scoreValue
+            evidenceUrl
+        }
+    }
+`;
+const MUTATION_SCORE_EVIDENCE = gql`
+    mutation setScores($scoreId: ID, $evidenceUrl: String) {
+        updateScore(
+            where: { id: $scoreId }
+            data: { evidenceUrl: $evidenceUrl }
+        ) {
+            id
+            scoreValue
+            evidenceUrl
         }
     }
 `;
@@ -73,6 +86,7 @@ const MUTATION_PUBLIC = gql`
             id
             scoreValue
             note
+            evidenceUrl
             heuristic {
                 heuristicNumber
             }
@@ -94,7 +108,7 @@ const MUTATION_CREATE_SCORE = gql`
                 project: { connect: { slug: $projectSlug } }
                 player: { connect: { slug: $playerSlug } }
                 journey: { connect: { slug: $journeySlug } }
-                evidenceUrl: "uuu"
+                evidenceUrl: ""
                 heuristic: { connect: { id: $heuristicId } }
             }
         ) {
@@ -125,6 +139,15 @@ const processChangeText = debounce(
         doMutate(variables, gqlString, isCreate);
     },
     1000,
+    false
+);
+const processChangeUrl = debounce(
+    async (variables, gqlString, isCreate = false) => {
+        console.log("Saving URL func");
+
+        doMutate(variables, gqlString, isCreate);
+    },
+    300,
     false
 );
 
@@ -176,6 +199,9 @@ function HeuristicItem({ heuristic, id }) {
     const [score, setScore] = useState(0);
     const [empty, setEmpty] = useState(false);
     const [text, setText] = useState(currentScore?.note || "");
+    const [evidenceUrl, setEvidenceUrl] = useState(
+        currentScore?.evidenceUrl || ""
+    );
     const { allScores, setAllScores } = useScoresContext();
     const [boxOpen, setBoxOpen] = useState(false);
     const router = useRouter();
@@ -192,6 +218,7 @@ function HeuristicItem({ heuristic, id }) {
         if (currentScore !== undefined) {
             setScore(currentScore.scoreValue);
             setText(currentScore.note);
+            setEvidenceUrl(currentScore.evidenceUrl);
             if (currentScore.note || currentScore.scoreValue) {
                 setEnable(true);
             }
@@ -316,6 +343,43 @@ function HeuristicItem({ heuristic, id }) {
         }, 4000);
     }
 
+    async function handleChangeEvidenceUrl(newText) {
+        setEvidenceUrl(newText);
+
+        let scoreId, scoreData;
+
+        if (empty) {
+            scoreData = await standByData();
+            console.log("standByIdUrl", scoreData);
+
+            scoreId = scoreData.id;
+        } else {
+            scoreId = currentScore.id;
+        }
+
+        processChangeUrl(
+            {
+                scoreId,
+                evidenceUrl: newText,
+            },
+            MUTATION_SCORE_EVIDENCE
+        );
+
+        let dataNew = await waitForNewData();
+
+        setToast({
+            open: true,
+            text: `Evidence for Heuristic ${dataNew.heuristic.heuristicNumber} updated!`,
+        });
+        // console.log("toastText", dataNew.note);
+        setTimeout(() => {
+            setToast({
+                open: false,
+                text: "",
+            });
+        }, 4000);
+    }
+
     return (
         <li className="flex mb-10 gap-5">
             <div>
@@ -352,7 +416,8 @@ function HeuristicItem({ heuristic, id }) {
                             fill="#1E77FC"
                         />
                     </svg>
-                    {boxOpen ? "Close" : "Add Note"} {text && "*"}
+                    {boxOpen ? "Close" : "Add Evidence"}{" "}
+                    {(text || evidenceUrl) && "*"}
                 </button>
 
                 <div
@@ -367,7 +432,10 @@ function HeuristicItem({ heuristic, id }) {
                     openBox={boxOpen}
                     currentScore={currentScore}
                     text={text}
+                    evidenceUrl={evidenceUrl}
                     onChangeText={handleChangeText}
+                    onChangeEvidenceUrl={handleChangeEvidenceUrl}
+                    hid={heuristic.id}
                 />
             </div>
         </li>
@@ -376,12 +444,19 @@ function HeuristicItem({ heuristic, id }) {
 
 export default HeuristicItem;
 
-function Note({ openBox, text, onChangeText }) {
-    const textRef = useRef(null);
+function Note({
+    openBox,
+    text,
+    evidenceUrl,
+    onChangeText,
+    onChangeEvidenceUrl,
+    hid,
+}) {
+    const urlRef = useRef(null);
 
     useEffect(() => {
         if (openBox) {
-            textRef.current.focus();
+            urlRef.current.focus();
         }
 
         return;
@@ -391,20 +466,44 @@ function Note({ openBox, text, onChangeText }) {
             style={{
                 transition: "0.2s",
                 overflowY: "hidden",
-                height: openBox ? 150 : 0,
+                height: openBox ? 240 : 0,
                 opacity: openBox ? 1 : 0,
             }}
-            className={`transition mt-3 flex `}
+            className={`transition mt-3 flex flex-col gap-5`}
         >
-            <textarea
-                className="w-full border border-slate-300 p-2 h-32 text-slate-500"
-                rows="3"
-                value={text || ""}
-                onChange={(ev) => {
-                    onChangeText(ev.target.value);
-                }}
-                ref={textRef}
-            ></textarea>
+            <div className="flex flex-col gap-1">
+                <label
+                    className="text-slate-500"
+                    htmlFor={"evidenceUrl_" + hid}
+                >
+                    Evidence URL
+                </label>
+                <input
+                    id={"evidenceUrl_" + hid}
+                    type="text"
+                    placeholder="https://"
+                    value={evidenceUrl || ""}
+                    onChange={(ev) => {
+                        onChangeEvidenceUrl(ev.target.value);
+                    }}
+                    ref={urlRef}
+                    className="w-full border border-slate-300 p-2 h-10 text-slate-500 rounded-md"
+                />
+            </div>
+            <div className="flex flex-col gap-1">
+                <label className="text-slate-500" htmlFor={"noteText_" + hid}>
+                    Note
+                </label>
+                <textarea
+                    id={"noteText_" + hid}
+                    className="w-full border border-slate-300 p-2 h-28 text-slate-500 rounded-md"
+                    rows="3"
+                    value={text || ""}
+                    onChange={(ev) => {
+                        onChangeText(ev.target.value);
+                    }}
+                ></textarea>
+            </div>
         </div>
     );
 }
