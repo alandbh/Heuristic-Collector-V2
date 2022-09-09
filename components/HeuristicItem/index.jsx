@@ -394,12 +394,12 @@ function HeuristicItem({ heuristic, id }) {
     }
 
     const scoreDescription = {
-        0: "Not evaluated yet",
-        1: "Totally disagree",
-        2: "Disagree",
-        3: "Neutral",
-        4: "Agree",
-        5: "Totally agree",
+        0: { color: "#999999", text: "Not evaluated yet" },
+        1: { color: "#bb0000", text: "Totally disagree" },
+        2: { color: "#ff0000", text: "Disagree" },
+        3: { color: "orange", text: "Neutral" },
+        4: { color: "#78b312", text: "Agree" },
+        5: { color: "#14a914", text: "Totally agree" },
     };
 
     return (
@@ -419,7 +419,12 @@ function HeuristicItem({ heuristic, id }) {
                     value={score}
                     onChange={(ev) => handleChangeRange(ev)}
                 />
-                <p>{scoreDescription[score]}</p>
+                <p
+                    className="text-sm text-slate-500"
+                    style={{ color: scoreDescription[score].color }}
+                >
+                    {scoreDescription[score].text}
+                </p>
                 <button
                     className={`font-bold py-1 pr-3 text-sm text-primary flex gap-2 ${
                         enable ? "opacity-100" : "opacity-40"
