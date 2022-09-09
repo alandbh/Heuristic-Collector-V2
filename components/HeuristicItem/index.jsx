@@ -128,7 +128,7 @@ const processChange = debounce(
 
         doMutate(variables, gqlString, isCreate);
     },
-    300,
+    1000,
     false
 );
 
@@ -209,15 +209,20 @@ function HeuristicItem({ heuristic, id }) {
     // debugger;
     // console.log("scores", allScores);
 
-    const currentScore = useMemo(() => {
-        allScores.find(
-            (score) =>
-                score.heuristic.heuristicNumber === heuristic.heuristicNumber
-        );
-    }, [allScores, heuristic]);
+    const currentScore = allScores.find(
+        (someScore) =>
+            someScore.heuristic.heuristicNumber === heuristic.heuristicNumber
+    );
+    // const currentScore = useMemo(() => {
+    //     allScores.find(
+    //         (score) =>
+    //             score.heuristic.heuristicNumber === heuristic.heuristicNumber
+    //     );
+    // }, [allScores, heuristic]);
 
     useEffect(() => {
         // debugger;
+        // console.log("HAS SCORE", currentScore);
         if (currentScore !== undefined) {
             setScore(currentScore.scoreValue);
             setText(currentScore.note);
@@ -225,10 +230,11 @@ function HeuristicItem({ heuristic, id }) {
             if (currentScore.note || currentScore.scoreValue) {
                 setEnable(true);
             }
+            setEmpty(false);
         } else {
-            setScore(0);
             setEmpty(true);
-            console.log("Undefined????");
+            setScore(0);
+            // console.log("Undefined????");
         }
     }, [currentScore]);
 
@@ -254,11 +260,15 @@ function HeuristicItem({ heuristic, id }) {
 
         setAllScores(newScores);
         // console.log("newScores", allScores);
+        // let dataNewAntes = await waitForNewData();
+
+        // console.log("NEW PROMISE ANTES", dataNewAntes);
 
         saveValue();
 
         function saveValue() {
             if (empty) {
+                // debugger;
                 processChange(
                     {
                         projectSlug: router.query.slug,
@@ -383,6 +393,15 @@ function HeuristicItem({ heuristic, id }) {
         }, 4000);
     }
 
+    const scoreDescription = {
+        0: "Not evaluated yet",
+        1: "Totally disagree",
+        2: "Disagree",
+        3: "Neutral",
+        4: "Agree",
+        5: "Totally agree",
+    };
+
     return (
         <li className="flex mb-10 gap-5">
             <div>
@@ -400,6 +419,7 @@ function HeuristicItem({ heuristic, id }) {
                     value={score}
                     onChange={(ev) => handleChangeRange(ev)}
                 />
+                <p>{scoreDescription[score]}</p>
                 <button
                     className={`font-bold py-1 pr-3 text-sm text-primary flex gap-2 ${
                         enable ? "opacity-100" : "opacity-40"
