@@ -30,7 +30,7 @@ function HeuristicGroup({ group }) {
                     {group.name}
                 </h1>
                 <div className="text-lg flex items-center gap-5">
-                    <b>
+                    <b className="whitespace-nowrap text-sm md:text-xl">
                         {groupTotalSore} of {5 * group.heuristic.length}
                     </b>
 
