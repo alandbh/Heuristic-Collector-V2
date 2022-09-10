@@ -512,7 +512,7 @@ function Note({
             className={`flex flex-col gap-3 overflow-hidden justify-between`}
             ref={collapseRef}
         >
-            <div>
+            <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
                     <label
                         className="text-slate-500"
@@ -529,7 +529,7 @@ function Note({
                             onChangeEvidenceUrl(ev.target.value);
                         }}
                         ref={urlRef}
-                        className="w-full border border-slate-300 p-2 h-10 text-slate-500 rounded-md"
+                        className="w-full border border-slate-300 dark:border-slate-500 p-2 h-10 text-slate-500 dark:text-slate-300 rounded-md"
                     />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -541,7 +541,7 @@ function Note({
                     </label>
                     <textarea
                         id={"noteText_" + hid}
-                        className="w-full border border-slate-300 p-2 h-28 text-slate-500 rounded-md"
+                        className="w-full border border-slate-300 dark:border-slate-500 p-2 h-28 text-slate-500 dark:text-slate-300 rounded-md"
                         rows="3"
                         value={text || ""}
                         onChange={(ev) => {

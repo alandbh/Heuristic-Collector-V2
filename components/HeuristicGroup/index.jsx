@@ -42,7 +42,7 @@ function HeuristicGroup({ group }) {
                     ></Donnut>
                 </div>
             </header>
-            <ul className="bg-white pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
+            <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
                 {group.heuristic.map((heuristicItem) => (
                     <HeuristicItem
                         key={heuristicItem.id}

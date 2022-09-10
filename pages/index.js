@@ -60,6 +60,7 @@ const QUERY_PROJECTS = gql`
             id
             name
             slug
+            year
             thumbnail {
                 url
             }
@@ -74,9 +75,16 @@ export default function Home(props) {
         <>
             <ClientOnly>
                 {/* <HeuristicList query={heuristicQuery} /> */}
-                {data?.projects?.map((proj) => (
-                    <Card key={proj.id} data={proj} />
-                ))}
+                <div className="m-10 flex flex-wrap gap-10">
+                    {data?.projects?.map((proj) => (
+                        <>
+                            <Card key={proj.id} data={proj} />
+                            <Card key={proj.id} data={proj} />
+                            <Card key={proj.id} data={proj} />
+                            <Card key={proj.id} data={proj} />
+                        </>
+                    ))}
+                </div>
             </ClientOnly>
         </>
     );

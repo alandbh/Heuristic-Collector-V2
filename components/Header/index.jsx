@@ -102,7 +102,7 @@ function Header({ routes, className }) {
                     {/* </Link> */}
                 </nav>
             </div>
-            <div className="bg-white shadow-md px-5 py-3">
+            <div className="bg-white dark:bg-slate-800 shadow-md px-5 py-3">
                 <div className="flex items-center gap-8 justify-between sm:justify-start">
                     <b className="hidden sm:inline">{project.name}</b>
                     <svg
