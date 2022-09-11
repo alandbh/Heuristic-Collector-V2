@@ -19,7 +19,7 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
@@ -27,4 +27,12 @@ a {
     color: rgba(255, 255, 255, .7);
     background: rgb(25, 35, 55);
   }
+} */
+
+html.dark {
+  color-scheme: dark;
+}
+.dark body {
+  color: rgba(255, 255, 255, .7);
+  background: rgb(25, 35, 55);
 }

@@ -79,18 +79,21 @@ function JourneySelect() {
         const modal = _modal.current;
         modal.style.transition = "0.4s";
         modal.style.display = "flex";
+        modal.children[0].style.transition = "0.4s";
+        modal.children[0].style.transform = "translateY(-30vh)";
         setTimeout(() => {
             modal.style.opacity = 0;
             modal.style.opacity = 1;
             modal.style.zIndex = 9;
-            modal.style.transform = "translateY(0px)";
+            modal.children[0].style.transform = "translateY(-20vh)";
         });
     }
 
     function closeModal(_modal) {
         const modal = _modal.current;
         modal.style.transition = "0.3s";
-        modal.style.transform = "translateY(-100px)";
+        modal.children[0].style.transition = "0.3s";
+        modal.children[0].style.transform = "translateY(-30vh)";
         modal.style.opacity = 0;
         setTimeout(() => {
             modal.style.display = "none";
@@ -125,6 +128,7 @@ function JourneySelect() {
                     <button
                         id="openModal"
                         onClick={() => handleModal(modalRef)}
+                        className="rounded-full hover:bg-slate-400/30 p-1 transition"
                     >
                         <svg
                             width="25"
@@ -148,24 +152,29 @@ function JourneySelect() {
                 ref={modalRef}
                 onClick={() => closeModal(modalRef)}
             >
-                <h3 className="text-3xl text-center font-bold">
-                    Select a joourney
-                </h3>
-                <ul
-                    className="bg-white dark:bg-slate-700 flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5 border-l-1 border border-y-0 border-r-0"
-                    style={{ maxHeight: "calc(100vh - 40px)" }}
-                >
-                    {data?.journeys?.map((journey) => (
-                        <li className="flex-1 min-w-[200px]" key={journey.slug}>
-                            <button
-                                className="border box-border border-l-0 border-gray-300 shadow-[inset_0px_0px_0px_1px_rgba(200,200,255,0.3)] font-bold text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-slate-200 hover:shadow-primary p-8 w-full flex justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all"
-                                onClick={() => handleSelectPlayer(journey)}
+                <div>
+                    <h3 className="text-3xl text-center font-bold">
+                        Select a joourney
+                    </h3>
+                    <ul
+                        className="bg-white dark:bg-slate-700 flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5 border-l-1 border border-y-0 border-r-0"
+                        style={{ maxHeight: "calc(100vh - 40px)" }}
+                    >
+                        {data?.journeys?.map((journey) => (
+                            <li
+                                className="flex-1 min-w-[200px]"
+                                key={journey.slug}
                             >
-                                {journey.name}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
+                                <button
+                                    className="border box-border border-l-0 border-gray-300 shadow-[inset_0px_0px_0px_1px_rgba(200,200,255,0.3)] font-bold text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-slate-200 hover:shadow-primary p-8 w-full flex justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all"
+                                    onClick={() => handleSelectPlayer(journey)}
+                                >
+                                    {journey.name}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );

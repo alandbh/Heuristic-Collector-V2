@@ -18,7 +18,7 @@ function Donnut({ total, sum = 0, radius = 34, thick = 6 }) {
         <div className={styles.percent} style={{ height: size, width: size }}>
             <svg style={{ width: size, height: size }}>
                 <circle
-                    className="stroke-slate-200"
+                    className="stroke-slate-200 dark:stroke-slate-100/30"
                     cx={radius}
                     cy={radius}
                     r={radius}
@@ -28,14 +28,14 @@ function Donnut({ total, sum = 0, radius = 34, thick = 6 }) {
                     }}
                 ></circle>
                 <circle
-                    className="stroke-primary"
+                    className="stroke-primary brightness-125"
                     style={dash}
                     cx={radius}
                     cy={radius}
                     r={radius}
                 ></circle>
             </svg>
-            <h2>
+            <h2 className="dark:text-slate-100/70">
                 {percent.toFixed(1)}
                 <span>%</span>
             </h2>
