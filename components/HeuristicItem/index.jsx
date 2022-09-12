@@ -90,7 +90,13 @@ const MUTATION_PUBLIC = gql`
             note
             evidenceUrl
             heuristic {
+                name
+                id
+                group {
+                    name
+                }
                 heuristicNumber
+                description
             }
         }
     }
@@ -130,7 +136,7 @@ const processChange = debounce(
 
         doMutate(variables, gqlString, isCreate);
     },
-    1000,
+    2000,
     false
 );
 
@@ -239,13 +245,6 @@ function HeuristicItem({ heuristic, id }) {
         setScore(Number(ev.target.value));
         // let newScores = [...allScores];
         // debugger;
-        let newScores = allScores.map((score) =>
-            score.heuristic.heuristicNumber === heuristic.heuristicNumber
-                ? { ...score, scoreValue: Number(ev.target.value) }
-                : score
-        );
-
-        setAllScores(newScores);
 
         saveValue();
 
@@ -279,6 +278,18 @@ function HeuristicItem({ heuristic, id }) {
 
         console.log("NEW PROMISE", dataNew);
         setEnable(true);
+
+        if (empty) {
+            setAllScores([...allScores, dataNew]);
+        } else {
+            let newScores = allScores.map((score) =>
+                score.heuristic.heuristicNumber === heuristic.heuristicNumber
+                    ? { ...score, scoreValue: Number(ev.target.value) }
+                    : score
+            );
+
+            setAllScores(newScores);
+        }
 
         setToast({
             open: true,

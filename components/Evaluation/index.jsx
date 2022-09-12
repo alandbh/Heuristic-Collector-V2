@@ -25,6 +25,9 @@ const QUERY_GROUPS = gql`
                 name
                 id
                 heuristicNumber
+                group {
+                    name
+                }
                 description
             }
         }

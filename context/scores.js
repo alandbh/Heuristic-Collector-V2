@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import client from "../lib/apollo";
 import Spinner from "../components/Spinner";
 
 import { gql, useQuery } from "@apollo/client";
@@ -45,6 +46,19 @@ export function ScoresWrapper({ children }) {
         },
     });
 
+    async function getNewScores() {
+        const { data } = await client.query({
+            query: QUERY_SCORES,
+            variables: {
+                projectSlug: router.query.slug,
+                journeySlug: router.query.journey,
+                playerSlug: router.query.player,
+            },
+        });
+
+        return data.scores;
+    }
+
     useEffect(() => {
         if (data) {
             setAllScores(data.scores);
@@ -76,7 +90,7 @@ export function ScoresWrapper({ children }) {
 
     return (
         <ScoresContext.Provider
-            value={{ allScores, loading, error, setAllScores }}
+            value={{ allScores, loading, error, setAllScores, getNewScores }}
         >
             {children}
         </ScoresContext.Provider>
