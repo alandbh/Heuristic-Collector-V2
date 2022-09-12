@@ -1,10 +1,11 @@
-import { gql, useMutation } from "@apollo/client";
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { gql } from "@apollo/client";
+import { useEffect, useRef, useState } from "react";
 import { useScoresContext } from "../../context/scores";
 import { useRouter } from "next/router";
 import Range from "../Range";
 import client from "../../lib/apollo";
 import { debounce, throttle } from "../../lib/utils";
+import Spinner from "../Spinner";
 
 const initialScore = {};
 
@@ -67,14 +68,15 @@ const MUTATION_SCORE = gql`
         }
     }
 `;
-const MUTATION_SCORE_EVIDENCE = gql`
-    mutation setScores($scoreId: ID, $evidenceUrl: String) {
+const MUTATION_EVIDENCE = gql`
+    mutation setScores($scoreId: ID, $evidenceUrl: String, $scoreNote: String) {
         updateScore(
             where: { id: $scoreId }
-            data: { evidenceUrl: $evidenceUrl }
+            data: { evidenceUrl: $evidenceUrl, note: $scoreNote }
         ) {
             id
             scoreValue
+            note
             evidenceUrl
         }
     }
@@ -132,18 +134,9 @@ const processChange = debounce(
     false
 );
 
-const processChangeText = debounce(
+const processChangeEvidence = debounce(
     async (variables, gqlString, isCreate = false) => {
-        console.log("Saving TEXT func");
-
-        doMutate(variables, gqlString, isCreate);
-    },
-    1000,
-    false
-);
-const processChangeUrl = debounce(
-    async (variables, gqlString, isCreate = false) => {
-        console.log("Saving URL func");
+        console.log("Saving EVIDENCE func");
 
         doMutate(variables, gqlString, isCreate);
     },
@@ -213,12 +206,6 @@ function HeuristicItem({ heuristic, id }) {
         (someScore) =>
             someScore.heuristic.heuristicNumber === heuristic.heuristicNumber
     );
-    // const currentScore = useMemo(() => {
-    //     allScores.find(
-    //         (score) =>
-    //             score.heuristic.heuristicNumber === heuristic.heuristicNumber
-    //     );
-    // }, [allScores, heuristic]);
 
     useEffect(() => {
         // debugger;
@@ -259,10 +246,6 @@ function HeuristicItem({ heuristic, id }) {
         );
 
         setAllScores(newScores);
-        // console.log("newScores", allScores);
-        // let dataNewAntes = await waitForNewData();
-
-        // console.log("NEW PROMISE ANTES", dataNewAntes);
 
         saveValue();
 
@@ -318,47 +301,22 @@ function HeuristicItem({ heuristic, id }) {
 
     async function handleChangeText(newText) {
         setText(newText);
-
-        let scoreId, scoreValue, scoreData;
-
-        if (empty) {
-            scoreData = await standByData();
-            console.log("standById", scoreData);
-
-            scoreId = scoreData.id;
-            scoreValue = score;
-        } else {
-            scoreId = currentScore.id;
-            scoreValue = score;
-        }
-
-        processChangeText(
-            {
-                scoreId,
-                scoreValue,
-                scoreNote: newText,
-            },
-            MUTATION_SCORE
-        );
-
-        let dataNew = await waitForNewData();
-
-        setToast({
-            open: true,
-            text: `Note for Heuristic ${dataNew.heuristic.heuristicNumber} updated!`,
-        });
-        // console.log("toastText", dataNew.note);
-        setTimeout(() => {
-            setToast({
-                open: false,
-                text: "",
-            });
-        }, 4000);
+        setStatus("active");
     }
 
     async function handleChangeEvidenceUrl(newText) {
         setEvidenceUrl(newText);
+        setStatus("active");
+    }
 
+    /**
+     *
+     * Setting the Evidence (URL and Note)
+     */
+
+    const [status, setStatus] = useState("saved");
+
+    async function onSaveEvidence() {
         let scoreId, scoreData;
 
         if (empty) {
@@ -370,15 +328,20 @@ function HeuristicItem({ heuristic, id }) {
             scoreId = currentScore.id;
         }
 
-        processChangeUrl(
+        setStatus("loading");
+
+        processChangeEvidence(
             {
                 scoreId,
-                evidenceUrl: newText,
+                evidenceUrl: evidenceUrl,
+                scoreNote: text,
             },
-            MUTATION_SCORE_EVIDENCE
+            MUTATION_EVIDENCE
         );
 
         let dataNew = await waitForNewData();
+
+        setStatus("saved");
 
         setToast({
             open: true,
@@ -460,6 +423,8 @@ function HeuristicItem({ heuristic, id }) {
                         evidenceUrl={evidenceUrl}
                         onChangeText={handleChangeText}
                         onChangeEvidenceUrl={handleChangeEvidenceUrl}
+                        onSaveEvidence={onSaveEvidence}
+                        status={status}
                         hid={heuristic.id}
                     />
                 </div>
@@ -483,32 +448,37 @@ function Note({
     evidenceUrl,
     onChangeText,
     onChangeEvidenceUrl,
+    onSaveEvidence,
+    status,
     hid,
 }) {
     const urlRef = useRef(null);
     const collapseRef = useRef(null);
 
     useEffect(() => {
-        if (openBox) {
-            collapseRef.current.style.display = "block";
-            collapseRef.current.style.transition = "0.3s";
-            urlRef.current.focus();
+        if (collapseRef) {
+            if (openBox) {
+                collapseRef.current.style.display = "block";
+                collapseRef.current.style.transition = "0.3s";
+                urlRef.current.focus();
 
-            setTimeout(() => {
-                collapseRef.current.style.height = "240px";
-                collapseRef.current.style.opacity = 1;
-            }, 10);
-        } else {
-            collapseRef.current.style.height = "0px";
-            collapseRef.current.style.opacity = 0;
+                setTimeout(() => {
+                    collapseRef.current.style.height = "312px";
+                    collapseRef.current.style.opacity = 1;
+                }, 10);
+            } else {
+                collapseRef.current.style.height = "0px";
+                collapseRef.current.style.opacity = 0;
 
-            setTimeout(() => {
-                collapseRef.current.style.display = "none";
-            }, 300);
+                setTimeout(() => {
+                    collapseRef.current.style.display = "none";
+                }, 300);
+            }
         }
 
         return;
     }, [openBox]);
+
     return (
         <div
             className={`flex flex-col gap-3 overflow-hidden justify-between`}
@@ -552,6 +522,53 @@ function Note({
                     ></textarea>
                 </div>
             </div>
+            <div className="flex justify-end py-4">
+                <BtnSmallPrimary
+                    status={status}
+                    onClick={() => onSaveEvidence()}
+                />
+            </div>
         </div>
+    );
+}
+
+function BtnSmallPrimary({ status = "active", onClick }) {
+    const contentStatus = {
+        active: "Save Evidence",
+        loading: (
+            <span className="flex items-center gap-2">
+                <Spinner radius={8} thick={2} /> Wait...
+            </span>
+        ),
+        saved: (
+            <span className="flex items-center gap-2">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M8 14.4C9.69739 14.4 11.3253 13.7257 12.5255 12.5255C13.7257 11.3253 14.4 9.69739 14.4 8C14.4 6.30261 13.7257 4.67475 12.5255 3.47452C11.3253 2.27428 9.69739 1.6 8 1.6C6.30261 1.6 4.67475 2.27428 3.47452 3.47452C2.27428 4.67475 1.6 6.30261 1.6 8C1.6 9.69739 2.27428 11.3253 3.47452 12.5255C4.67475 13.7257 6.30261 14.4 8 14.4V14.4ZM8 16C3.5816 16 0 12.4184 0 8C0 3.5816 3.5816 0 8 0C12.4184 0 16 3.5816 16 8C16 12.4184 12.4184 16 8 16ZM4.8 6.4L3.2 8L7.2 12L12.8 6.4L11.2 4.8L7.2 8.8L4.8 6.4Z"
+                        fill="currentColor"
+                    />
+                </svg>
+                Evidence Saved
+            </span>
+        ),
+    };
+
+    return (
+        <button
+            onClick={onClick}
+            className={`py-2 px-4 rounded-md text-white/70 text-sm ${
+                status === "saved"
+                    ? "border opacity-70"
+                    : "bg-primary hover:bg-primary/60"
+            }`}
+        >
+            {contentStatus[status]}
+        </button>
     );
 }
