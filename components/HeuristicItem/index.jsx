@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { gql } from "@apollo/client";
+
 import { useScoresContext } from "../../context/scores";
 import { useRouter } from "next/router";
 import Range from "../Range";
@@ -17,6 +19,122 @@ import {
     MUTATION_EVIDENCE,
     MUTATION_CREATE_SCORE,
 } from "../../lib/mutations";
+
+const newEmptyScores = [];
+
+const uniqueScores = [];
+
+function getUnicScores(arr) {
+    let unique = null;
+    unique = arr.filter((element) => {
+        const isDuplicate = uniqueScores.includes(element.heuristicId);
+
+        if (!isDuplicate) {
+            uniqueScores.push(element.heuristicId);
+
+            return true;
+        }
+
+        return false;
+    });
+
+    return unique;
+}
+
+let stringCreateFunc = (
+    projectSlug,
+    playerSlug,
+    journeySlug,
+    heuristicId
+) => `createScore(
+    data: {
+        scoreValue: 0
+        project: { connect: { slug: "${projectSlug}" } }
+        player: { connect: { slug: "${playerSlug}" } }
+        journey: { connect: { slug: "${journeySlug}" } }
+        evidenceUrl: ""
+        note: ""
+        heuristic: { connect: { id: "${heuristicId}" } }
+    }
+) {
+    scoreValue
+    id
+},
+
+`;
+
+const resultStr = `mutation createMultipleScores {
+    createScore(
+       data: 
+         {
+           scoreValue: 1
+           project: { connect: { slug: "retail-30" } }
+           player: { connect: { slug: "carrefour" } }
+           journey: { connect: { slug: "desktop"} }
+           evidenceUrl: ""
+           heuristic: { connect: { id: "cl4umuwo2tot10dkdaajg5cd0" } }
+         }
+     ) {
+       id
+       scoreValue
+     },
+     
+   createScore(
+       data: 
+         {
+           scoreValue: 2
+            project: { connect: { slug: "retail-30" } }
+           player: { connect: { slug: "carrefour" } }
+           journey: { connect: { slug: "desktop"} }
+           evidenceUrl: ""
+           heuristic: { connect: { id: "cl4umvmmrtr3u0bkggvofjc9e" } }
+         }
+     ) {
+       id
+       scoreValue
+       },
+     
+   }`;
+
+let multiString = "";
+
+let stringCreate = "";
+
+let MUTATION_CREATE_MANY_SCORE;
+
+const writeNewScores = debounce(async () => {
+    const newEmptyScoresArray = getUnicScores(newEmptyScores);
+    // console.log("NEW", getUnicScores(newEmptyScores));
+
+    // console.log(newEmptyScores);
+    newEmptyScoresArray.forEach((score) => {
+        return (multiString =
+            multiString +
+            stringCreateFunc(
+                score.projectSlug,
+                score.playerSlug,
+                score.journeySlug,
+                score.heuristicId
+            ));
+    });
+
+    stringCreate = `
+    mutation createMultipleScores {
+       ${multiString}
+    }
+    `;
+
+    const stringMut = stringCreate.replace(/  |\r\n|\n|\r/gm, "");
+    // console.log("stringCreate", stringCreate);
+
+    MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
+
+    const { data } = await client.mutate({
+        mutation: MUTATION_CREATE_MANY_SCORE,
+    });
+
+    console.log("SALVOUUUU", data);
+}, 3000);
 
 /**
  *
@@ -59,9 +177,23 @@ function HeuristicItem({ heuristic, id }) {
         } else {
             setEmpty(true);
             setScore(0);
+            const newEmptyScore = {
+                projectSlug: router.query.slug,
+                playerSlug: router.query.player,
+                journeySlug: router.query.journey,
+                heuristicId: heuristic.id,
+                scoreValue: 0,
+            };
+
+            newEmptyScores.push(newEmptyScore);
+            // localStorage.setItem(
+            //     "new_empty_scores",
+            //     JSON.stringify(newEmptyScores)
+            // );
+            writeNewScores();
             // console.log("Undefined????");
         }
-    }, [currentScore]);
+    }, [currentScore, router, heuristic]);
 
     /**
      *
