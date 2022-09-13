@@ -20,6 +20,8 @@ import {
     MUTATION_CREATE_SCORE,
 } from "../../lib/mutations";
 
+let newEmptyScoresSaved = false;
+
 const newEmptyScores = [];
 
 const uniqueScores = [];
@@ -104,7 +106,14 @@ let MUTATION_CREATE_MANY_SCORE;
 
 const writeNewScores = debounce(async () => {
     const newEmptyScoresArray = getUnicScores(newEmptyScores);
+
+    localStorage.setItem(
+        "new_empty_scores",
+        JSON.stringify(newEmptyScoresArray)
+    );
     // console.log("NEW", getUnicScores(newEmptyScores));
+
+    // return;
 
     // console.log(newEmptyScores);
     newEmptyScoresArray.forEach((score) => {
@@ -127,6 +136,11 @@ const writeNewScores = debounce(async () => {
     const stringMut = stringCreate.replace(/  |\r\n|\n|\r/gm, "");
     // console.log("stringCreate", stringCreate);
 
+    const resultProcess = {
+        saved: false,
+        published: false,
+    };
+
     MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
 
     const { data } = await client.mutate({
@@ -134,13 +148,41 @@ const writeNewScores = debounce(async () => {
     });
 
     console.log("SALVOUUUU", data);
+
+    newEmptyScoresSaved = true;
+
+    console.log("SALVOUUUU13");
+
+    resultProcess.saved = true;
+
+    const publishString = `mutation publishManyScores {
+        publishManyScoresConnection (first: 1000, where: {scoreValue: 0} ) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }`;
+
+    // const { data: dataPublished } = await client.mutate({
+    //     mutation: publishString,
+    // });
+    // console.log("PUBLICOU", dataPublished);
+    // resultProcess.published = true
+
+    return resultProcess;
 }, 3000);
 
 /**
  *
  *
- * Begining of the component
- * ----------------------------------
+ *
+ * ------------------------------------
+ *      Begining of the component
+ * ------------------------------------
+ *
+ *
  *
  */
 
@@ -163,37 +205,46 @@ function HeuristicItem({ heuristic, id }) {
             someScore.heuristic.heuristicNumber === heuristic.heuristicNumber
     );
 
-    useEffect(() => {
-        // debugger;
-        // console.log("HAS SCORE", currentScore);
-        if (currentScore !== undefined) {
-            setScore(currentScore.scoreValue);
-            setText(currentScore.note);
-            setEvidenceUrl(currentScore.evidenceUrl);
-            if (currentScore.note || currentScore.scoreValue) {
-                setEnable(true);
-            }
-            setEmpty(false);
-        } else {
-            setEmpty(true);
-            setScore(0);
-            const newEmptyScore = {
-                projectSlug: router.query.slug,
-                playerSlug: router.query.player,
-                journeySlug: router.query.journey,
-                heuristicId: heuristic.id,
-                scoreValue: 0,
-            };
+    useEffect(
+        () => async () => {
+            // JSON.parse(localStorage.getItem("new_empty_scores")).length > 1;
+            // debugger;
+            // console.log("HAS SCORE", currentScore);
+            if (
+                currentScore !== undefined &&
+                JSON.parse(localStorage.getItem("new_empty_scores")).length > 1
+            ) {
+                setScore(currentScore.scoreValue);
+                setText(currentScore.note);
+                setEvidenceUrl(currentScore.evidenceUrl);
+                if (currentScore.note || currentScore.scoreValue) {
+                    setEnable(true);
+                }
+                setEmpty(false);
+            } else {
+                setEmpty(true);
+                setScore(0);
 
-            newEmptyScores.push(newEmptyScore);
-            // localStorage.setItem(
-            //     "new_empty_scores",
-            //     JSON.stringify(newEmptyScores)
-            // );
-            writeNewScores();
-            // console.log("Undefined????");
-        }
-    }, [currentScore, router, heuristic]);
+                console.log("ESCREVEU????");
+
+                const newEmptyScore = {
+                    projectSlug: router.query.slug,
+                    playerSlug: router.query.player,
+                    journeySlug: router.query.journey,
+                    heuristicId: heuristic.id,
+                    scoreValue: 0,
+                };
+
+                newEmptyScores.push(newEmptyScore);
+
+                if (localStorage.getItem("new_empty_scores") === null) {
+                    writeNewScores();
+                    // console.log("ESCREVEU!!!");
+                }
+            }
+        },
+        [currentScore, router, heuristic]
+    );
 
     /**
      *
