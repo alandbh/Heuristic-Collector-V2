@@ -1,188 +1,22 @@
-import { gql } from "@apollo/client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useScoresContext } from "../../context/scores";
 import { useRouter } from "next/router";
 import Range from "../Range";
+import Evidence from "../Evidence";
 import client from "../../lib/apollo";
-import { debounce, throttle } from "../../lib/utils";
-import Spinner from "../Spinner";
-
-const initialScore = {};
-
-class Deferred {
-    constructor() {
-        this.promise = new Promise((resolve, reject) => {
-            this.reject = reject;
-            this.resolve = resolve;
-        });
-    }
-}
-
-const deferredPromise = {
-    run: null,
-};
-
-async function waitForNewData() {
-    deferredPromise.run = new Deferred();
-
-    function standByDataT() {
-        return deferredPromise.run.promise;
-    }
-
-    let dataNew = await standByDataT();
-
-    return dataNew;
-}
-
-function standByData() {
-    return new Promise((resolve, reject) => {
-        const intervalGetItd = setInterval(() => {
-            if (initialScore.id) {
-                resolve(initialScore);
-
-                stopListening();
-            }
-        }, 1000);
-
-        function stopListening() {
-            clearInterval(intervalGetItd);
-            initialScore.isNew = false;
-        }
-    });
-}
-
-/**
- *
- * GRAPHQL CONSTANTS
- */
-const MUTATION_SCORE = gql`
-    mutation setScores($scoreId: ID, $scoreValue: Int, $scoreNote: String) {
-        updateScore(
-            where: { id: $scoreId }
-            data: { scoreValue: $scoreValue, note: $scoreNote }
-        ) {
-            id
-            note
-            scoreValue
-            evidenceUrl
-        }
-    }
-`;
-const MUTATION_EVIDENCE = gql`
-    mutation setScores($scoreId: ID, $evidenceUrl: String, $scoreNote: String) {
-        updateScore(
-            where: { id: $scoreId }
-            data: { evidenceUrl: $evidenceUrl, note: $scoreNote }
-        ) {
-            id
-            scoreValue
-            note
-            evidenceUrl
-        }
-    }
-`;
-
-const MUTATION_PUBLIC = gql`
-    mutation setScorePublic($scoreId: ID) {
-        publishScore(where: { id: $scoreId }, to: PUBLISHED) {
-            id
-            scoreValue
-            note
-            evidenceUrl
-            heuristic {
-                name
-                id
-                group {
-                    name
-                }
-                heuristicNumber
-                description
-            }
-        }
-    }
-`;
-
-const MUTATION_CREATE_SCORE = gql`
-    mutation createNewScore(
-        $projectSlug: String
-        $playerSlug: String
-        $journeySlug: String
-        $scoreValue: Int!
-        $heuristicId: ID
-    ) {
-        createScore(
-            data: {
-                scoreValue: $scoreValue
-                project: { connect: { slug: $projectSlug } }
-                player: { connect: { slug: $playerSlug } }
-                journey: { connect: { slug: $journeySlug } }
-                evidenceUrl: ""
-                heuristic: { connect: { id: $heuristicId } }
-            }
-        ) {
-            scoreValue
-            id
-        }
-    }
-`;
-
-/**
- *
- * Debounced function for processing changes on Range
- */
-const processChange = debounce(
-    async (variables, gqlString, isCreate = false) => {
-        console.log("Saving data func");
-
-        doMutate(variables, gqlString, isCreate);
-    },
-    2000,
-    false
-);
-
-const processChangeEvidence = debounce(
-    async (variables, gqlString, isCreate = false) => {
-        console.log("Saving EVIDENCE func");
-
-        doMutate(variables, gqlString, isCreate);
-    },
-    300,
-    false
-);
-
-async function doMutate(variables, gqlString, isCreate) {
-    const { data } = await client.mutate({
-        mutation: gqlString,
-        variables,
-    });
-
-    if (data) {
-        console.log("doMutate", data);
-        const newId = isCreate ? data.createScore.id : data.updateScore.id;
-        doPublic(newId);
-    }
-}
-
-async function doPublic(newId) {
-    // console.log("varr", newId);
-
-    const { data } = await client.mutate({
-        mutation: MUTATION_PUBLIC,
-        variables: { scoreId: newId },
-    });
-
-    console.log("resopp", data);
-
-    initialScore.id = await data.publishScore.id;
-    initialScore.scoreValue = await data.publishScore.scoreValue;
-    initialScore.note = await data.publishScore.note;
-    initialScore.heuristic = await data.publishScore.heuristic;
-    initialScore.now = Date.now();
-
-    deferredPromise.run.resolve(data.publishScore);
-
-    // return _data;
-}
+import {
+    debounce,
+    throttle,
+    processChange,
+    processChangeEvidence,
+    waitForNewData,
+    standByData,
+} from "../../lib/utils";
+import {
+    MUTATION_SCORE,
+    MUTATION_EVIDENCE,
+    MUTATION_CREATE_SCORE,
+} from "../../lib/mutations";
 
 /**
  *
@@ -190,8 +24,6 @@ async function doPublic(newId) {
  * Begining of the component
  * ----------------------------------
  *
- * @param {*props} param0
- * @returns Heuristic Item with Range and Note
  */
 
 function HeuristicItem({ heuristic, id }) {
@@ -233,9 +65,10 @@ function HeuristicItem({ heuristic, id }) {
 
     /**
      *
-     * Setting the Score
      *
-     * @param {*event} ev
+     * Setting the Score
+     * -----------------------
+     *
      */
 
     const [enable, setEnable] = useState(false);
@@ -252,6 +85,7 @@ function HeuristicItem({ heuristic, id }) {
             if (empty) {
                 // debugger;
                 processChange(
+                    client,
                     {
                         projectSlug: router.query.slug,
                         playerSlug: router.query.player,
@@ -264,6 +98,7 @@ function HeuristicItem({ heuristic, id }) {
                 );
             } else {
                 processChange(
+                    client,
                     {
                         scoreId: currentScore.id,
                         scoreValue: Number(ev.target.value),
@@ -305,9 +140,10 @@ function HeuristicItem({ heuristic, id }) {
 
     /**
      *
-     * Setting the Note
      *
-     * @param {*newText} string
+     * Setting the Note
+     * ------------------------
+     *
      */
 
     async function handleChangeText(newText) {
@@ -323,6 +159,8 @@ function HeuristicItem({ heuristic, id }) {
     /**
      *
      * Setting the Evidence (URL and Note)
+     * --------------------------------------
+     *
      */
 
     const [status, setStatus] = useState("saved");
@@ -342,6 +180,7 @@ function HeuristicItem({ heuristic, id }) {
         setStatus("loading");
 
         processChangeEvidence(
+            client,
             {
                 scoreId,
                 evidenceUrl: evidenceUrl,
@@ -427,7 +266,7 @@ function HeuristicItem({ heuristic, id }) {
                         </span>
                     </button>
 
-                    <Note
+                    <Evidence
                         openBox={boxOpen}
                         currentScore={currentScore}
                         text={text}
@@ -452,134 +291,3 @@ function HeuristicItem({ heuristic, id }) {
 }
 
 export default HeuristicItem;
-
-function Note({
-    openBox,
-    text,
-    evidenceUrl,
-    onChangeText,
-    onChangeEvidenceUrl,
-    onSaveEvidence,
-    status,
-    hid,
-}) {
-    const urlRef = useRef(null);
-    const collapseRef = useRef(null);
-
-    useEffect(() => {
-        if (collapseRef) {
-            if (openBox) {
-                collapseRef.current.style.display = "block";
-                collapseRef.current.style.transition = "0.3s";
-                urlRef.current.focus();
-
-                setTimeout(() => {
-                    collapseRef.current.style.height = "312px";
-                    collapseRef.current.style.opacity = 1;
-                }, 10);
-            } else {
-                collapseRef.current.style.height = "0px";
-                collapseRef.current.style.opacity = 0;
-
-                setTimeout(() => {
-                    collapseRef.current.style.display = "none";
-                }, 300);
-            }
-        }
-
-        return;
-    }, [openBox]);
-
-    return (
-        <div
-            className={`flex flex-col gap-3 overflow-hidden justify-between`}
-            ref={collapseRef}
-        >
-            <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1">
-                    <label
-                        className="text-slate-500"
-                        htmlFor={"evidenceUrl_" + hid}
-                    >
-                        Evidence URL
-                    </label>
-                    <input
-                        id={"evidenceUrl_" + hid}
-                        type="text"
-                        placeholder="https://"
-                        value={evidenceUrl || ""}
-                        onChange={(ev) => {
-                            onChangeEvidenceUrl(ev.target.value);
-                        }}
-                        ref={urlRef}
-                        className="w-full border border-slate-300 dark:border-slate-500 p-2 h-10 text-slate-500 dark:text-slate-300 rounded-md"
-                    />
-                </div>
-                <div className="flex flex-col gap-1">
-                    <label
-                        className="text-slate-500"
-                        htmlFor={"noteText_" + hid}
-                    >
-                        Note
-                    </label>
-                    <textarea
-                        id={"noteText_" + hid}
-                        className="w-full border border-slate-300 dark:border-slate-500 p-2 h-28 text-slate-500 dark:text-slate-300 rounded-md"
-                        rows="3"
-                        value={text || ""}
-                        onChange={(ev) => {
-                            onChangeText(ev.target.value);
-                        }}
-                    ></textarea>
-                </div>
-            </div>
-            <div className="flex justify-end py-4">
-                <BtnSmallPrimary
-                    status={status}
-                    onClick={() => onSaveEvidence()}
-                />
-            </div>
-        </div>
-    );
-}
-
-function BtnSmallPrimary({ status = "active", onClick }) {
-    const contentStatus = {
-        active: "Save Evidence",
-        loading: (
-            <span className="flex items-center gap-2">
-                <Spinner radius={8} thick={2} /> Wait...
-            </span>
-        ),
-        saved: (
-            <span className="flex items-center gap-2">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M8 14.4C9.69739 14.4 11.3253 13.7257 12.5255 12.5255C13.7257 11.3253 14.4 9.69739 14.4 8C14.4 6.30261 13.7257 4.67475 12.5255 3.47452C11.3253 2.27428 9.69739 1.6 8 1.6C6.30261 1.6 4.67475 2.27428 3.47452 3.47452C2.27428 4.67475 1.6 6.30261 1.6 8C1.6 9.69739 2.27428 11.3253 3.47452 12.5255C4.67475 13.7257 6.30261 14.4 8 14.4V14.4ZM8 16C3.5816 16 0 12.4184 0 8C0 3.5816 3.5816 0 8 0C12.4184 0 16 3.5816 16 8C16 12.4184 12.4184 16 8 16ZM4.8 6.4L3.2 8L7.2 12L12.8 6.4L11.2 4.8L7.2 8.8L4.8 6.4Z"
-                        fill="currentColor"
-                    />
-                </svg>
-                Evidence Saved
-            </span>
-        ),
-    };
-
-    return (
-        <button
-            onClick={onClick}
-            className={`py-2 px-4 rounded-md text-white/70 text-sm ${
-                status === "saved"
-                    ? "border opacity-70"
-                    : "bg-primary hover:bg-primary/60"
-            }`}
-        >
-            {contentStatus[status]}
-        </button>
-    );
-}
