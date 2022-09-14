@@ -136,42 +136,32 @@ const writeNewScores = debounce(async () => {
     const stringMut = stringCreate.replace(/  |\r\n|\n|\r/gm, "");
     // console.log("stringCreate", stringCreate);
 
-    const resultProcess = {
-        saved: false,
-        published: false,
-    };
-
     MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
 
-    const { data } = await client.mutate({
+    const { data: savedData } = await client.mutate({
         mutation: MUTATION_CREATE_MANY_SCORE,
     });
 
-    console.log("SALVOUUUU", data);
-
-    newEmptyScoresSaved = true;
+    console.log("SALVOUUUU", savedData);
 
     console.log("SALVOUUUU13");
 
-    resultProcess.saved = true;
-
-    const publishString = `mutation publishManyScores {
-        publishManyScoresConnection (first: 1000, where: {scoreValue: 0} ) {
-          edges {
-            node {
-              id
+    const PUBLISH_STRING = gql`
+        mutation publishManyScores {
+            publishManyScoresConnection(first: 1000, where: { scoreValue: 0 }) {
+                edges {
+                    node {
+                        id
+                    }
+                }
             }
-          }
         }
-      }`;
+    `;
 
-    // const { data: dataPublished } = await client.mutate({
-    //     mutation: publishString,
-    // });
-    // console.log("PUBLICOU", dataPublished);
-    // resultProcess.published = true
-
-    return resultProcess;
+    const { data: dataPublished } = await client.mutate({
+        mutation: PUBLISH_STRING,
+    });
+    console.log("PUBLICOU", dataPublished);
 }, 3000);
 
 /**
