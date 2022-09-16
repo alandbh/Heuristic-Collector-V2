@@ -156,7 +156,7 @@ function HeuristicItem({ heuristic, id }) {
     const router = useRouter();
 
     // debugger;
-    // console.log("scores", allScores);
+    console.log("scores", allScores);
 
     const currentScore = allScores.find(
         (someScore) =>
@@ -190,7 +190,7 @@ function HeuristicItem({ heuristic, id }) {
             //     "new_empty_scores",
             //     JSON.stringify(newEmptyScores)
             // );
-            writeNewScores();
+            // writeNewScores();
             // console.log("Undefined????");
         }
     }, [currentScore, router, heuristic]);
@@ -346,6 +346,10 @@ function HeuristicItem({ heuristic, id }) {
         4: { color: "#78b312", text: "Agree" },
         5: { color: "#14a914", text: "Totally agree" },
     };
+
+    if (empty) {
+        return <div>Empty</div>;
+    }
 
     return (
         <li className="flex mb-10 gap-5">

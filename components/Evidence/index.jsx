@@ -30,7 +30,9 @@ function Evidence({
                 collapseRef.current.style.opacity = 0;
 
                 setTimeout(() => {
-                    collapseRef.current.style.display = "none";
+                    if (collapseRef.current !== null) {
+                        collapseRef.current.style.display = "none";
+                    }
                 }, 300);
             }
         }
