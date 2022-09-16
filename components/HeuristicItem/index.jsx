@@ -63,39 +63,6 @@ let stringCreateFunc = (
 
 `;
 
-const resultStr = `mutation createMultipleScores {
-    createScore(
-       data: 
-         {
-           scoreValue: 1
-           project: { connect: { slug: "retail-30" } }
-           player: { connect: { slug: "carrefour" } }
-           journey: { connect: { slug: "desktop"} }
-           evidenceUrl: ""
-           heuristic: { connect: { id: "cl4umuwo2tot10dkdaajg5cd0" } }
-         }
-     ) {
-       id
-       scoreValue
-     },
-     
-   createScore(
-       data: 
-         {
-           scoreValue: 2
-            project: { connect: { slug: "retail-30" } }
-           player: { connect: { slug: "carrefour" } }
-           journey: { connect: { slug: "desktop"} }
-           evidenceUrl: ""
-           heuristic: { connect: { id: "cl4umvmmrtr3u0bkggvofjc9e" } }
-         }
-     ) {
-       id
-       scoreValue
-       },
-     
-   }`;
-
 let multiString = "";
 
 let stringCreate = "";

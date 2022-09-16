@@ -37,7 +37,7 @@ const getUniqueGroups = debounce((arr, key, func) => {
     // func();
 }, 300);
 
-const debCreateNewScores = debounce((data, router) => {
+const debCreateNewScores = debounce((data, router, func) => {
     console.log("groupssss", data.groups);
 
     data.groups.forEach((group) => {
@@ -66,11 +66,11 @@ const debCreateNewScores = debounce((data, router) => {
             mutation: MUTATION_CREATE_MANY_SCORE,
         })
         .then((data) => {
-            publishNewScores();
+            publishNewScores(func);
         });
 }, 500);
 
-function publishNewScores() {
+function publishNewScores(func) {
     const PUBLISH_STRING = gql`
         mutation publishManyScores {
             publishManyScoresConnection(first: 1000, where: { scoreValue: 0 }) {
@@ -89,6 +89,7 @@ function publishNewScores() {
         })
         .then((data) => {
             console.log("PUBLICOU", data);
+            func();
         });
 }
 
@@ -165,20 +166,23 @@ export default function GroupContainer({ data }) {
 
     useEffect(() => {
         // setEmpty(true);
-        getNewScores().then((data) => {
-            // console.log("newscores", data);
+        getNewScores().then((dataScores) => {
+            // console.log("newscores", dataScores);
 
-            if (data.length > 0) {
-                // console.log("newscoreswwww", data);
+            if (dataScores.length > 0) {
+                // console.log("newscoreswwww", dataScores);
                 setEmpty(false);
             } else {
                 createNewScores();
+                // debCreateNewScores(data, router);
             }
         });
-    }, [getNewScores]);
+    });
 
     function createNewScores() {
-        debCreateNewScores(data, router);
+        debCreateNewScores(data, router, () => {
+            setEmpty(false);
+        });
     }
 
     if (!dataJourneys) {
