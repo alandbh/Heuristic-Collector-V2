@@ -46,18 +46,22 @@ export function ScoresWrapper({ children }) {
         },
     });
 
-    async function getNewScores() {
-        const { data } = await client.query({
+    window.getNewScores = async function getNewScores() {
+        const { data: newData } = await client.query({
             query: QUERY_SCORES,
             variables: {
                 projectSlug: router.query.slug,
                 journeySlug: router.query.journey,
                 playerSlug: router.query.player,
             },
+            fetchPolicy: "network-only",
         });
 
-        return data.scores;
-    }
+        setAllScores(newData.scores);
+        console.log("SETTING NEW ALL SCORES", newData);
+
+        return newData.scores;
+    };
 
     useEffect(() => {
         if (data) {

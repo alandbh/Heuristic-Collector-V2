@@ -13,12 +13,29 @@ import {
     processChangeEvidence,
     waitForNewData,
     standByData,
+    Deferred,
 } from "../../lib/utils";
 import {
     MUTATION_SCORE,
     MUTATION_EVIDENCE,
     MUTATION_CREATE_SCORE,
 } from "../../lib/mutations";
+
+const newEmptyScoresPromisse = {
+    run: null,
+};
+
+async function waitForPublish() {
+    newEmptyScoresPromisse.run = new Deferred();
+
+    function standByDataT() {
+        return newEmptyScoresPromisse.run.promise;
+    }
+
+    let isPublished = await standByDataT();
+
+    return isPublished;
+}
 
 const newEmptyScores = [];
 
@@ -48,7 +65,7 @@ let stringCreateFunc = (
     heuristicId
 ) => `createScore(
     data: {
-        scoreValue: 0
+        scoreValue: 1
         project: { connect: { slug: "${projectSlug}" } }
         player: { connect: { slug: "${playerSlug}" } }
         journey: { connect: { slug: "${journeySlug}" } }
@@ -63,48 +80,22 @@ let stringCreateFunc = (
 
 `;
 
-const resultStr = `mutation createMultipleScores {
-    createScore(
-       data: 
-         {
-           scoreValue: 1
-           project: { connect: { slug: "retail-30" } }
-           player: { connect: { slug: "carrefour" } }
-           journey: { connect: { slug: "desktop"} }
-           evidenceUrl: ""
-           heuristic: { connect: { id: "cl4umuwo2tot10dkdaajg5cd0" } }
-         }
-     ) {
-       id
-       scoreValue
-     },
-     
-   createScore(
-       data: 
-         {
-           scoreValue: 2
-            project: { connect: { slug: "retail-30" } }
-           player: { connect: { slug: "carrefour" } }
-           journey: { connect: { slug: "desktop"} }
-           evidenceUrl: ""
-           heuristic: { connect: { id: "cl4umvmmrtr3u0bkggvofjc9e" } }
-         }
-     ) {
-       id
-       scoreValue
-       },
-     
-   }`;
-
 let multiString = "";
 
 let stringCreate = "";
 
 let MUTATION_CREATE_MANY_SCORE;
 
-const writeNewScores = debounce(async () => {
+const writeNewScores = debounce(async (func) => {
     const newEmptyScoresArray = getUnicScores(newEmptyScores);
+
+    localStorage.setItem(
+        "new_empty_scores",
+        JSON.stringify(newEmptyScoresArray)
+    );
     // console.log("NEW", getUnicScores(newEmptyScores));
+
+    // return;
 
     // console.log(newEmptyScores);
     newEmptyScoresArray.forEach((score) => {
@@ -124,23 +115,47 @@ const writeNewScores = debounce(async () => {
     }
     `;
 
-    const stringMut = stringCreate.replace(/  |\r\n|\n|\r/gm, "");
     // console.log("stringCreate", stringCreate);
 
     MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
 
-    const { data } = await client.mutate({
+    const { data: savedData } = await client.mutate({
         mutation: MUTATION_CREATE_MANY_SCORE,
     });
 
-    console.log("SALVOUUUU", data);
+    console.log("SALVOUUUU", savedData);
+
+    console.log("SALVOUUUU13");
+
+    const PUBLISH_STRING = gql`
+        mutation publishManyScores {
+            publishManyScoresConnection(first: 1000, where: { scoreValue: 1 }) {
+                edges {
+                    node {
+                        id
+                    }
+                }
+            }
+        }
+    `;
+
+    const { data: dataPublished } = await client.mutate({
+        mutation: PUBLISH_STRING,
+    });
+    console.log("PUBLICOU", dataPublished);
+    // newEmptyScoresPromisse.run.resolve(true);
+    func();
 }, 3000);
 
 /**
  *
  *
- * Begining of the component
- * ----------------------------------
+ *
+ * ------------------------------------
+ *      Begining of the component
+ * ------------------------------------
+ *
+ *
  *
  */
 
@@ -151,49 +166,72 @@ function HeuristicItem({ heuristic, id }) {
     const [evidenceUrl, setEvidenceUrl] = useState(
         currentScore?.evidenceUrl || ""
     );
-    const { allScores, setAllScores } = useScoresContext();
+    const { allScores, setAllScores, getNewScores } = useScoresContext();
     const [boxOpen, setBoxOpen] = useState(false);
     const router = useRouter();
 
     // debugger;
-    // console.log("scores", allScores);
+    console.log("scores", allScores);
+    // let currentScore;
 
     const currentScore = allScores.find(
         (someScore) =>
             someScore.heuristic.heuristicNumber === heuristic.heuristicNumber
     );
 
-    useEffect(() => {
-        // debugger;
-        // console.log("HAS SCORE", currentScore);
-        if (currentScore !== undefined) {
-            setScore(currentScore.scoreValue);
-            setText(currentScore.note);
-            setEvidenceUrl(currentScore.evidenceUrl);
-            if (currentScore.note || currentScore.scoreValue) {
-                setEnable(true);
-            }
-            setEmpty(false);
-        } else {
-            setEmpty(true);
-            setScore(0);
-            const newEmptyScore = {
-                projectSlug: router.query.slug,
-                playerSlug: router.query.player,
-                journeySlug: router.query.journey,
-                heuristicId: heuristic.id,
-                scoreValue: 0,
-            };
+    useEffect(
+        () => async () => {
+            // JSON.parse(localStorage.getItem("new_empty_scores")).length > 1;
+            // debugger;
+            if (currentScore !== undefined) {
+                console.log("HAS SCORE", currentScore);
+                // debugger;
+                setScore(currentScore.scoreValue);
+                setText(currentScore.note);
+                setEvidenceUrl(currentScore.evidenceUrl);
+                if (currentScore.note || currentScore.scoreValue) {
+                    setEnable(true);
+                }
+                setEmpty(false);
+            } else {
+                setEmpty(true);
+                setScore(0);
 
-            newEmptyScores.push(newEmptyScore);
-            // localStorage.setItem(
-            //     "new_empty_scores",
-            //     JSON.stringify(newEmptyScores)
-            // );
-            writeNewScores();
-            // console.log("Undefined????");
-        }
-    }, [currentScore, router, heuristic]);
+                console.log("ESCREVEU????");
+
+                const newEmptyScore = {
+                    projectSlug: router.query.slug,
+                    playerSlug: router.query.player,
+                    journeySlug: router.query.journey,
+                    heuristicId: heuristic.id,
+                    scoreValue: 0,
+                };
+
+                newEmptyScores.push(newEmptyScore);
+
+                if (localStorage.getItem("new_empty_scores") === null) {
+                    writeNewScores(() => {
+                        // getNewScores().then((data) => {
+                        //     console.log("new scores", data);
+                        //     currentScore = allScores.find(
+                        //         (someScore) =>
+                        //             someScore.heuristic.heuristicNumber ===
+                        //             heuristic.heuristicNumber
+                        //     );
+                        // });
+                    });
+                    console.log("ESCREVEU!!!");
+                }
+            }
+        },
+        [router, heuristic, getNewScores, allScores, currentScore]
+    );
+
+    // useEffect(() => {
+    //     console.log("antes response");
+    //     getNewScores();
+    //     waitForPublish().then((data) => getNewScores());
+    // }, [getNewScores]);
 
     /**
      *
@@ -211,52 +249,70 @@ function HeuristicItem({ heuristic, id }) {
         // let newScores = [...allScores];
         // debugger;
 
-        saveValue();
+        // saveValue();
 
-        function saveValue() {
-            if (empty) {
-                // debugger;
-                processChange(
-                    client,
-                    {
-                        projectSlug: router.query.slug,
-                        playerSlug: router.query.player,
-                        journeySlug: router.query.journey,
-                        heuristicId: heuristic.id,
-                        scoreValue: Number(ev.target.value),
-                    },
-                    MUTATION_CREATE_SCORE,
-                    true
-                );
-            } else {
-                processChange(
-                    client,
-                    {
-                        scoreId: currentScore.id,
-                        scoreValue: Number(ev.target.value),
-                        scoreNote: currentScore.note,
-                    },
-                    MUTATION_SCORE
-                );
-            }
-        }
+        // function saveValue() {
+        //     if (empty) {
+        //         // debugger;
+        //         processChange(
+        //             client,
+        //             {
+        //                 projectSlug: router.query.slug,
+        //                 playerSlug: router.query.player,
+        //                 journeySlug: router.query.journey,
+        //                 heuristicId: heuristic.id,
+        //                 scoreValue: Number(ev.target.value),
+        //             },
+        //             MUTATION_CREATE_SCORE,
+        //             true
+        //         );
+        //     } else {
+        //         processChange(
+        //             client,
+        //             {
+        //                 scoreId: currentScore.id,
+        //                 scoreValue: Number(ev.target.value),
+        //                 scoreNote: currentScore.note,
+        //             },
+        //             MUTATION_SCORE
+        //         );
+        //     }
+        // }
+
+        processChange(
+            client,
+            {
+                scoreId: currentScore.id,
+                scoreValue: Number(ev.target.value),
+                scoreNote: currentScore.note,
+            },
+            MUTATION_SCORE
+        );
 
         let dataNew = await waitForNewData();
 
         console.log("NEW PROMISE", dataNew);
         setEnable(true);
 
-        if (empty) {
-            setAllScores([...allScores, dataNew]);
-        } else {
-            let newScores = allScores.map((score) =>
-                score.heuristic.heuristicNumber === heuristic.heuristicNumber
-                    ? { ...score, scoreValue: Number(ev.target.value) }
-                    : score
-            );
+        // if (empty) {
+        //     setAllScores([...allScores, dataNew]);
+        // } else {
+        //     let newScores = allScores.map((score) =>
+        //         score.heuristic.heuristicNumber === heuristic.heuristicNumber
+        //             ? { ...score, scoreValue: Number(ev.target.value) }
+        //             : score
+        //     );
 
-            setAllScores(newScores);
-        }
+        //     setAllScores(newScores);
+        // }
+        // debugger;
+        let newScores = allScores.map((score) =>
+            score.heuristic.heuristicNumber === heuristic.heuristicNumber
+                ? { ...score, scoreValue: Number(ev.target.value) }
+                : score
+        );
+
+        setAllScores(newScores);
 
         setToast({
             open: true,
