@@ -92,23 +92,6 @@ function publishNewScores() {
         });
 }
 
-// function getUnicScores(arr) {
-//     let unique = null;
-//     unique = arr.filter((element) => {
-//         const isDuplicate = uniqueHeuristics.includes(element.heuristicId);
-
-//         if (!isDuplicate) {
-//             uniqueHeuristics.push(element.heuristicId);
-
-//             return true;
-//         }
-
-//         return false;
-//     });
-
-//     return unique;
-// }
-
 let multiString = "";
 
 let stringCreate = "";
@@ -180,38 +163,13 @@ export default function GroupContainer({ data }) {
      * ------------------------------
      */
 
-    // const groupsMemo = useMemo(() => {
-    //     getUniqueGroups(data.groups, "id");
-    //     return data.groups;
-    // }, [data]);
-
-    /**
-     *
-     * Mapping groups
-     */
-
-    // groupsMemo.map((group) => {
-    //     groupsMapped.push(group);
-    //     group.heuristic.map((heuristicItem) => {});
-    // });
-
-    // if (groupsMapped) {
-    //     groupsMapped.map((group) => {
-    //         console.log("heuristics", group.heuristic);
-    //     });
-    // }
-
-    // useEffect(() => {
-    //     setGroups(data.groups);
-    // }, [data]);
-
     useEffect(() => {
         // setEmpty(true);
         getNewScores().then((data) => {
-            console.log("newscores", data);
+            // console.log("newscores", data);
 
             if (data.length > 0) {
-                console.log("newscoreswwww", data);
+                // console.log("newscoreswwww", data);
                 setEmpty(false);
             } else {
                 createNewScores();
@@ -222,9 +180,6 @@ export default function GroupContainer({ data }) {
     function createNewScores() {
         debCreateNewScores(data, router);
     }
-
-    // useEffect(() => {
-    // }, [groups, stringCreateFunc, empty]);
 
     if (!dataJourneys) {
         return null;
@@ -242,10 +197,6 @@ export default function GroupContainer({ data }) {
             </div>
         );
     }
-
-    // if (empty) {
-    //     return null;
-    // }
 
     return (
         <>

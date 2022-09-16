@@ -156,7 +156,7 @@ function HeuristicItem({ heuristic, id }) {
     const router = useRouter();
 
     // debugger;
-    console.log("scores", allScores);
+    // console.log("scores", allScores);
 
     const currentScore = allScores.find(
         (someScore) =>
