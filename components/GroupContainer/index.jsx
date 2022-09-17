@@ -194,6 +194,8 @@ const stringCreateFunc = (
 
 export default function GroupContainer({ data }) {
     const router = useRouter();
+    const [findingsList, setFindingsList] = useState(null);
+    const [findingsLoading, setFindingsLoading] = useState(true);
     const [empty, setEmpty] = useState(true);
     const [groups, setGroups] = useState(null);
     const [newScores, setNewScores] = useState([]);
@@ -209,16 +211,35 @@ export default function GroupContainer({ data }) {
         },
     });
 
-    const {
-        data: dataFindings,
-        loading: loadingFindings,
-        error: errorFindings,
-    } = useQuery(QUERY_FINDINGS, {
-        variables: {
-            playerSlug: router.query.player,
-            projectSlug: router.query.slug,
-            journeySlug: router.query.journey,
-        },
+    // const {
+    //     data: dataFindings,
+    //     loading: loadingFindings,
+    //     error: errorFindings,
+    // } = useQuery(QUERY_FINDINGS, {
+    //     variables: {
+    //         playerSlug: router.query.player,
+    //         projectSlug: router.query.slug,
+    //         journeySlug: router.query.journey,
+    //     },
+    // });
+    function getFindings() {
+        client
+            .query({
+                query: QUERY_FINDINGS,
+                variables: {
+                    playerSlug: router.query.player,
+                    projectSlug: router.query.slug,
+                    journeySlug: router.query.journey,
+                },
+                fetchPolicy: "network-only",
+            })
+            .then(({ data }) => {
+                console.log("FINDINGS", data);
+                setFindingsList(data);
+            });
+    }
+    useEffect(() => {
+        getFindings();
     });
 
     useEffect(() => {
@@ -279,7 +300,11 @@ export default function GroupContainer({ data }) {
                         <HeuristicGroup group={group} key={group.id} />
                     ))}
 
-                    <Findings data={dataFindings} router={router} />
+                    <Findings
+                        data={findingsList}
+                        router={router}
+                        getFindings={getFindings}
+                    />
                 </div>
                 <div>
                     <h1 className="text-2xl">Categories</h1>
@@ -290,8 +315,10 @@ export default function GroupContainer({ data }) {
     );
 }
 
-function Findings({ data, router }) {
+function Findings({ data, router, getFindings }) {
     const [findings, setFindings] = useState(data?.findings || []);
+
+    const [findingsLoading, setFindingsLoading] = useState(false);
 
     useEffect(() => {
         if (data) {
@@ -305,6 +332,7 @@ function Findings({ data, router }) {
     }
 
     function handleAddOneMoreFinding() {
+        setFindingsLoading(true);
         doMutate(
             client,
             {
@@ -314,11 +342,13 @@ function Findings({ data, router }) {
             },
             MUTATION_CREATE_FINDINGS,
             "create",
-            addFinding
+            addFinding,
+            setFindingsLoading
         );
     }
     function addFinding(finding) {
-        setFindings([...findings, finding]);
+        // setFindings([...findings, finding]);
+        getFindings();
     }
     return (
         <section className="mx-3">
@@ -341,7 +371,9 @@ function Findings({ data, router }) {
                 })}
                 <li>
                     <button onClick={handleAddOneMoreFinding}>
-                        Add one more finding
+                        {findingsLoading
+                            ? `Loading...`
+                            : `Add one more finding`}
                     </button>
                 </li>
             </ul>
@@ -352,11 +384,17 @@ function Findings({ data, router }) {
 function FindingBlock({ finding }) {
     const [text, setText] = useState(finding.findingObject.text || "");
 
+    const [loading, setLoading] = useState(false);
+    const [disabled, setDisabled] = useState(true);
+
     function onChangeText(value) {
+        setDisabled(false);
         setText(value);
     }
 
     function handleClickSaveFinding(id) {
+        setLoading(true);
+        setDisabled(true);
         doMutate(
             client,
             {
@@ -365,7 +403,9 @@ function FindingBlock({ finding }) {
                 theType: "goodA",
             },
             MUTATION_FINDINGS,
-            "edit"
+            "edit",
+            null,
+            setLoading
         );
     }
 
@@ -386,7 +426,13 @@ function FindingBlock({ finding }) {
                     onChangeText(ev.target.value);
                 }}
             ></textarea>
-            <button onClick={handleClickSaveFinding}>Save finding</button>
+            <button
+                className={`${disabled && "opacity-50"}`}
+                disabled={disabled}
+                onClick={handleClickSaveFinding}
+            >
+                {loading ? "Saving..." : "Save finding"}
+            </button>
         </div>
     );
 }
@@ -396,26 +442,28 @@ function doMutate(
     variables,
     mutationString,
     verb = "edit",
-    setFindings
+    setFindings,
+    setLoading
 ) {
     // console.log(client, variables, mutationString, isCreate, setFindings);
-
+    console.log("verb", verb);
     client
         .mutate({
             mutation: mutationString,
             variables,
         })
         .then(({ data }) => {
-            console.log(data);
-            if (verb === "create") {
-                doPublic(client, data.createFinding.id, verb, setFindings);
-            } else {
-                doPublic(client, data.updateFinding.id);
-            }
+            doPublic(
+                client,
+                data.updateFinding.id,
+                verb,
+                setFindings,
+                setLoading
+            );
         });
 }
 
-function doPublic(client, newId, verb, setFindings) {
+function doPublic(client, newId, verb, setFindings, setLoading) {
     console.log("varr", newId);
 
     client
@@ -424,9 +472,14 @@ function doPublic(client, newId, verb, setFindings) {
             variables: { findingId: newId },
         })
         .then(({ data }) => {
+            console.log("verb", verb);
             if (verb === "create") {
                 console.log("publicou", data.publishFinding);
                 setFindings(data.publishFinding);
+                setLoading(false);
+            } else if (verb === "edit") {
+                console.log("publicou EDIT", data.publishFinding);
+                setLoading(false);
             }
         });
 
