@@ -66,7 +66,7 @@ const MUTATION_CREATE_FINDINGS = gql`
                 project: { connect: { slug: $projectSlug } }
                 player: { connect: { slug: $playerSlug } }
                 journey: { connect: { slug: $journeySlug } }
-                findingObject: { text: "criado aqui", theType: "good criado" }
+                findingObject: { text: "", theType: "neutral" }
             }
         ) {
             id
@@ -371,7 +371,7 @@ function Findings({ data, router, getFindings }) {
                     <p>sdsdsdsdsd sd sds ds d</p>
                 </div>
             </header>
-            <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg flex flex-col gap-10">
+            <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-8 rounded-lg shadow-lg flex flex-col gap-10">
                 {findings.map((finding) => {
                     return (
                         <li key={finding.id}>
@@ -397,15 +397,25 @@ function Findings({ data, router, getFindings }) {
 function FindingBlock({ finding, callBack }) {
     const [text, setText] = useState(finding.findingObject.text || "");
 
-    const [theType, setTheType] = useState("neutral");
+    const [theType, setTheType] = useState(
+        finding.findingObject.theType || "neutral"
+    );
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState("disabled");
     const [disabled, setDisabled] = useState(true);
     const [confirmOpen, setConfirmOpen] = useState(false);
 
+    console.log("finding.findingObject.theType", finding.findingObject.theType);
+
     function onChangeText(value) {
         setDisabled(false);
         setText(value);
+    }
+
+    function onChangeTheType(type) {
+        console.log(type);
+        setTheType(type);
+        setDisabled(false);
     }
 
     function handleClickSaveFinding(id) {
@@ -417,7 +427,7 @@ function FindingBlock({ finding, callBack }) {
             {
                 findingId: finding.id,
                 text,
-                theType: "goodA",
+                theType: theType,
             },
             MUTATION_FINDINGS,
             "edit",
@@ -469,12 +479,42 @@ function FindingBlock({ finding, callBack }) {
                         onChangeText(ev.target.value);
                     }}
                 ></textarea>
-                <Switch
-                    options={["bad", "neutral", "good"]}
-                    onChange={(theType) => setTheType(theType)}
-                />
+                <div className="flex justify-between">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-slate-500">
+                            Choose an option for this finding:
+                        </label>
+                        <Switch
+                            options={["bad", "neutral", "good"]}
+                            onChange={(theType) => onChangeTheType(theType)}
+                            selected={theType}
+                        />
+                    </div>
+                    <div>
+                        {confirmOpen ? (
+                            <div className="flex gap-2 items-center">
+                                <span className="opacity-60">
+                                    Confirm delete?{" "}
+                                </span>
+                                <button
+                                    className="border px-4 rounded-full h-7 text-red-500 border-red-500 hover:bg-red-700/10"
+                                    onClick={doDeleteFinding}
+                                >
+                                    Yes
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                className="text-red-500 "
+                                onClick={handleClickDelete}
+                            >
+                                Delete
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-betweenss justify-end mb-5">
                 <BtnSmallPrimary
                     disabled={disabled}
                     status={status}
@@ -482,27 +522,9 @@ function FindingBlock({ finding, callBack }) {
                     textFinished="Saved"
                     onClick={handleClickSaveFinding}
                 />
-
-                <div>
-                    {confirmOpen ? (
-                        <div className="flex gap-2 items-center">
-                            <span className="opacity-60">Confirm delete? </span>
-                            <button
-                                className="border px-4 rounded-full h-7 text-red-500 border-red-500 hover:bg-red-700/10"
-                                onClick={doDeleteFinding}
-                            >
-                                Yes
-                            </button>
-                        </div>
-                    ) : (
-                        <button
-                            className="text-red-500 "
-                            onClick={handleClickDelete}
-                        >
-                            Delete
-                        </button>
-                    )}
-                </div>
+            </div>
+            <div className="opacity-50">
+                <hr />
             </div>
         </div>
     );

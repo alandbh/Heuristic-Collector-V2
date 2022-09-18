@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-function Switch({ onChange, options }) {
-    const [option, setOption] = useState(options[1]);
+function Switch({ onChange, options, selected }) {
+    const [option, setOption] = useState(selected);
 
     function handleOnChange(ev) {
         setOption(ev.target.value);
