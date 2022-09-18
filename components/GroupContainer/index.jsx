@@ -372,12 +372,13 @@ function Findings({ data, router, getFindings }) {
                 </div>
             </header>
             <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-8 rounded-lg shadow-lg flex flex-col gap-10">
-                {findings.map((finding) => {
+                {findings.map((finding, index) => {
                     return (
                         <li key={finding.id}>
                             <FindingBlock
                                 finding={finding}
                                 callBack={getFindings}
+                                index={index}
                             />
                         </li>
                     );
@@ -394,7 +395,7 @@ function Findings({ data, router, getFindings }) {
     );
 }
 
-function FindingBlock({ finding, callBack }) {
+function FindingBlock({ finding, callBack, index }) {
     const [text, setText] = useState(finding.findingObject.text || "");
 
     const [theType, setTheType] = useState(
@@ -409,6 +410,7 @@ function FindingBlock({ finding, callBack }) {
 
     function onChangeText(value) {
         setDisabled(false);
+        setStatus("active");
         setText(value);
     }
 
@@ -416,6 +418,7 @@ function FindingBlock({ finding, callBack }) {
         console.log(type);
         setTheType(type);
         setDisabled(false);
+        setStatus("active");
     }
 
     function handleClickSaveFinding(id) {
@@ -463,6 +466,7 @@ function FindingBlock({ finding, callBack }) {
 
     return (
         <div className="flex flex-col gap-3">
+            <h3 className="font-bold text-lg">Finding #{index + 1}</h3>
             <label
                 className="text-slate-500"
                 htmlFor={"findingText_" + finding.id}
