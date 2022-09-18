@@ -397,6 +397,7 @@ function FindingBlock({ finding, callBack }) {
 
     const [loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(true);
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     function onChangeText(value) {
         setDisabled(false);
@@ -421,6 +422,13 @@ function FindingBlock({ finding, callBack }) {
     }
 
     function handleClickDelete() {
+        setConfirmOpen(true);
+    }
+
+    function handleConfirmDelete() {}
+
+    function doDeleteFinding() {
+        setConfirmOpen(false);
         doMutate(
             client,
             {
@@ -456,15 +464,26 @@ function FindingBlock({ finding, callBack }) {
                         onChangeText(ev.target.value);
                     }}
                 ></textarea>
-                <button onClick={handleClickDelete}>X</button>
             </div>
-            <button
-                className={`${disabled && "opacity-50"}`}
-                disabled={disabled}
-                onClick={handleClickSaveFinding}
-            >
-                {loading ? "Saving..." : "Save finding"}
-            </button>
+            <div className="flex justify-between">
+                <button
+                    className={`${disabled && "opacity-50"}`}
+                    disabled={disabled}
+                    onClick={handleClickSaveFinding}
+                >
+                    {loading ? "Saving..." : "Save finding"}
+                </button>
+                <div>
+                    {confirmOpen ? (
+                        <div>
+                            Confirm delete?{" "}
+                            <button onClick={doDeleteFinding}>Yes</button>
+                        </div>
+                    ) : (
+                        <button onClick={handleClickDelete}>Delete</button>
+                    )}
+                </div>
+            </div>
         </div>
     );
 }
@@ -495,6 +514,7 @@ function doMutate(
             } else {
                 console.log("deletando", data);
                 newId = data.deleteFinding.id;
+                setFindings();
             }
 
             doPublic(client, newId, verb, setFindings, setLoading);
