@@ -82,6 +82,14 @@ const MUTATION_PUBLISH_FINDING = gql`
     }
 `;
 
+const MURATION_DELETE_FINDING = gql`
+    mutation DeleteFinding($findingId: ID) {
+        deleteFinding(where: { id: $findingId }) {
+            id
+        }
+    }
+`;
+
 let selectedJourney;
 
 const uniqueHeuristics = [];
@@ -365,7 +373,10 @@ function Findings({ data, router, getFindings }) {
                 {findings.map((finding) => {
                     return (
                         <li key={finding.id}>
-                            <FindingBlock finding={finding} />
+                            <FindingBlock
+                                finding={finding}
+                                callBack={getFindings}
+                            />
                         </li>
                     );
                 })}
@@ -381,7 +392,7 @@ function Findings({ data, router, getFindings }) {
     );
 }
 
-function FindingBlock({ finding }) {
+function FindingBlock({ finding, callBack }) {
     const [text, setText] = useState(finding.findingObject.text || "");
 
     const [loading, setLoading] = useState(false);
@@ -409,6 +420,24 @@ function FindingBlock({ finding }) {
         );
     }
 
+    function handleClickDelete() {
+        doMutate(
+            client,
+            {
+                findingId: finding.id,
+            },
+            MURATION_DELETE_FINDING,
+            "delete",
+            reloadFindingList,
+            setLoading
+        );
+    }
+
+    function reloadFindingList(finding) {
+        // setFindings([...findings, finding]);
+        callBack();
+    }
+
     return (
         <div className="flex flex-col gap-1">
             <label
@@ -417,15 +446,18 @@ function FindingBlock({ finding }) {
             >
                 Type what you`ve found
             </label>
-            <textarea
-                id={"findingText_" + finding.id}
-                className="w-full border border-slate-300 dark:border-slate-500 p-2 h-28 text-slate-500 dark:text-slate-300 rounded-md"
-                rows="3"
-                value={text}
-                onChange={(ev) => {
-                    onChangeText(ev.target.value);
-                }}
-            ></textarea>
+            <div className="flex gap-2">
+                <textarea
+                    id={"findingText_" + finding.id}
+                    className="w-full border border-slate-300 dark:border-slate-500 p-2 h-28 text-slate-500 dark:text-slate-300 rounded-md"
+                    rows="3"
+                    value={text}
+                    onChange={(ev) => {
+                        onChangeText(ev.target.value);
+                    }}
+                ></textarea>
+                <button onClick={handleClickDelete}>X</button>
+            </div>
             <button
                 className={`${disabled && "opacity-50"}`}
                 disabled={disabled}
@@ -453,13 +485,19 @@ function doMutate(
             variables,
         })
         .then(({ data }) => {
-            doPublic(
-                client,
-                data.updateFinding.id,
-                verb,
-                setFindings,
-                setLoading
-            );
+            let newId;
+            if (verb === "edit") {
+                newId = data.updateFinding.id;
+                console.log("editando", data);
+            } else if (verb === "create") {
+                console.log("criando", data);
+                newId = data.createFinding.id;
+            } else {
+                console.log("deletando", data);
+                newId = data.deleteFinding.id;
+            }
+
+            doPublic(client, newId, verb, setFindings, setLoading);
         });
 }
 
