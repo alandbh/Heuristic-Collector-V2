@@ -221,17 +221,6 @@ export default function GroupContainer({ data }) {
         },
     });
 
-    // const {
-    //     data: dataFindings,
-    //     loading: loadingFindings,
-    //     error: errorFindings,
-    // } = useQuery(QUERY_FINDINGS, {
-    //     variables: {
-    //         playerSlug: router.query.player,
-    //         projectSlug: router.query.slug,
-    //         journeySlug: router.query.journey,
-    //     },
-    // });
     function getFindings() {
         client
             .query({
@@ -244,7 +233,6 @@ export default function GroupContainer({ data }) {
                 fetchPolicy: "network-only",
             })
             .then(({ data }) => {
-                console.log("FINDINGS", data);
                 setFindingsList(data);
             });
     }
@@ -291,17 +279,6 @@ export default function GroupContainer({ data }) {
         return null;
     }
 
-    // if (!selectedJourney) {
-    //     return (
-    //         <div className="h-[calc(100vh_-_126px)] flex flex-col items-center px-5 text-center">
-    //             <h1 className="text-2xl mb-5">
-    //                 {`This player doens't have the selected journey.`}
-    //             </h1>
-    //             <p>Please, select another journey / player</p>
-    //         </div>
-    //     );
-    // }
-
     return (
         <>
             <div className="gap-5 max-w-5xl mx-auto md:grid grid-cols-3 ">
@@ -335,7 +312,7 @@ function Findings({ data, router, getFindings }) {
             setFindings(data.findings);
         }
     }, [data]);
-    console.log("findings", findings);
+    // console.log("findingsAAAA", findings);
 
     if (!data) {
         return null;
@@ -371,7 +348,8 @@ function Findings({ data, router, getFindings }) {
                     <p>sdsdsdsdsd sd sds ds d</p>
                 </div>
             </header>
-            <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-8 rounded-lg shadow-lg flex flex-col gap-10">
+            <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-0 rounded-lg shadow-lg flex flex-col gap-10">
+                {findings.length === 0 && <div>No findings registered yet</div>}
                 {findings.map((finding, index) => {
                     return (
                         <li key={finding.id}>
@@ -383,7 +361,7 @@ function Findings({ data, router, getFindings }) {
                         </li>
                     );
                 })}
-                <li>
+                <li className="px-8">
                     <button onClick={handleAddOneMoreFinding}>
                         {findingsLoading
                             ? `Loading...`
@@ -406,8 +384,6 @@ function FindingBlock({ finding, callBack, index }) {
     const [disabled, setDisabled] = useState(true);
     const [confirmOpen, setConfirmOpen] = useState(false);
 
-    console.log("finding.findingObject.theType", finding.findingObject.theType);
-
     function onChangeText(value) {
         setDisabled(false);
         setStatus("active");
@@ -415,7 +391,6 @@ function FindingBlock({ finding, callBack, index }) {
     }
 
     function onChangeTheType(type) {
-        console.log(type);
         setTheType(type);
         setDisabled(false);
         setStatus("active");
@@ -443,8 +418,6 @@ function FindingBlock({ finding, callBack, index }) {
         setConfirmOpen(true);
     }
 
-    function handleConfirmDelete() {}
-
     function doDeleteFinding() {
         setConfirmOpen(false);
         doMutate(
@@ -466,35 +439,25 @@ function FindingBlock({ finding, callBack, index }) {
 
     return (
         <div className="flex flex-col gap-3">
-            <h3 className="font-bold text-lg">Finding #{index + 1}</h3>
-            <label
-                className="text-slate-500"
-                htmlFor={"findingText_" + finding.id}
-            >
-                Type what you`ve found
-            </label>
-            <div className="flex gap-2 flex-col">
-                <textarea
-                    id={"findingText_" + finding.id}
-                    className="w-full border border-slate-300 dark:border-slate-500 p-2 h-28 text-slate-500 dark:text-slate-300 rounded-md"
-                    rows="3"
-                    value={text}
-                    onChange={(ev) => {
-                        onChangeText(ev.target.value);
-                    }}
-                ></textarea>
-                <div className="flex justify-between">
-                    <div className="flex flex-col gap-2">
-                        <label className="text-slate-500">
-                            Choose an option for this finding:
-                        </label>
-                        <Switch
-                            options={["bad", "neutral", "good"]}
-                            onChange={(theType) => onChangeTheType(theType)}
-                            selected={theType}
-                        />
-                    </div>
-                    <div>
+            <div className="px-8">
+                <h3 className="font-bold text-lg">Finding #{index + 1}</h3>
+                <label
+                    className="text-slate-500"
+                    htmlFor={"findingText_" + finding.id}
+                >
+                    Type what you`ve found
+                </label>
+                <div className="flex gap-4 flex-col">
+                    <textarea
+                        id={"findingText_" + finding.id}
+                        className="w-full border border-slate-300 dark:border-slate-500 p-2 h-28 text-slate-500 dark:text-slate-300 rounded-md"
+                        rows="3"
+                        value={text}
+                        onChange={(ev) => {
+                            onChangeText(ev.target.value);
+                        }}
+                    ></textarea>
+                    <div className="flex justify-end">
                         {confirmOpen ? (
                             <div className="flex gap-2 items-center">
                                 <span className="opacity-60">
@@ -516,18 +479,30 @@ function FindingBlock({ finding, callBack, index }) {
                             </button>
                         )}
                     </div>
+                    <div className="flex justify-between">
+                        <div className="flex flex-col gap-2">
+                            <label className="text-slate-500">
+                                Choose an option for this finding:
+                            </label>
+                            <Switch
+                                options={["bad", "neutral", "good"]}
+                                onChange={(theType) => onChangeTheType(theType)}
+                                selected={theType}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-center md:justify-end mb-5 mt-5">
+                        <BtnSmallPrimary
+                            disabled={disabled}
+                            status={status}
+                            textActive="Save Finding"
+                            textFinished="Saved"
+                            onClick={handleClickSaveFinding}
+                        />
+                    </div>
                 </div>
             </div>
-            <div className="flex justify-betweenss justify-end mb-5">
-                <BtnSmallPrimary
-                    disabled={disabled}
-                    status={status}
-                    textActive="Save Finding"
-                    textFinished="Saved"
-                    onClick={handleClickSaveFinding}
-                />
-            </div>
-            <div className="opacity-50">
+            <div className="dark:opacity-10">
                 <hr />
             </div>
         </div>
