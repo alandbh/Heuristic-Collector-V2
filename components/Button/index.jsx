@@ -5,9 +5,11 @@ export function BtnSmallPrimary({
     onClick,
     textActive,
     textFinished,
+    disabled,
 }) {
     const contentStatus = {
         active: textActive,
+        disabled: textActive,
         loading: (
             <span className="flex items-center gap-2">
                 <Spinner radius={8} thick={2} /> Wait...
@@ -34,11 +36,12 @@ export function BtnSmallPrimary({
 
     return (
         <button
+            disabled={disabled}
             onClick={onClick}
-            className={`py-2 px-4 rounded-md text-white/70 text-sm ${
-                status === "saved"
-                    ? "border opacity-70"
-                    : "bg-primary hover:bg-primary/60"
+            className={`py-2 px-4 rounded-md  dark:text-white/70 text-sm ${
+                status === "saved" || disabled
+                    ? "border opacity-70 text-slate-400 cursor-not-allowed"
+                    : "bg-primary hover:bg-primary/60 text-white/80"
             }`}
         >
             {contentStatus[status]}

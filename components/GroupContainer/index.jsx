@@ -5,6 +5,8 @@ import HeuristicGroup from "../HeuristicGroup";
 import { useScoresContext } from "../../context/scores";
 import { getUnicItem, debounce } from "../../lib/utils";
 import client from "../../lib/apollo";
+import { BtnSmallPrimary } from "../Button";
+import Switch from "../Switch";
 
 const QUERY_JOURNEYS = gql`
     query GetGroups($playerSlug: String, $projectSlug: String) {
@@ -369,7 +371,7 @@ function Findings({ data, router, getFindings }) {
                     <p>sdsdsdsdsd sd sds ds d</p>
                 </div>
             </header>
-            <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
+            <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg flex flex-col gap-10">
                 {findings.map((finding) => {
                     return (
                         <li key={finding.id}>
@@ -395,7 +397,9 @@ function Findings({ data, router, getFindings }) {
 function FindingBlock({ finding, callBack }) {
     const [text, setText] = useState(finding.findingObject.text || "");
 
+    const [theType, setTheType] = useState("neutral");
     const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState("disabled");
     const [disabled, setDisabled] = useState(true);
     const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -406,6 +410,7 @@ function FindingBlock({ finding, callBack }) {
 
     function handleClickSaveFinding(id) {
         setLoading(true);
+        setStatus("loading");
         setDisabled(true);
         doMutate(
             client,
@@ -417,7 +422,7 @@ function FindingBlock({ finding, callBack }) {
             MUTATION_FINDINGS,
             "edit",
             null,
-            setLoading
+            setStatus
         );
     }
 
@@ -447,14 +452,14 @@ function FindingBlock({ finding, callBack }) {
     }
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-3">
             <label
                 className="text-slate-500"
                 htmlFor={"findingText_" + finding.id}
             >
                 Type what you`ve found
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-col">
                 <textarea
                     id={"findingText_" + finding.id}
                     className="w-full border border-slate-300 dark:border-slate-500 p-2 h-28 text-slate-500 dark:text-slate-300 rounded-md"
@@ -464,23 +469,38 @@ function FindingBlock({ finding, callBack }) {
                         onChangeText(ev.target.value);
                     }}
                 ></textarea>
+                <Switch
+                    options={["bad", "neutral", "good"]}
+                    onChange={(theType) => setTheType(theType)}
+                />
             </div>
             <div className="flex justify-between">
-                <button
-                    className={`${disabled && "opacity-50"}`}
+                <BtnSmallPrimary
                     disabled={disabled}
+                    status={status}
+                    textActive="Save Finding"
+                    textFinished="Saved"
                     onClick={handleClickSaveFinding}
-                >
-                    {loading ? "Saving..." : "Save finding"}
-                </button>
+                />
+
                 <div>
                     {confirmOpen ? (
-                        <div>
-                            Confirm delete?{" "}
-                            <button onClick={doDeleteFinding}>Yes</button>
+                        <div className="flex gap-2 items-center">
+                            <span className="opacity-60">Confirm delete? </span>
+                            <button
+                                className="border px-4 rounded-full h-7 text-red-500 border-red-500 hover:bg-red-700/10"
+                                onClick={doDeleteFinding}
+                            >
+                                Yes
+                            </button>
                         </div>
                     ) : (
-                        <button onClick={handleClickDelete}>Delete</button>
+                        <button
+                            className="text-red-500 "
+                            onClick={handleClickDelete}
+                        >
+                            Delete
+                        </button>
                     )}
                 </div>
             </div>
@@ -537,7 +557,7 @@ function doPublic(client, newId, verb, setFindings, setLoading) {
                 setLoading(false);
             } else if (verb === "edit") {
                 console.log("publicou EDIT", data.publishFinding);
-                setLoading(false);
+                setLoading("saved");
             }
         });
 
