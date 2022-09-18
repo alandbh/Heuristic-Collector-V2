@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import HeuristicGroup from "../HeuristicGroup";
@@ -383,6 +383,7 @@ function FindingBlock({ finding, callBack, index }) {
     const [status, setStatus] = useState("disabled");
     const [disabled, setDisabled] = useState(true);
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const groupRef = useRef(null);
 
     function onChangeText(value) {
         setDisabled(false);
@@ -419,17 +420,23 @@ function FindingBlock({ finding, callBack, index }) {
     }
 
     function doDeleteFinding() {
-        setConfirmOpen(false);
-        doMutate(
-            client,
-            {
-                findingId: finding.id,
-            },
-            MURATION_DELETE_FINDING,
-            "delete",
-            reloadFindingList,
-            setLoading
-        );
+        groupRef.current.style.transition = "0.5s";
+        groupRef.current.style.opacity = "0";
+        groupRef.current.style.transform = "translateX(-80px)";
+
+        setTimeout(() => {
+            setConfirmOpen(false);
+            doMutate(
+                client,
+                {
+                    findingId: finding.id,
+                },
+                MURATION_DELETE_FINDING,
+                "delete",
+                reloadFindingList,
+                setLoading
+            );
+        }, 500);
     }
 
     function reloadFindingList(finding) {
@@ -438,8 +445,8 @@ function FindingBlock({ finding, callBack, index }) {
     }
 
     return (
-        <div className="flex flex-col gap-3">
-            <div className="px-8">
+        <div className="flex flex-col gap-3 overflow-x-hidden">
+            <div ref={groupRef} className="px-8">
                 <h3 className="font-bold text-lg">Finding #{index + 1}</h3>
                 <label
                     className="text-slate-500"
