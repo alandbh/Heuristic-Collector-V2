@@ -127,7 +127,7 @@ function PlayerSelect() {
                     Select a Player
                 </label>
                 <div className="flex gap-2 items-center content-center">
-                    <picture className="h-6 block dark:brightness-[10] dark:grayscale dark:opacity-70">
+                    <picture className="h-6 block dark:brightness-[0] dark:invert dark:grayscale dark:opacity-70">
                         <source srcSet={selected?.logo.url} type="image/webp" />
                         <img
                             className="object-cover max-h-5"
@@ -179,7 +179,7 @@ function PlayerSelect() {
                                     className="border box-border border-l-0 border-gray-300 shadow-[inset_0px_0px_0px_1px_rgba(200,200,255,0.3)] font-bold text-slate-500 hover:text-primary hover:shadow-primary p-8 w-full flex justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all"
                                     onClick={() => handleSelectPlayer(player)}
                                 >
-                                    <picture className="h-6 block dark:grayscale dark:brightness-[10]">
+                                    <picture className="h-6 block dark:grayscale dark:brightness-[0] dark:invert">
                                         <source
                                             srcSet={player.logo.url}
                                             type="image/webp"
