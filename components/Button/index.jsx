@@ -5,7 +5,7 @@ export function BtnSmallPrimary({
     onClick,
     textActive,
     textFinished,
-    disabled,
+    disabled = false,
 }) {
     const contentStatus = {
         active: textActive,

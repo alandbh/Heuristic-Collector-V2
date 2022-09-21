@@ -337,6 +337,18 @@ function Findings({ data, router, getFindings }) {
         // setFindings([...findings, finding]);
         getFindings();
     }
+
+    let addButtonText;
+    let addButtonStatus = "active";
+
+    if (findingsLoading) {
+        addButtonStatus = "loading";
+        addButtonText = "Wait...";
+    } else if (findings.length === 0) {
+        addButtonText = "Add a new finding";
+    } else {
+        addButtonText = "Add one more finding";
+    }
     return (
         <section className="mx-3">
             <header className="flex flex-col justify-between mb-6 items-center px-4 gap-3">
@@ -345,11 +357,22 @@ function Findings({ data, router, getFindings }) {
                     <span>General Findings</span>
                 </h1>
                 <div className="text-lg flex items-center gap-5">
-                    <p>sdsdsdsdsd sd sds ds d</p>
+                    <p>
+                        This is a space for you to put some useful findings
+                        regarding this player, that are not described in none of
+                        the heuristics above. It could be a good thing (like
+                        this player allows credit card scanning) or a bad one
+                        (the face recognition does not work properly).
+                    </p>
                 </div>
             </header>
             <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-0 rounded-lg shadow-lg flex flex-col gap-10">
-                {findings.length === 0 && <div>No findings registered yet</div>}
+                {findings.length === 0 && (
+                    <div className="text-center">
+                        <span className="text-3xl">🤷‍♀️</span> <br />
+                        No findings registered yet
+                    </div>
+                )}
                 {findings.map((finding, index) => {
                     return (
                         <li key={finding.id}>
@@ -361,12 +384,16 @@ function Findings({ data, router, getFindings }) {
                         </li>
                     );
                 })}
-                <li className="px-8">
-                    <button onClick={handleAddOneMoreFinding}>
-                        {findingsLoading
-                            ? `Loading...`
-                            : `Add one more finding`}
-                    </button>
+                <li className="px-8 pb-8 flex justify-center">
+                    {/* <button onClick={handleAddOneMoreFinding}>
+                        {addButtonText}
+                    </button> */}
+
+                    <BtnSmallPrimary
+                        status={addButtonStatus}
+                        textActive={addButtonText}
+                        onClick={handleAddOneMoreFinding}
+                    />
                 </li>
             </ul>
         </section>
@@ -516,7 +543,7 @@ function FindingBlock({ finding, callBack, index }) {
                         <BtnSmallPrimary
                             disabled={disabled}
                             status={status}
-                            textActive="Save Finding"
+                            textActive={`Save Finding #${index + 1}`}
                             textFinished="Saved"
                             onClick={handleClickSaveFinding}
                         />
