@@ -530,7 +530,7 @@ function FindingBlock({ finding, callBack, index }) {
                     <div className="flex justify-between">
                         <div className="flex flex-col gap-2">
                             <label className="text-slate-500">
-                                Choose an option for this finding:
+                                How do you describe this finding?
                             </label>
                             <Switch
                                 options={["bad", "neutral", "good"]}
