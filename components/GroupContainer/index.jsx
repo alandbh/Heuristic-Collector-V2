@@ -419,24 +419,28 @@ function FindingBlock({ finding, callBack, index }) {
         setConfirmOpen(true);
     }
 
-    function doDeleteFinding() {
-        groupRef.current.style.transition = "0.5s";
-        groupRef.current.style.opacity = "0";
-        groupRef.current.style.transform = "translateX(-80px)";
+    function doDeleteFinding(confirm) {
+        if (confirm) {
+            groupRef.current.style.transition = "0.5s";
+            groupRef.current.style.opacity = "0";
+            groupRef.current.style.transform = "translateX(-80px)";
 
-        setTimeout(() => {
+            setTimeout(() => {
+                setConfirmOpen(false);
+                doMutate(
+                    client,
+                    {
+                        findingId: finding.id,
+                    },
+                    MURATION_DELETE_FINDING,
+                    "delete",
+                    reloadFindingList,
+                    setLoading
+                );
+            }, 500);
+        } else {
             setConfirmOpen(false);
-            doMutate(
-                client,
-                {
-                    findingId: finding.id,
-                },
-                MURATION_DELETE_FINDING,
-                "delete",
-                reloadFindingList,
-                setLoading
-            );
-        }, 500);
+        }
     }
 
     function reloadFindingList(finding) {
@@ -447,9 +451,9 @@ function FindingBlock({ finding, callBack, index }) {
     return (
         <div className="flex flex-col gap-3 overflow-x-hidden">
             <div ref={groupRef} className="px-8">
-                <h3 className="font-bold text-lg">Finding #{index + 1}</h3>
+                <h3 className="font-bold text-lg mb-4">Finding #{index + 1}</h3>
                 <label
-                    className="text-slate-500"
+                    className="text-slate-500 mb-2 inline-block"
                     htmlFor={"findingText_" + finding.id}
                 >
                     Type what you`ve found
@@ -464,7 +468,11 @@ function FindingBlock({ finding, callBack, index }) {
                             onChangeText(ev.target.value);
                         }}
                     ></textarea>
-                    <div className="flex justify-end">
+                    <div
+                        className={`flex ${
+                            confirmOpen ? "justify-center" : "justify-end"
+                        }`}
+                    >
                         {confirmOpen ? (
                             <div className="flex gap-2 items-center">
                                 <span className="opacity-60">
@@ -472,9 +480,15 @@ function FindingBlock({ finding, callBack, index }) {
                                 </span>
                                 <button
                                     className="border px-4 rounded-full h-7 text-red-500 border-red-500 hover:bg-red-700/10"
-                                    onClick={doDeleteFinding}
+                                    onClick={() => doDeleteFinding(true)}
                                 >
                                     Yes
+                                </button>
+                                <button
+                                    className="px-4 h-7  hover:underline"
+                                    onClick={() => doDeleteFinding(false)}
+                                >
+                                    No
                                 </button>
                             </div>
                         ) : (
