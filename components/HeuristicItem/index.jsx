@@ -328,7 +328,7 @@ function HeuristicItem({ heuristic, id }) {
                 <p className="text-sm">{heuristic.description}</p>
 
                 <div className="flex flex-col gap-3 justify-between">
-                    <div>
+                    <div className="max-w-sm">
                         <Range
                             type={"range"}
                             id={id}
