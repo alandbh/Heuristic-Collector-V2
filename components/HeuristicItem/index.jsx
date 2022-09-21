@@ -319,7 +319,7 @@ function HeuristicItem({ heuristic, id }) {
     }
 
     return (
-        <li className="flex mb-10 gap-5">
+        <li id={"h_" + heuristic.id} className="flex mb-10 gap-5">
             <div>
                 <b className="text-xl">{heuristic.heuristicNumber}</b>
             </div>
