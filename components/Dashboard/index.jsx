@@ -49,10 +49,17 @@ function getZeroedScores(scores, journey, player) {
     return zeroed;
 }
 
-function getScoresByJourney(scores, journey, player) {
-    const scoresByJourney = scores?.filter(
+function getScoresByJourneyAndPlayer(scores, journey, player) {
+    const scoresByJourneyAndPlayer = scores?.filter(
         (score) =>
             score.player.slug === player && score.journey.slug === journey
+    );
+
+    return scoresByJourneyAndPlayer;
+}
+function getScoresByJourney(scores, journey) {
+    const scoresByJourney = scores?.filter(
+        (score) => score.journey.slug === journey
     );
 
     return scoresByJourney;
@@ -91,7 +98,7 @@ function Dashboard() {
                                     }{" "}
                                     of{" "}
                                     {
-                                        getScoresByJourney(
+                                        getScoresByJourneyAndPlayer(
                                             allScores?.scores,
                                             "desktop",
                                             "carrefour"
@@ -101,7 +108,7 @@ function Dashboard() {
 
                                 <Donnut
                                     total={
-                                        getScoresByJourney(
+                                        getScoresByJourneyAndPlayer(
                                             allScores?.scores,
                                             "desktop",
                                             "carrefour"
@@ -120,7 +127,14 @@ function Dashboard() {
                             </div>
                         </header>
                         <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
-                            <li>aasasas</li>
+                            <li className="md:w-[700px]">
+                                aasasas
+                                <Progress
+                                    amount={33}
+                                    total={54}
+                                    legend="Mobile"
+                                />
+                            </li>
                         </ul>
                     </section>
                 </div>
@@ -137,7 +151,7 @@ function Dashboard() {
                 }{" "}
                 /
                 {
-                    getScoresByJourney(
+                    getScoresByJourneyAndPlayer(
                         allScores?.scores,
                         "desktop",
                         "carrefour"
@@ -145,16 +159,14 @@ function Dashboard() {
                 }
             </h1>
 
-            <Debugg
+            {/* <Debugg
                 data={getZeroedScores(
                     allScores?.scores,
                     "desktop",
                     "carrefour"
                 )}
             ></Debugg>
-            <Debugg data={allScores}></Debugg>
-
-            <Progress amount={33} total={54} />
+            <Debugg data={allScores}></Debugg> */}
         </>
     );
 }
