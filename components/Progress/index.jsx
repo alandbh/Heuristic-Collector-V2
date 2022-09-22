@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./Progress.module.css";
 
-function Progress({ amount = 10, total = 100 }) {
+function Progress({ amount = 10, total = 100, legend, style }) {
     const [percentage, setPercentage] = useState(0);
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -11,7 +11,7 @@ function Progress({ amount = 10, total = 100 }) {
         return () => clearTimeout(timeout);
     }, [amount, total]);
     return (
-        <div className={styles.container}>
+        <div style={{ ...style }} className={styles.container}>
             <b style={{ left: percentage + "%" }}>{percentage}%</b>
             <div className={styles.base}>
                 <div
@@ -19,9 +19,12 @@ function Progress({ amount = 10, total = 100 }) {
                     className={styles.bar}
                 ></div>
             </div>
-            <span>
-                {amount} of {total}
-            </span>
+            <div className={styles.description}>
+                <span className={styles.numbers}>
+                    {amount} of {total}
+                </span>
+                {legend && <span className={styles.legend}>{legend}</span>}
+            </div>
         </div>
     );
 }

@@ -20,6 +20,10 @@
     transition: .8s;
 }
 
+.description {
+    display: flex;
+    justify-content: space-between;
+}
 .container span {
     /* color: #555; */
     line-height: 2rem;
