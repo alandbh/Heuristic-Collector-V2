@@ -1,0 +1,43 @@
+.container {
+    display: flex;
+    max-width: 500px;
+    min-width: 300px;
+    width: 100%;
+    flex-direction: column;
+    position: relative;
+    padding-top: 2.8rem;
+}
+
+.container b {
+    width: 50px;
+    margin-left: -25px;
+    left: 76%;
+    font-weight: bold;
+    font-size: x-large;
+    position: absolute;
+    top: 0;
+    text-align: center;
+    transition: .8s;
+}
+
+.container span {
+    /* color: #555; */
+    line-height: 2rem;
+}
+
+.container .base {
+    border-radius: 3000px;
+    overflow: hidden;
+    height: .8rem;
+    width: 100%;
+    background: #eee;
+    
+}
+
+.container .bar {
+    width: 76%;
+    height: 100%;
+    background: limegreen;
+    flex: 1;
+    transition: .8s;
+}

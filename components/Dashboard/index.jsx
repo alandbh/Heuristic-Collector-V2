@@ -1,7 +1,11 @@
+import Progress from "../Progress";
+
 function Dashboard() {
     return (
         <>
-            <h1>Dashboard</h1>
+            <h1>Dashboardss</h1>
+
+            <Progress amount={33} total={54} />
         </>
     );
 }
