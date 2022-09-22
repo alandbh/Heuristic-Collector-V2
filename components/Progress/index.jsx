@@ -12,18 +12,20 @@ function Progress({ amount = 10, total = 100, legend, style }) {
     }, [amount, total]);
     return (
         <div style={{ ...style }} className={styles.container}>
-            <b style={{ left: percentage + "%" }}>{percentage}%</b>
-            <div className={styles.base}>
-                <div
-                    style={{ width: percentage + "%" }}
-                    className={styles.bar}
-                ></div>
+            {legend && <span className={styles.legend}>{legend}</span>}
+            <div className={styles["bar-wrapper"]}>
+                <div className={styles.base}>
+                    <div
+                        style={{ width: percentage + "%" }}
+                        className={styles.bar}
+                    ></div>
+                </div>
+                <b style={{}}>{percentage}%</b>
             </div>
             <div className={styles.description}>
                 <span className={styles.numbers}>
                     {amount} of {total}
                 </span>
-                {legend && <span className={styles.legend}>{legend}</span>}
             </div>
         </div>
     );
