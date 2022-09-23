@@ -16,11 +16,20 @@ function Header({ routes, className }) {
     const { project } = useProjectContext();
 
     function handleNav(param, value) {
-        let _query = { ...router.query };
-        _query[param] = value;
+        if (value) {
+            router.replace("/project/" + router.query.slug, undefined, {
+                shallow: true,
+            });
 
-        router.replace({
-            query: _query,
+            router.replace({
+                query: {
+                    slug: router.query.slug,
+                    tab: value,
+                },
+            });
+        }
+        router.replace("/project/" + router.query.slug, undefined, {
+            shallow: true,
         });
     }
 
@@ -99,7 +108,7 @@ function Header({ routes, className }) {
                                         d="M14.714 13.5H2.428V2.359a.143.143 0 00-.143-.143h-1a.143.143 0 00-.142.143v12.285c0 .079.064.143.142.143h13.429a.143.143 0 00.143-.143v-1a.143.143 0 00-.143-.142zM4 12.073h1a.143.143 0 00.143-.143V9.358A.143.143 0 005 9.215H4a.143.143 0 00-.143.143v2.571c0 .079.064.143.143.143zm2.714 0h1a.143.143 0 00.143-.143V6.215a.143.143 0 00-.143-.143h-1a.143.143 0 00-.143.143v5.714c0 .079.064.143.143.143zm2.714 0h1a.143.143 0 00.143-.143V7.608a.143.143 0 00-.143-.143h-1a.143.143 0 00-.143.143v4.321c0 .079.065.143.143.143zm2.715 0h1a.143.143 0 00.142-.143V4.786a.143.143 0 00-.142-.143h-1a.143.143 0 00-.143.143v7.143c0 .079.064.143.143.143z"
                                     ></path>
                                 </svg>
-                                Dashboard
+                                Dashboardaa
                             </span>
                         </button>
                         {/* </Link> */}
