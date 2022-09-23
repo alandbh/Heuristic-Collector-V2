@@ -77,15 +77,19 @@ function Dashboard() {
         },
     });
 
+    if (!allScores) {
+        return null;
+    }
+
     return (
         <>
-            <div className="gap-5 max-w-5xl mx-auto md:grid grid-cols-3 ">
+            <div className="gap-5 max-w-6xl mx-auto md:grid grid-cols-3 ">
                 <div className="md:col-span-2 flex flex-col gap-20">
                     <section className="mx-3">
                         <header className="flex justify-between mb-6 items-center px-4 gap-3">
                             <h1 className="text-xl font-bold">
                                 <div className="h-[5px] bg-primary w-10 mb-1"></div>
-                                aaaaaaaa
+                                Overall progress
                             </h1>
                             <div className="text-lg flex items-center gap-5">
                                 <b className="whitespace-nowrap text-sm md:text-xl">
