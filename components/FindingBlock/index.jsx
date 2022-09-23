@@ -143,7 +143,7 @@ function FindingBlock({
                                 How do you describe this finding?
                             </label>
                             <Switch
-                                options={["bad", "neutral", "good"]}
+                                options={["blocker", "bad", "neutral", "good"]}
                                 onChange={(theType) => onChangeTheType(theType)}
                                 selected={theType}
                             />
