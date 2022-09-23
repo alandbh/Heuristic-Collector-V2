@@ -154,7 +154,7 @@ function JourneySelect() {
             >
                 <div>
                     <h3 className="text-3xl text-center font-bold">
-                        Select a joourney
+                        Select a journey
                     </h3>
                     <ul
                         className="bg-white dark:bg-slate-700 flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5 border-l-1 border border-y-0 border-r-0"

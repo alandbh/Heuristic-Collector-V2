@@ -1,4 +1,3 @@
-import { gql } from "@apollo/client";
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -34,6 +33,7 @@ function Header({ routes, className }) {
     }
 
     const LINK_CLASSES = `border flex gap-2 align-middle items-center py-1 px-4 md:px-5 rounded-full transition-all text-xs md:text-sm `;
+
     return (
         <header>
             <div className="bg-primary flex justify-between px-5 items-center h-12">
