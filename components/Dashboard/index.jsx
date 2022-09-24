@@ -38,7 +38,7 @@ const QUERY_SCORES = gql`
     }
 `;
 
-function getZeroedScores(scores, journey, player) {
+function getZeroedScoresByJourneyAndPlayer(scores, journey, player) {
     const zeroed = scores?.filter(
         (score) =>
             score.scoreValue === 0 &&
@@ -49,20 +49,53 @@ function getZeroedScores(scores, journey, player) {
     return zeroed;
 }
 
-function getScoresByJourneyAndPlayer(scores, journey, player) {
+function getZeroedScores(params) {
+    const { scores, journey, player } = params;
+    let zeroed;
+    if (scores && journey && player) {
+        zeroed = scores?.filter(
+            (score) =>
+                score.scoreValue === 0 &&
+                score.player.slug === player &&
+                score.journey.slug === journey
+        );
+    } else if (scores && journey) {
+        zeroed = scores?.filter(
+            (score) => score.scoreValue === 0 && score.journey.slug === journey
+        );
+    } else if (scores && player) {
+        zeroed = scores?.filter(
+            (score) => score.scoreValue === 0 && score.player.slug === player
+        );
+    } else {
+        zeroed = scores?.filter((score) => score.scoreValue === 0);
+    }
+
+    return zeroed;
+}
+
+function getAllScores(params) {
+    const { scores, journey, player } = params;
     const scoresByJourneyAndPlayer = scores?.filter(
         (score) =>
             score.player.slug === player && score.journey.slug === journey
     );
 
-    return scoresByJourneyAndPlayer;
-}
-function getScoresByJourney(scores, journey) {
-    const scoresByJourney = scores?.filter(
-        (score) => score.journey.slug === journey
-    );
+    let allScores;
+    if (scores && journey && player) {
+        allScores = scores?.filter(
+            (score) =>
+                score.player.slug === player && score.journey.slug === journey
+        );
+    } else if (scores && journey) {
+        allScores = scores?.filter((score) => score.journey.slug === journey);
+    } else if (scores && player) {
+        allScores = scores?.filter((score) => score.player.slug === player);
+    } else {
+        allScores = scores;
+    }
 
-    return scoresByJourney;
+    return allScores;
 }
 
 function Dashboard() {
@@ -94,36 +127,36 @@ function Dashboard() {
                             <div className="text-lg flex items-center gap-5">
                                 <b className="whitespace-nowrap text-sm md:text-xl">
                                     {
-                                        getZeroedScores(
-                                            allScores?.scores,
-                                            "desktop",
-                                            "carrefour"
-                                        ).length
+                                        getZeroedScores({
+                                            scores: allScores?.scores,
+                                            journey: "desktop",
+                                            player: "carrefour",
+                                        }).length
                                     }{" "}
                                     of{" "}
                                     {
-                                        getScoresByJourneyAndPlayer(
-                                            allScores?.scores,
-                                            "desktop",
-                                            "carrefour"
-                                        ).length
+                                        getAllScores({
+                                            scores: allScores?.scores,
+                                            journey: "desktop",
+                                            player: "carrefour",
+                                        }).length
                                     }
                                 </b>
 
                                 <Donnut
                                     total={
-                                        getScoresByJourneyAndPlayer(
-                                            allScores?.scores,
-                                            "desktop",
-                                            "carrefour"
-                                        ).length
+                                        getAllScores({
+                                            scores: allScores?.scores,
+                                            journey: "desktop",
+                                            player: "carrefour",
+                                        }).length
                                     }
                                     sum={
-                                        getZeroedScores(
-                                            allScores?.scores,
-                                            "desktop",
-                                            "carrefour"
-                                        ).length
+                                        getZeroedScores({
+                                            scores: allScores?.scores,
+                                            journey: "desktop",
+                                            player: "carrefour",
+                                        }).length
                                     }
                                     radius={25}
                                     thick={3}
@@ -147,30 +180,26 @@ function Dashboard() {
                     {/* <Debugg data={allScores} /> */}
                 </div>
             </div>
-            <h1>
-                Dashboardss{" "}
-                {
-                    getZeroedScores(allScores?.scores, "desktop", "carrefour")
-                        .length
-                }{" "}
-                /
-                {
-                    getScoresByJourneyAndPlayer(
-                        allScores?.scores,
-                        "desktop",
-                        "carrefour"
-                    ).length
-                }
-            </h1>
 
-            {/* <Debugg
-                data={getZeroedScores(
-                    allScores?.scores,
-                    "desktop",
-                    "carrefour"
-                )}
+            <div>Zeroes</div>
+            <Debugg
+                data={
+                    getZeroedScores({
+                        scores: allScores?.scores,
+                        journey: "desktop",
+                    }).length
+                }
             ></Debugg>
-            <Debugg data={allScores}></Debugg> */}
+
+            <div>All Scores length</div>
+            <Debugg
+                data={
+                    getAllScores({
+                        scores: allScores?.scores,
+                    }).length
+                }
+            ></Debugg>
+            {/* <Debugg data={allScores}></Debugg> */}
         </>
     );
 }
