@@ -60,6 +60,10 @@ const getUniqueGroups = debounce((arr, key, func) => {
 const debCreateNewScores = debounce((data, router, func) => {
     console.log("groupssss", data.groups);
 
+    if (data.groups.length === 0) {
+        return null;
+    }
+
     data.groups.forEach((group) => {
         group.heuristic.forEach((heurisric) => {
             return (multiString =
