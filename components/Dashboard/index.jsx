@@ -98,6 +98,51 @@ function getAllScores(params) {
     return allScores;
 }
 
+function getAllPlayers(allScores) {
+    const playersArr = allScores.map((score) => score.player.slug);
+
+    return getUnique(playersArr);
+}
+
+function getCompletedPlayers(params) {
+    const { scores, journey, player } = params;
+    const zeroed = getZeroedScores({ scores });
+    const allPlayers = getAllPlayers(scores);
+    let completed = [];
+
+    allPlayers.map((player) => {
+        const zeroedScore = zeroed.filter(
+            (score) => score.player.slug === player
+        );
+        if (zeroedScore.length === 0) {
+            completed.push(player);
+            return player;
+        }
+        return;
+    });
+
+    return completed;
+}
+function getUncompletedPlayers(params) {
+    const { scores, journey, player } = params;
+    const zeroed = getZeroedScores({ scores });
+    const allPlayers = getAllPlayers(scores);
+    let uncompleted = zeroed.map((score) => score.player.slug);
+
+    return getUnique(uncompleted);
+}
+
+function getUnique(arr) {
+    return [...new Set(arr)];
+}
+
+/**
+ *
+ * ------------------------------------
+ *
+ * COMPONENT
+ * -------------------------------------
+ */
 function Dashboard() {
     const router = useRouter();
     const {
@@ -113,6 +158,8 @@ function Dashboard() {
     if (!allScores) {
         return null;
     }
+
+    getUncompletedPlayers({ scores: allScores?.scores });
 
     return (
         <>
@@ -199,7 +246,16 @@ function Dashboard() {
                     }).length
                 }
             ></Debugg>
-            {/* <Debugg data={allScores}></Debugg> */}
+            <div>All Players</div>
+            <Debugg data={getAllPlayers(allScores.scores)}></Debugg>
+            <div>All Completed</div>
+            <Debugg
+                data={getCompletedPlayers({ scores: allScores?.scores })}
+            ></Debugg>
+            <div>All Un-Completed</div>
+            <Debugg
+                data={getUncompletedPlayers({ scores: allScores?.scores })}
+            ></Debugg>
         </>
     );
 }
