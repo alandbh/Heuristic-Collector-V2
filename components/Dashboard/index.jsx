@@ -101,16 +101,20 @@ function getAllScores(params) {
     return allScores;
 }
 
-function getAllPlayers(allScores) {
-    const playersArr = allScores.map((score) => score.player.slug);
+function getAllPlayers(scores, journey) {
+    const scoresByJourney = getAllScores({
+        scores,
+        journey,
+    });
+    const playersArr = scoresByJourney.map((score) => score.player.slug);
 
     return getUnique(playersArr);
 }
 
 function getCompletedPlayers(params) {
     const { scores, journey, player } = params;
-    const zeroed = getZeroedScores({ scores });
-    const allPlayers = getAllPlayers(scores);
+    const zeroed = getZeroedScores({ scores, journey });
+    const allPlayers = getAllPlayers(scores, journey);
     let completed = [];
 
     allPlayers.map((player) => {
@@ -128,18 +132,25 @@ function getCompletedPlayers(params) {
 }
 function getUncompletedPlayers(params) {
     const { scores, journey, player } = params;
-    const zeroed = getZeroedScores({ scores });
+    const zeroed = getZeroedScores({ scores, journey });
     let uncompleted = zeroed.map((score) => score.player.slug);
 
     return getUnique(uncompleted);
 }
 
 function getBlockedPlayers(params) {
-    const { scores, journey, player } = params;
+    const { scores, journey } = params;
 
+    let selectedScores;
     let blocked = [];
 
-    scores.map((score) => {
+    if (journey) {
+        selectedScores = getAllScores({ scores, journey });
+    } else {
+        selectedScores = scores;
+    }
+
+    selectedScores.map((score) => {
         const finding = score.player.finding.find(
             (found) => found.findingObject.theType === "blocker"
         );
@@ -202,7 +213,12 @@ function Dashboard() {
         return null;
     }
 
-    console.log(getBlockedPlayers({ scores: allScores.scores }));
+    const scoresMobile = getAllScores({
+        scores: allScores.scores,
+        journey: "mobile",
+    });
+
+    console.log(getAllPlayers(scoresMobile));
 
     return (
         <>
@@ -293,15 +309,23 @@ function Dashboard() {
             <Debugg data={getAllPlayers(allScores.scores)}></Debugg>
             <div>All Completed</div>
             <Debugg
-                data={getCompletedPlayers({ scores: allScores?.scores })}
+                data={getCompletedPlayers({
+                    scores: allScores?.scores,
+                })}
             ></Debugg>
             <div>All Un-Completed</div>
             <Debugg
-                data={getUncompletedPlayers({ scores: allScores?.scores })}
+                data={getUncompletedPlayers({
+                    scores: allScores?.scores,
+                    journey: "mobile",
+                })}
             ></Debugg>
             <div>All Blockers</div>
             <Debugg
-                data={getBlockedPlayers({ scores: allScores.scores })}
+                data={getBlockedPlayers({
+                    scores: allScores.scores,
+                    journey: "mobile",
+                })}
             ></Debugg>
         </>
     );
