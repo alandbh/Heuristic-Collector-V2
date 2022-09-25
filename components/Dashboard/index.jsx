@@ -6,7 +6,7 @@ import Debugg from "../../lib/Debugg";
 import Donnut from "../Donnut";
 import Progress from "../Progress";
 
-const QUERY_SCORES = gql`
+const QUERY_SCORES_BY_PROJECT = gql`
     query GetScores(
         $projectSlug: String # $journeySlug: String # $playerSlug: String
     ) {
@@ -27,6 +27,9 @@ const QUERY_SCORES = gql`
             player {
                 name
                 slug
+                finding {
+                    findingObject
+                }
             }
             heuristic {
                 heuristicNumber
@@ -126,13 +129,53 @@ function getCompletedPlayers(params) {
 function getUncompletedPlayers(params) {
     const { scores, journey, player } = params;
     const zeroed = getZeroedScores({ scores });
-    const allPlayers = getAllPlayers(scores);
     let uncompleted = zeroed.map((score) => score.player.slug);
 
     return getUnique(uncompleted);
 }
 
-function getUnique(arr) {
+function getBlockedPlayers(params) {
+    const { scores, journey, player } = params;
+
+    let blocked = [];
+
+    scores.map((score) => {
+        const finding = score.player.finding.find(
+            (found) => found.findingObject.theType === "blocker"
+        );
+        if (finding !== undefined) {
+            blocked.push({
+                playerSlug: score.player.slug,
+                theType: finding.findingObject.theType,
+            });
+        }
+    });
+
+    return getUnique(blocked, "playerSlug");
+}
+
+// function getUnique(arr) {
+//     return [...new Set(arr)];
+// }
+function getUnique(arr, key = null, subkey = null) {
+    if (key && subkey) {
+        let unique = [];
+        arr.forEach((obj) => {
+            if (!unique.includes(obj[key][subkey])) {
+                unique.push(obj[key][subkey]);
+            }
+        });
+    } else if (key && !subkey) {
+        let unique = [];
+        arr.forEach((obj) => {
+            if (!unique.includes(obj[key])) {
+                unique.push(obj[key]);
+            }
+        });
+
+        return unique;
+    }
+
     return [...new Set(arr)];
 }
 
@@ -149,7 +192,7 @@ function Dashboard() {
         data: allScores,
         loading,
         error,
-    } = useQuery(QUERY_SCORES, {
+    } = useQuery(QUERY_SCORES_BY_PROJECT, {
         variables: {
             projectSlug: router.query.slug,
         },
@@ -159,7 +202,7 @@ function Dashboard() {
         return null;
     }
 
-    getUncompletedPlayers({ scores: allScores?.scores });
+    console.log(getBlockedPlayers({ scores: allScores.scores }));
 
     return (
         <>
@@ -255,6 +298,10 @@ function Dashboard() {
             <div>All Un-Completed</div>
             <Debugg
                 data={getUncompletedPlayers({ scores: allScores?.scores })}
+            ></Debugg>
+            <div>All Blockers</div>
+            <Debugg
+                data={getBlockedPlayers({ scores: allScores.scores })}
             ></Debugg>
         </>
     );
