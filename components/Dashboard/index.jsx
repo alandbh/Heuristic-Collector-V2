@@ -41,17 +41,6 @@ const QUERY_SCORES_BY_PROJECT = gql`
     }
 `;
 
-function getZeroedScoresByJourneyAndPlayer(scores, journey, player) {
-    const zeroed = scores?.filter(
-        (score) =>
-            score.scoreValue === 0 &&
-            score.player.slug === player &&
-            score.journey.slug === journey
-    );
-
-    return zeroed;
-}
-
 function getZeroedScores(params) {
     const { scores, journey, player } = params;
     let zeroed;
