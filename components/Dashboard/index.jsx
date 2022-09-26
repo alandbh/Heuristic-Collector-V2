@@ -280,19 +280,19 @@ function Dashboard() {
     //         scoresByPlayer.length) *
     //     100;
 
+    const zeroedScores = getZeroedScores({
+        scores: allScores.scores,
+        journey,
+    }).length;
+
+    const scoresAmount = getAllScores({
+        scores: allScores.scores,
+        journey,
+    }).length;
+
+    const doneAmout = scoresAmount - zeroedScores;
+
     const percentageDone = function () {
-        const zeroedScores = getZeroedScores({
-            scores: allScores.scores,
-            journey,
-        }).length;
-
-        const scoresAmount = getAllScores({
-            scores: allScores.scores,
-            journey,
-        }).length;
-
-        const doneAmout = scoresAmount - zeroedScores;
-
         return {
             total: scoresAmount,
             sum: doneAmout,
@@ -318,19 +318,16 @@ function Dashboard() {
                             </h1>
                             <div className="text-lg flex items-center gap-5">
                                 <b className="whitespace-nowrap text-sm md:text-xl">
-                                    {
+                                    {getAllScores({
+                                        scores: allScores?.scores,
+                                    }).length -
                                         getZeroedScores({
                                             scores: allScores?.scores,
-                                            journey: "desktop",
-                                            player: "carrefour",
-                                        }).length
-                                    }{" "}
+                                        }).length}{" "}
                                     of{" "}
                                     {
                                         getAllScores({
                                             scores: allScores?.scores,
-                                            journey: "desktop",
-                                            player: "carrefour",
                                         }).length
                                     }
                                 </b>
@@ -339,15 +336,14 @@ function Dashboard() {
                                     total={
                                         getAllScores({
                                             scores: allScores?.scores,
-                                            journey: "desktop",
-                                            player: "carrefour",
                                         }).length
                                     }
                                     sum={
+                                        getAllScores({
+                                            scores: allScores?.scores,
+                                        }).length -
                                         getZeroedScores({
                                             scores: allScores?.scores,
-                                            journey: "desktop",
-                                            player: "carrefour",
                                         }).length
                                     }
                                     radius={25}
