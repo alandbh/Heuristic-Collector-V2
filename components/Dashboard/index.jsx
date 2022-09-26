@@ -111,6 +111,26 @@ function getAllPlayers(scores, journey) {
     return getUnique(playersArr);
 }
 
+function getCompletedPlayersSucessfully(params) {
+    const { scores, journey, player } = params;
+    const zeroed = getZeroedScores({ scores, journey });
+    const allPlayers = getAllPlayers(scores, journey);
+    const blocked = getBlockedPlayers({ scores, journey });
+    let completed = [];
+
+    allPlayers.map((player) => {
+        const zeroedScore = zeroed.filter(
+            (score) => score.player.slug === player
+        );
+        if (zeroedScore.length === 0) {
+            completed.push(player);
+            return player;
+        }
+        return;
+    });
+
+    return completed.filter((player) => !blocked.includes(player));
+}
 function getCompletedPlayers(params) {
     const { scores, journey, player } = params;
     const zeroed = getZeroedScores({ scores, journey });
@@ -130,8 +150,19 @@ function getCompletedPlayers(params) {
 
     return completed;
 }
+
+/**
+ * @typedef {Object} ParamObj
+ * @property {array} scores - scores array
+ * @property {string} journey - Indicates whether user has close the toast.
+ */
+/**
+ * Function to get uncompleted Players
+ * @param {ParamObj}} - {@link params} object
+ * @returns [playerSlug]
+ */
 function getUncompletedPlayers(params) {
-    const { scores, journey, player } = params;
+    const { scores, journey } = params;
     const zeroed = getZeroedScores({ scores, journey });
     let uncompleted = zeroed.map((score) => score.player.slug);
 
@@ -165,9 +196,6 @@ function getBlockedPlayers(params) {
     return getUnique(blocked, "playerSlug");
 }
 
-// function getUnique(arr) {
-//     return [...new Set(arr)];
-// }
 function getUnique(arr, key = null, subkey = null) {
     if (key && subkey) {
         let unique = [];
@@ -307,10 +335,18 @@ function Dashboard() {
             ></Debugg>
             <div>All Players</div>
             <Debugg data={getAllPlayers(allScores.scores)}></Debugg>
+            <div>All Successfully Completed</div>
+            <Debugg
+                data={getCompletedPlayersSucessfully({
+                    scores: allScores?.scores,
+                    journey: "desktop",
+                })}
+            ></Debugg>
             <div>All Completed</div>
             <Debugg
                 data={getCompletedPlayers({
                     scores: allScores?.scores,
+                    journey: "desktop",
                 })}
             ></Debugg>
             <div>All Un-Completed</div>
