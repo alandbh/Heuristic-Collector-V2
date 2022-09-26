@@ -142,6 +142,31 @@ function getCompletedPlayers(params) {
     return completed;
 }
 
+function getPlayerPercentage(params) {
+    const { scores, journey, player } = params;
+
+    const scoresByPlayer = getAllScores({
+        scores,
+        player,
+        journey,
+    });
+
+    const zeroedPlayersScored = getZeroedScores({
+        scores,
+        player,
+        journey,
+    });
+
+    let percentage;
+
+    percentage =
+        ((scoresByPlayer.length - zeroedPlayersScored.length) /
+            scoresByPlayer.length) *
+        100;
+
+    return percentage;
+}
+
 /**
  * @typedef {Object} ParamObj
  * @property {array} scores - scores array
@@ -238,10 +263,47 @@ function Dashboard() {
         journey: "mobile",
     });
 
-    console.log(getAllPlayers(scoresMobile));
+    // const scoresByPlayer = getAllScores({
+    //     scores: allScores.scores,
+    //     player: "carrefour",
+    //     journey: "desktop",
+    // });
+
+    // const zeroedPlayersScored = getZeroedScores({
+    //     scores: allScores.scores,
+    //     player: "carrefour",
+    //     journey: "desktop",
+    // });
+
+    // const percentage =
+    //     ((scoresByPlayer.length - zeroedPlayersScored.length) /
+    //         scoresByPlayer.length) *
+    //     100;
+
+    const percentageDone = function () {
+        const zeroedScores = getZeroedScores({
+            scores: allScores.scores,
+            journey,
+        }).length;
+
+        const scoresAmount = getAllScores({
+            scores: allScores.scores,
+            journey,
+        }).length;
+
+        const doneAmout = scoresAmount - zeroedScores;
+
+        return {
+            total: scoresAmount,
+            sum: doneAmout,
+        };
+    };
+
+    console.log(percentageDone());
 
     function onChangeJourney(journey) {
-        setJourney(journey);
+        let selectedJourney = journey !== "overall" ? journey : "";
+        setJourney(selectedJourney);
     }
 
     return (
@@ -315,13 +377,14 @@ function Dashboard() {
                                     ------------------
                                 */}
 
-                                <div className="flex items-center justify-center mt-20">
+                                <div className="flex gap-10 flex-col items-center justify-center mt-20">
                                     <div className="flex flex-wrap gap-10 text-center w-auto">
                                         <div className="flex flex-col gap-3">
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getCompletedPlayers({
                                                         scores: allScores?.scores,
+                                                        journey,
                                                     }).length
                                                 }
                                             </div>
@@ -333,6 +396,7 @@ function Dashboard() {
                                                     getCompletedPlayersSucessfully(
                                                         {
                                                             scores: allScores?.scores,
+                                                            journey,
                                                         }
                                                     ).length
                                                 }
@@ -344,6 +408,7 @@ function Dashboard() {
                                                 {
                                                     getBlockedPlayers({
                                                         scores: allScores.scores,
+                                                        journey,
                                                     }).length
                                                 }
                                             </div>
@@ -354,10 +419,52 @@ function Dashboard() {
                                                 {
                                                     getUncompletedPlayers({
                                                         scores: allScores?.scores,
+                                                        journey,
                                                     }).length
                                                 }
                                             </div>
                                             <div>In Progress</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-10">
+                                        <div className="flex flex-col gap-5 text-center items-center">
+                                            <Donnut
+                                                total={percentageDone().total}
+                                                sum={percentageDone().sum}
+                                                radius={58}
+                                                thick={6}
+                                            ></Donnut>
+
+                                            <h3 className="font-bold text-xl">
+                                                Done
+                                            </h3>
+                                        </div>
+
+                                        <div className="flex flex-col gap-5 text-center items-center">
+                                            <Donnut
+                                                total={
+                                                    getAllPlayers(
+                                                        allScores.scores,
+                                                        journey
+                                                    ).length
+                                                }
+                                                sum={
+                                                    getBlockedPlayers({
+                                                        scores: allScores.scores,
+                                                        journey,
+                                                    }).length
+                                                }
+                                                radius={58}
+                                                thick={6}
+                                                color={{
+                                                    base: "#ddd",
+                                                    primary: "red",
+                                                }}
+                                            ></Donnut>
+                                            <h3 className="font-bold text-xl">
+                                                Players with flags
+                                            </h3>
                                         </div>
                                     </div>
                                 </div>
@@ -381,7 +488,6 @@ function Dashboard() {
                 data={
                     getZeroedScores({
                         scores: allScores?.scores,
-                        journey: "desktop",
                     }).length
                 }
             ></Debugg>
