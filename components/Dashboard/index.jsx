@@ -1,10 +1,12 @@
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import client from "../../lib/apollo";
 
 import Debugg from "../../lib/Debugg";
 import Donnut from "../Donnut";
 import Progress from "../Progress";
+import Switch, { SwitchMono } from "../Switch";
 
 const QUERY_SCORES_BY_PROJECT = gql`
     query GetScores(
@@ -215,6 +217,7 @@ function getUnique(arr, key = null, subkey = null) {
  * -------------------------------------
  */
 function Dashboard() {
+    const [journey, setJourney] = useState();
     const router = useRouter();
     const {
         data: allScores,
@@ -237,6 +240,10 @@ function Dashboard() {
 
     console.log(getAllPlayers(scoresMobile));
 
+    function onChangeJourney(journey) {
+        setJourney(journey);
+    }
+
     return (
         <>
             <div className="gap-5 max-w-6xl mx-auto md:grid grid-cols-3 ">
@@ -245,7 +252,7 @@ function Dashboard() {
                         <header className="flex justify-between mb-6 items-center px-4 gap-3">
                             <h1 className="text-xl font-bold">
                                 <div className="h-[5px] bg-primary w-10 mb-1"></div>
-                                Overall progress
+                                Analysis progress
                             </h1>
                             <div className="text-lg flex items-center gap-5">
                                 <b className="whitespace-nowrap text-sm md:text-xl">
@@ -286,9 +293,23 @@ function Dashboard() {
                                 ></Donnut>
                             </div>
                         </header>
+
                         <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
                             <li className="md:w-[700px]">
-                                aasasas
+                                <div>
+                                    <SwitchMono
+                                        options={[
+                                            "Overall",
+                                            "Desktop",
+                                            "Mobile",
+                                            "Other",
+                                        ]}
+                                        onChange={(journey) =>
+                                            onChangeJourney(journey)
+                                        }
+                                        selected={"Overall"}
+                                    />
+                                </div>
                                 <Progress
                                     amount={33}
                                     total={54}

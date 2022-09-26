@@ -104,3 +104,74 @@ function Switch({ onChange, options, selected }) {
 }
 
 export default Switch;
+
+/**
+ *
+ *
+ *
+ *
+ */
+
+function SwitchMono({ onChange, options, selected }) {
+    const [option, setOption] = useState(selected);
+
+    function handleOnChangeMono(ev) {
+        console.log(ev.target.value);
+        setOption(ev.target.value);
+        onChange(ev.target.value);
+    }
+
+    function getBubblePosition() {
+        if (option === options[0]) {
+            return "translate-x-[2px] w-[100px] border border-blue-500 bg-blue-100";
+        } else if (option === options[1]) {
+            return "translate-x-[102px] w-[100px] border border-blue-500 bg-blue-100";
+        } else if (option === options[2]) {
+            return "translate-x-[202px] w-[100px] border border-blue-500 bg-blue-100";
+        } else {
+            return "translate-x-[302px] w-[100px] border border-blue-500 bg-blue-100";
+        }
+    }
+
+    return (
+        <>
+            <div className="wrapper flex  w-fit border dark:border-white/60 h-8 rounded-full relative">
+                <div
+                    className={`bubble z-0 transition duration-200 rounded-full top-[2px] h-[26px] absolute ${getBubblePosition()}`}
+                ></div>
+                <div
+                    className={`container flex w-[${
+                        (options.length - 1) * 100
+                    }px] justify-between items-center font-bold z-10  text-xs leading-8 uppercase dark:text-white/60`}
+                >
+                    {options.map((_option, index) => (
+                        <label
+                            key={index}
+                            className="flex w-[100px] items-center justify-center grow cursor-pointer"
+                        >
+                            <input
+                                type="radio"
+                                className="sr-only"
+                                name="worktype"
+                                value={options[index]}
+                                checked={option === options[index]}
+                                onChange={(ev) => handleOnChangeMono(ev)}
+                            />
+                            <span
+                                className={
+                                    option === options[index]
+                                        ? `text-blue-500`
+                                        : `text-blue-500 dark:text-blue-100`
+                                }
+                            >
+                                {options[index]}
+                            </span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+        </>
+    );
+}
+
+export { SwitchMono };
