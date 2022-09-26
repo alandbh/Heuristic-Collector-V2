@@ -299,16 +299,67 @@ function Dashboard() {
                                 <div>
                                     <SwitchMono
                                         options={[
-                                            "Overall",
-                                            "Desktop",
-                                            "Mobile",
-                                            "Other",
+                                            "overall",
+                                            "desktop",
+                                            "mobile",
                                         ]}
                                         onChange={(journey) =>
                                             onChangeJourney(journey)
                                         }
-                                        selected={"Overall"}
+                                        selected={"overall"}
                                     />
+                                </div>
+
+                                {/* 
+                                    Big Numbers
+                                    ------------------
+                                */}
+
+                                <div className="flex items-center justify-center mt-20">
+                                    <div className="flex flex-wrap gap-10 text-center w-auto">
+                                        <div className="flex flex-col gap-3">
+                                            <div className="text-4xl font-bold">
+                                                {
+                                                    getCompletedPlayers({
+                                                        scores: allScores?.scores,
+                                                    }).length
+                                                }
+                                            </div>
+                                            <div>Done</div>
+                                        </div>
+                                        <div className="flex flex-col gap-3 text-green-600">
+                                            <div className="text-4xl font-bold">
+                                                {
+                                                    getCompletedPlayersSucessfully(
+                                                        {
+                                                            scores: allScores?.scores,
+                                                        }
+                                                    ).length
+                                                }
+                                            </div>
+                                            <div>Successfully Done</div>
+                                        </div>
+                                        <div className="flex flex-col gap-3 text-red-500">
+                                            <div className="text-4xl font-bold">
+                                                {
+                                                    getBlockedPlayers({
+                                                        scores: allScores.scores,
+                                                    }).length
+                                                }
+                                            </div>
+                                            <div>With Blockers</div>
+                                        </div>
+                                        <div className="flex flex-col gap-3 text-blue-600">
+                                            <div className="text-4xl font-bold">
+                                                {
+                                                    getUncompletedPlayers({
+                                                        scores: allScores?.scores,
+                                                    }).length
+                                                }
+                                            </div>
+                                            <div>In Progress</div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <Progress
                                     amount={33}
@@ -349,7 +400,6 @@ function Dashboard() {
             <Debugg
                 data={getCompletedPlayersSucessfully({
                     scores: allScores?.scores,
-                    journey: "desktop",
                 })}
             ></Debugg>
             <div>All Completed</div>
@@ -363,7 +413,6 @@ function Dashboard() {
             <Debugg
                 data={getUncompletedPlayers({
                     scores: allScores?.scores,
-                    journey: "mobile",
                 })}
             ></Debugg>
             <div>All Blockers</div>
