@@ -101,6 +101,16 @@ function getAllPlayers(scores, journey) {
 
     return getUnique(playersArr);
 }
+function getAllPlayersObj(params) {
+    const { scores, journey, player } = params;
+    const scoresByJourney = getAllScores({
+        scores,
+        journey,
+    });
+    const playersArr = scoresByJourney.map((score) => score.player);
+
+    return getUnique(playersArr, "slug");
+}
 
 function getCompletedPlayersSucessfully(params) {
     const { scores, journey, player } = params;
@@ -164,7 +174,11 @@ function getPlayerPercentage(params) {
             scoresByPlayer.length) *
         100;
 
-    return percentage;
+    return {
+        total: scoresByPlayer.length,
+        sum: scoresByPlayer.length - zeroedPlayersScored.length,
+        percentage: percentage,
+    };
 }
 
 /**
@@ -212,6 +226,12 @@ function getBlockedPlayers(params) {
     return getUnique(blocked, "playerSlug");
 }
 
+function hasBlocker(playerObj) {
+    return playerObj.finding.some(
+        (obj) => obj.findingObject.theType === "blocker"
+    );
+}
+
 function getUnique(arr, key = null, subkey = null) {
     if (key && subkey) {
         let unique = [];
@@ -221,14 +241,16 @@ function getUnique(arr, key = null, subkey = null) {
             }
         });
     } else if (key && !subkey) {
-        let unique = [];
+        let uniqueKey = [];
+        let uniqueObj = [];
         arr.forEach((obj) => {
-            if (!unique.includes(obj[key])) {
-                unique.push(obj[key]);
+            if (!uniqueKey.includes(obj[key])) {
+                uniqueKey.push(obj[key]);
+                uniqueObj.push(obj);
             }
         });
 
-        return unique;
+        return uniqueObj;
     }
 
     return [...new Set(arr)];
@@ -292,24 +314,36 @@ function Dashboard() {
 
     const doneAmout = scoresAmount - zeroedScores;
 
-    const percentageDone = function () {
+    const getPercentageDone = function (player) {
+        const total = getPlayerPercentage({
+            scores: allScores.scores,
+            journey,
+            player,
+        }).total;
+
+        const sum = getPlayerPercentage({
+            scores: allScores.scores,
+            journey,
+            player,
+        }).sum;
+
         return {
-            total: scoresAmount,
-            sum: doneAmout,
+            total,
+            sum,
         };
     };
-
-    console.log(percentageDone());
 
     function onChangeJourney(journey) {
         let selectedJourney = journey !== "overall" ? journey : "";
         setJourney(selectedJourney);
     }
 
+    console.log(getAllPlayersObj({ scores: allScores.scores }));
+
     return (
         <>
-            <div className="gap-5 max-w-6xl mx-auto md:grid grid-cols-3 ">
-                <div className="md:col-span-2 flex flex-col gap-20">
+            <div className="gap-5 max-w-6xl mx-auto md:grid grid-cols-4 ">
+                <div className="md:col-span-3 flex flex-col gap-20">
                     <section className="mx-3">
                         <header className="flex justify-between mb-6 items-center px-4 gap-3">
                             <h1 className="text-xl font-bold">
@@ -374,8 +408,8 @@ function Dashboard() {
                                 */}
 
                                 <div className="flex gap-10 flex-col items-center justify-center mt-20">
-                                    <div className="flex flex-wrap gap-10 text-center w-auto">
-                                        <div className="flex flex-col gap-3">
+                                    <div className="flex flex-wrap gap-4 justify-between md:gap-10 text-center w-auto">
+                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px]">
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getCompletedPlayers({
@@ -384,9 +418,11 @@ function Dashboard() {
                                                     }).length
                                                 }
                                             </div>
-                                            <div>Done</div>
+                                            <div className="text-xs md:text-md">
+                                                Done
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col gap-3 text-green-600">
+                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-green-600">
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getCompletedPlayersSucessfully(
@@ -397,9 +433,11 @@ function Dashboard() {
                                                     ).length
                                                 }
                                             </div>
-                                            <div>Successfully Done</div>
+                                            <div className="text-xs md:text-md">
+                                                Successfully Done
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col gap-3 text-red-500">
+                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-red-500">
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getBlockedPlayers({
@@ -408,9 +446,11 @@ function Dashboard() {
                                                     }).length
                                                 }
                                             </div>
-                                            <div>With Blockers</div>
+                                            <div className="text-xs md:text-md">
+                                                With Blockers
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col gap-3 text-blue-600">
+                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-blue-600">
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getUncompletedPlayers({
@@ -419,15 +459,17 @@ function Dashboard() {
                                                     }).length
                                                 }
                                             </div>
-                                            <div>In Progress</div>
+                                            <div className="text-xs md:text-md">
+                                                In Progress
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div className="flex gap-10">
                                         <div className="flex flex-col gap-5 text-center items-center">
                                             <Donnut
-                                                total={percentageDone().total}
-                                                sum={percentageDone().sum}
+                                                total={scoresAmount}
+                                                sum={doneAmout}
                                                 radius={58}
                                                 thick={6}
                                             ></Donnut>
@@ -464,11 +506,84 @@ function Dashboard() {
                                         </div>
                                     </div>
                                 </div>
-                                <Progress
-                                    amount={33}
-                                    total={54}
-                                    legend="Mobile"
-                                />
+
+                                {/* 
+                                
+                                    Progress By Player 
+                                    ----------------------------
+
+                                 */}
+
+                                <div className="grid grid-cols-3 mt-10">
+                                    <div className="col-span-1">
+                                        <h3>Players</h3>
+
+                                        <ul className="mt-10">
+                                            {getAllPlayersObj({
+                                                scores: allScores.scores,
+                                                journey,
+                                            }).map((player) => {
+                                                let playerColor;
+
+                                                if (hasBlocker(player)) {
+                                                    playerColor = "#ff0000";
+                                                } else if (
+                                                    getPercentageDone(
+                                                        player.slug
+                                                    ).sum ===
+                                                    getPercentageDone(
+                                                        player.slug
+                                                    ).total
+                                                ) {
+                                                    playerColor = "#1cab1c";
+                                                } else {
+                                                    playerColor = "dodgerblue";
+                                                }
+
+                                                return (
+                                                    <li
+                                                        key={player.slug}
+                                                        className={`flex gap-2 items-center border-r-2 border-r-[${playerColor}] py-3`}
+                                                    >
+                                                        <div>
+                                                            <div
+                                                                style={{
+                                                                    background:
+                                                                        playerColor,
+                                                                }}
+                                                                className={`p-1 bg-[${playerColor}] w-1 rounded-full`}
+                                                            ></div>
+                                                        </div>
+                                                        <div className="flex-1 mr-2">
+                                                            <Progress
+                                                                amount={
+                                                                    getPercentageDone(
+                                                                        player.slug
+                                                                    ).sum
+                                                                }
+                                                                total={
+                                                                    getPercentageDone(
+                                                                        player.slug
+                                                                    ).total
+                                                                }
+                                                                legend={
+                                                                    player.name
+                                                                }
+                                                                size="small"
+                                                                barColor={
+                                                                    playerColor
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <h3>Player progress</h3>
+                                    </div>
+                                </div>
                             </li>
                         </ul>
                     </section>
@@ -521,7 +636,7 @@ function Dashboard() {
             <Debugg
                 data={getBlockedPlayers({
                     scores: allScores.scores,
-                    journey: "mobile",
+                    journey: "desktop",
                 })}
             ></Debugg>
         </>
