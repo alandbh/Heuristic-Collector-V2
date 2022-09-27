@@ -138,15 +138,26 @@ function FindingBlock({
                         )}
                     </div>
                     <div className="flex justify-between">
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 relative w-full">
                             <label className="text-slate-500">
                                 How do you describe this finding?
                             </label>
-                            <Switch
-                                options={["blocker", "bad", "neutral", "good"]}
-                                onChange={(theType) => onChangeTheType(theType)}
-                                selected={theType}
-                            />
+                            <div className="relative h-12 w-full">
+                                <div className="absolute h-12 scale-75 md:scale-100 origin-top-left">
+                                    <Switch
+                                        options={[
+                                            "blocker",
+                                            "bad",
+                                            "neutral",
+                                            "good",
+                                        ]}
+                                        onChange={(theType) =>
+                                            onChangeTheType(theType)
+                                        }
+                                        selected={theType}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="flex justify-center md:justify-end mb-5 mt-5">
