@@ -253,11 +253,13 @@ export default function GroupContainer({ data }) {
                 <div className="relative">
                     <div className={scrollY > 150 ? "fixed top-8" : "relative"}>
                         <aside>
-                            <h1 className="text-2xl">Search</h1>
+                            <h1 className="text-xl font-bold mb-5">Search</h1>
                             <input type="search" name="search" id="search" />
                         </aside>
                         <aside>
-                            <h1 className="text-2xl">Categories</h1>
+                            <h1 className="text-xl font-bold mb-5">
+                                Heuristic Groups
+                            </h1>
                             <ul>
                                 {data.groups.map((group) => (
                                     <li
@@ -277,6 +279,19 @@ export default function GroupContainer({ data }) {
                                         </Scroll>
                                     </li>
                                 ))}
+
+                                <li className="cursor-pointer mt-10">
+                                    <Scroll
+                                        activeClass="text-blue-500 hover:text-blue-700"
+                                        className="py-1 block text-slate-500 font-bold hover:text-slate-800"
+                                        to="findings_section"
+                                        spy={true}
+                                        smooth={true}
+                                        offset={-50}
+                                    >
+                                        General Findings
+                                    </Scroll>
+                                </li>
                             </ul>
                         </aside>
                     </div>

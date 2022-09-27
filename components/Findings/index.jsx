@@ -101,7 +101,7 @@ function Findings({ data, router, getFindings }) {
         addButtonText = "Add one more finding";
     }
     return (
-        <section className="mx-3">
+        <section id="findings_section" className="mx-3">
             <header className="flex flex-col justify-between mb-6 items-center px-4 gap-3">
                 <h1 className="text-xl font-bold flex flex-col items-center gap-2">
                     <span className="h-[5px] block bg-primary w-10 mb-1"></span>
