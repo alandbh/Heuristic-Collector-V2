@@ -116,7 +116,9 @@ function getCompletedPlayersSucessfully(params) {
     const { scores, journey, player } = params;
     const zeroed = getZeroedScores({ scores, journey });
     const allPlayers = getAllPlayers(scores, journey);
-    const blocked = getBlockedPlayers({ scores, journey });
+    const blocked = getBlockedPlayers({ scores, journey }).map(
+        (player) => player.playerSlug
+    );
     let completed = [];
 
     allPlayers.map((player) => {
@@ -130,7 +132,9 @@ function getCompletedPlayersSucessfully(params) {
         return;
     });
 
-    return completed.filter((player) => !blocked.includes(player));
+    let success = completed.filter((player) => !blocked.includes(player));
+
+    return success;
 }
 function getCompletedPlayers(params) {
     const { scores, journey, player } = params;
@@ -338,7 +342,14 @@ function Dashboard() {
         setJourney(selectedJourney);
     }
 
-    console.log(getAllPlayersObj({ scores: allScores.scores }));
+    function getSuccessDone() {
+        return getCompletedPlayersSucessfully({
+            scores: allScores.scores,
+            journey,
+        });
+    }
+
+    console.log(getSuccessDone());
 
     return (
         <>
@@ -424,14 +435,7 @@ function Dashboard() {
                                         </div>
                                         <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-green-600">
                                             <div className="text-4xl font-bold">
-                                                {
-                                                    getCompletedPlayersSucessfully(
-                                                        {
-                                                            scores: allScores?.scores,
-                                                            journey,
-                                                        }
-                                                    ).length
-                                                }
+                                                {getSuccessDone().length}
                                             </div>
                                             <div className="text-xs md:text-md">
                                                 Successfully Done
