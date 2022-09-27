@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
+import { Link as Scroll } from "react-scroll";
 import HeuristicGroup from "../HeuristicGroup";
 import { useScoresContext } from "../../context/scores";
-import { getUnicItem, debounce } from "../../lib/utils";
+import { getUnicItem, debounce, useScroll } from "../../lib/utils";
 import Findings from "../Findings";
 import client from "../../lib/apollo";
 
@@ -229,6 +230,8 @@ export default function GroupContainer({ data }) {
         });
     }
 
+    const [scrollY, setScrollY] = useScroll(0);
+
     if (!dataJourneys) {
         return null;
     }
@@ -247,9 +250,36 @@ export default function GroupContainer({ data }) {
                         getFindings={getFindings}
                     />
                 </div>
-                <div>
-                    <h1 className="text-2xl">Categories</h1>
-                    {/* <Debugg data={allScores} /> */}
+                <div className="relative">
+                    <div className={scrollY > 150 ? "fixed top-8" : "relative"}>
+                        <aside>
+                            <h1 className="text-2xl">Search</h1>
+                            <input type="search" name="search" id="search" />
+                        </aside>
+                        <aside>
+                            <h1 className="text-2xl">Categories</h1>
+                            <ul>
+                                {data.groups.map((group) => (
+                                    <li
+                                        key={group.id}
+                                        className="cursor-pointer"
+                                    >
+                                        {/* <a href={"#" + group.id}>{group.name}</a> */}
+                                        <Scroll
+                                            activeClass="text-blue-500 hover:text-blue-700"
+                                            className="py-1 block text-slate-500 font-bold hover:text-slate-800"
+                                            to={group.id}
+                                            spy={true}
+                                            smooth={true}
+                                            offset={-50}
+                                        >
+                                            {group.name}
+                                        </Scroll>
+                                    </li>
+                                ))}
+                            </ul>
+                        </aside>
+                    </div>
                 </div>
             </div>
         </>
