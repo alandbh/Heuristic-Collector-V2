@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { Link as Scroll } from "react-scroll";
@@ -333,7 +333,9 @@ function SearchBox(data) {
         includeScore: true,
         keys: ["name", "description"],
         minMatchCharLength: 3,
-        threshold: 0.5,
+        threshold: 0.3,
+        location: 0,
+        distance: 2000,
     };
 
     if (data) {
@@ -344,18 +346,21 @@ function SearchBox(data) {
         }
     }
 
+    const inputRef = useRef(null);
+
     console.log("RESULT", result);
 
     function handleClick(id) {
         console.log("clicou", id);
+
+        inputRef.current.value = "";
+        setResult([]);
 
         const heuristicElement = document.getElementById(id);
 
         heuristicElement.classList.add("bg-blue-100", "animate-pulse");
 
         heuristicElement.style.boxShadow = "7px 0 0px 24px rgb(219, 234, 254)";
-
-        //7px 0 0px 24px #1f7cdf3f
 
         setTimeout(() => {
             heuristicElement.classList.remove("bg-blue-100", "animate-pulse");
@@ -387,6 +392,7 @@ function SearchBox(data) {
                     name="search"
                     id="search"
                     autoComplete="off"
+                    ref={inputRef}
                 />
             </div>
             <div className="px-1">
@@ -416,20 +422,6 @@ function SearchBox(data) {
                             </Scroll>
                         </li>
                     ))}
-
-                    {/* <li className="block cursor-pointer w-full">
-                        <Scroll
-                            activeClass="underline underline-offset-4 hover:text-blue-700"
-                            className="py-1 block text-slate-500 hover:text-slate-800"
-                            to="findings_section"
-                            spy={true}
-                            smooth={true}
-                            offset={-50}
-                            onClick={handleClick}
-                        >
-                            General Findings
-                        </Scroll>
-                    </li> */}
                 </ul>
             </div>
         </>
