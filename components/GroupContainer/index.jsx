@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { Link as Scroll } from "react-scroll";
+import Fuse from "fuse.js";
 import HeuristicGroup from "../HeuristicGroup";
 import { useScoresContext } from "../../context/scores";
 import { getUnicItem, debounce, useScroll } from "../../lib/utils";
@@ -212,7 +213,7 @@ export default function GroupContainer({ data }) {
     useEffect(() => {
         // setEmpty(true);
         getNewScores().then((dataScores) => {
-            // console.log("newscores", dataScores);
+            console.log("newscores");
 
             if (dataScores.length > 0) {
                 // console.log("newscoreswwww", dataScores);
@@ -222,18 +223,31 @@ export default function GroupContainer({ data }) {
                 // debCreateNewScores(data, router);
             }
         });
-    });
 
-    function createNewScores() {
-        debCreateNewScores(data, router, () => {
-            setEmpty(false);
-        });
-    }
+        function createNewScores() {
+            debCreateNewScores(data, router, () => {
+                setEmpty(false);
+            });
+        }
+    }, [getNewScores, data, router]);
 
-    const [scrollY, setScrollY] = useScroll(0);
+    const [scrollY] = useScroll(0);
 
     if (!dataJourneys) {
         return null;
+    }
+
+    const options = {
+        includeScore: true,
+        keys: ["heuristic.name"],
+    };
+
+    const fuse = new Fuse(data.groups, options);
+
+    function handleSearch(term) {
+        const result = fuse.search(term);
+
+        console.log("RESULT", result);
     }
 
     return (
@@ -256,7 +270,9 @@ export default function GroupContainer({ data }) {
                             <h1 className="text-slate-400 text-sm uppercase mb-5 border-b-2 pb-3">
                                 Search
                             </h1>
-                            <input type="search" name="search" id="search" />
+                            <div>
+                                <SearchBox data={data.groups} />
+                            </div>
                         </aside>
                         <aside>
                             <h1 className="text-slate-400 text-sm uppercase mb-5 border-b-2 pb-3">
@@ -268,7 +284,6 @@ export default function GroupContainer({ data }) {
                                         key={group.id}
                                         className="cursor-pointer"
                                     >
-                                        {/* <a href={"#" + group.id}>{group.name}</a> */}
                                         <Scroll
                                             activeClass="underline underline-offset-4 hover:text-blue-700"
                                             className="py-1 block text-primary font-bold hover:text-slate-800"
@@ -303,6 +318,39 @@ export default function GroupContainer({ data }) {
                     </div>
                 </div>
             </div>
+        </>
+    );
+}
+
+function SearchBox(data) {
+    function handleClick() {
+        console.log("clicou");
+    }
+    return (
+        <>
+            <div>
+                <input
+                    onChange={(e) => handleSearch(e.target.value)}
+                    type="search"
+                    name="search"
+                    id="search"
+                />
+            </div>
+            <ul>
+                <li className="cursor-pointer mt-5">
+                    <Scroll
+                        activeClass="underline underline-offset-4 hover:text-blue-700"
+                        className="py-1 block text-slate-500 hover:text-slate-800"
+                        to="findings_section"
+                        spy={true}
+                        smooth={true}
+                        offset={-50}
+                        onClick={handleClick}
+                    >
+                        General Findings
+                    </Scroll>
+                </li>
+            </ul>
         </>
     );
 }
