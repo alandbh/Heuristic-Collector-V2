@@ -252,12 +252,14 @@ export default function GroupContainer({ data }) {
                 </div>
                 <div className="relative">
                     <div className={scrollY > 150 ? "fixed top-8" : "relative"}>
-                        <aside>
-                            <h1 className="text-xl font-bold mb-5">Search</h1>
+                        <aside className="mb-10">
+                            <h1 className="text-slate-400 text-sm uppercase mb-5 border-b-2 pb-3">
+                                Search
+                            </h1>
                             <input type="search" name="search" id="search" />
                         </aside>
                         <aside>
-                            <h1 className="text-xl font-bold mb-5">
+                            <h1 className="text-slate-400 text-sm uppercase mb-5 border-b-2 pb-3">
                                 Heuristic Groups
                             </h1>
                             <ul>
@@ -268,8 +270,8 @@ export default function GroupContainer({ data }) {
                                     >
                                         {/* <a href={"#" + group.id}>{group.name}</a> */}
                                         <Scroll
-                                            activeClass="text-blue-500 hover:text-blue-700"
-                                            className="py-1 block text-slate-500 font-bold hover:text-slate-800"
+                                            activeClass="underline underline-offset-4 hover:text-blue-700"
+                                            className="py-1 block text-primary font-bold hover:text-slate-800"
                                             to={group.id}
                                             spy={true}
                                             smooth={true}
@@ -280,10 +282,14 @@ export default function GroupContainer({ data }) {
                                     </li>
                                 ))}
 
-                                <li className="cursor-pointer mt-10">
+                                <li className="mt-5">
+                                    <hr />
+                                </li>
+
+                                <li className="cursor-pointer mt-5">
                                     <Scroll
-                                        activeClass="text-blue-500 hover:text-blue-700"
-                                        className="py-1 block text-slate-500 font-bold hover:text-slate-800"
+                                        activeClass="underline underline-offset-4 hover:text-blue-700"
+                                        className="py-1 block text-primary font-bold hover:text-slate-800"
                                         to="findings_section"
                                         spy={true}
                                         smooth={true}
