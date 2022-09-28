@@ -400,11 +400,11 @@ function SearchBox(data) {
                     {result?.map((item, index) => (
                         <li
                             key={index}
-                            className="block cursor-pointer w-full px-4 py-1 border-b-2"
+                            className="block cursor-pointer w-full py-1 border-b-2"
                         >
                             <Scroll
                                 activeClass="hover:text-blue-700"
-                                className="py-1 block text-slate-500 hover:text-slate-800"
+                                className="py-1 px-4 w-full block text-slate-500 hover:text-slate-800 focus:bg-blue-100 focus:outline-none"
                                 to={item.item.id}
                                 spy={true}
                                 smooth={true}
@@ -413,7 +413,7 @@ function SearchBox(data) {
                                 tabIndex={0}
                                 href="#"
                             >
-                                <b className="text-blue-300">
+                                <b className="text-blue-400">
                                     {item.item.name}
                                 </b>
                                 <span className="truncate block w-full h-8">
