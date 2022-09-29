@@ -20,8 +20,8 @@ async function getData(query, variables) {
 }
 
 const QUERY_ALL = gql`
-    query getAllPlayers {
-        players(where: { project: { slug: "retail-30" } }) {
+    query getAllPlayers($projectSlug: String) {
+        players(where: { project: { slug: $projectSlug } }) {
             id
             name
             scores(first: 1000) {
@@ -34,6 +34,9 @@ const QUERY_ALL = gql`
                 }
                 scoreValue
                 note
+            }
+            finding {
+                findingObject
             }
         }
     }
@@ -60,58 +63,66 @@ const QUERY_JOURNEYS = gql`
 //       },
 
 export default async function handler(req, res) {
+    const { project } = req.query;
     const allJourneys = await getData(QUERY_JOURNEYS);
-    const allPlayers = await getData(QUERY_ALL);
+    const allPlayers = await getData(QUERY_ALL, { projectSlug: project });
 
-    const newPlayerArr = allPlayers.data.players.map(({ id, name, scores }) => {
-        const playerOb = {};
-        playerOb.id = id;
-        playerOb.name = name;
+    console.log(req.query);
+    // console.log(allPlayers.data.players[0].finding);
 
-        const journeys = {};
+    const newPlayerArr = allPlayers.data.players.map(
+        ({ id, name, scores, finding }) => {
+            const playerOb = {};
+            playerOb.id = id;
+            playerOb.name = name;
 
-        allJourneys.data.journeys.map((jou) => {
-            journeys[jou.slug] = {};
+            const journeys = {};
 
-            const scoresByJourney = scores
-                .filter((score) => {
-                    return score.journey.slug === jou.slug;
-                })
-                .map((score) => {
-                    return {
-                        journey: score.journey.slug,
-                        heuristic: "h_" + score.heuristic.heuristicNumber,
-                        scoreValue: score.scoreValue,
-                        note: score.note,
-                    };
+            allJourneys.data.journeys.map((jou) => {
+                journeys[jou.slug] = {};
+
+                const scoresByJourney = scores
+                    .filter((score) => {
+                        return score.journey.slug === jou.slug;
+                    })
+                    .map((score) => {
+                        return {
+                            journey: score.journey.slug,
+                            heuristic: "h_" + score.heuristic.heuristicNumber,
+                            scoreValue: score.scoreValue,
+                            note: score.note,
+                        };
+                    });
+
+                scoresByJourney.sort((a, b) => {
+                    const nameA = a.heuristic.toUpperCase(); // ignore upper and lowercase
+                    const nameB = b.heuristic.toUpperCase(); // ignore upper and lowercase
+                    if (nameA < nameB) {
+                        return -1;
+                    }
+                    if (nameA > nameB) {
+                        return 1;
+                    }
+
+                    // names must be equal
+                    return 0;
                 });
 
-            scoresByJourney.sort((a, b) => {
-                const nameA = a.heuristic.toUpperCase(); // ignore upper and lowercase
-                const nameB = b.heuristic.toUpperCase(); // ignore upper and lowercase
-                if (nameA < nameB) {
-                    return -1;
-                }
-                if (nameA > nameB) {
-                    return 1;
-                }
+                scoresByJourney.map((score) => {
+                    journeys[jou.slug][score.heuristic] = {};
+                    journeys[jou.slug][score.heuristic].scoreValue =
+                        score.scoreValue;
+                    journeys[jou.slug][score.heuristic].note = score.note;
+                });
 
-                // names must be equal
-                return 0;
+                playerOb.scores = journeys;
             });
 
-            scoresByJourney.map((score) => {
-                journeys[jou.slug][score.heuristic] = {};
-                journeys[jou.slug][score.heuristic].scoreValue =
-                    score.scoreValue;
-                journeys[jou.slug][score.heuristic].note = score.note;
-            });
+            playerOb.findings = finding.map((item) => item.findingObject);
 
-            playerOb.scores = journeys;
-        });
-
-        return playerOb;
-    });
+            return playerOb;
+        }
+    );
     serve(newPlayerArr);
     // serve(allPlayers);
 
