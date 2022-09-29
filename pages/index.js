@@ -6,86 +6,24 @@ import ClientOnly from "../lib/ClientOnly";
 import HeuristicList from "../components/HeuristicList";
 import Card from "../components/Card";
 
-const GET_PLAYERS = gql`
-    query MyQuery($playerSlug: String) {
-        player(where: { slug: $playerSlug }) {
-            name
-            scores {
-                journey {
-                    slug
-                }
-                heuristic {
-                    name
-                    heuristicNumber
-                }
-                scoreValue
-            }
-        }
-    }
-`;
-
-const playersQuery = gql`
-    query {
-        player(where: { slug: "magalu" }) {
-            name
-            slug
-            project {
-                name
-            }
-            scores(where: { journey: { slug: "desktop" } }) {
-                heuristic {
-                    heuristicNumber
-                    name
-                    description
-                }
-                scoreValue
-            }
-        }
-    }
-`;
-const heuristicQuery = gql`
-    query {
-        heuristics(where: { group: { name: "1. Need Recognition" } }) {
-            name
-            group {
-                name
-            }
-        }
-    }
-`;
-
-const QUERY_PROJECTS = gql`
-    query {
-        projects {
-            id
-            name
-            slug
-            year
-            thumbnail {
-                url
-            }
-        }
-    }
-`;
-
 export default function Home(props) {
-    const { data, loading, error } = useQuery(QUERY_PROJECTS);
-    console.log(data?.projects);
     return (
         <>
-            <ClientOnly>
-                {/* <HeuristicList query={heuristicQuery} /> */}
-                <div className="m-10 flex flex-wrap gap-10">
-                    {data?.projects?.map((proj) => (
-                        <>
-                            <Card key={proj.id} data={proj} />
-                            <Card key={proj.id} data={proj} />
-                            <Card key={proj.id} data={proj} />
-                            <Card key={proj.id} data={proj} />
-                        </>
-                    ))}
+            <div className="flex flex-col max-w-5xl mx-auto">
+                <div className="flex w-full justify-between my-10">
+                    <Image
+                        src={`/logo-58.svg`}
+                        width={166}
+                        height={58}
+                        alt={`Heuristic Collector Logo`}
+                    />
+
+                    <button className="bg-primary hover:bg-primary/70 text-white/80 uppercase px-8 py-6 rounded-md font-bold h-1 flex items-center">
+                        Log In
+                    </button>
                 </div>
-            </ClientOnly>
+                <div>sdsds</div>
+            </div>
         </>
     );
 }
