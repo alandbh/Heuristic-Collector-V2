@@ -281,22 +281,23 @@ function Dashboard() {
     //     },
     // });
 
-    const getNewScores = async function getNewScores() {
-        const { data: newData } = await client.query({
-            query: QUERY_SCORES_BY_PROJECT,
-            variables: {
-                projectSlug: router.query.slug,
-            },
-            fetchPolicy: "network-only",
-        });
-
-        setAllScores(newData);
-
-        return newData;
-    };
     useEffect(() => {
+        const getNewScores = async function getNewScores() {
+            const { data: newData } = await client.query({
+                query: QUERY_SCORES_BY_PROJECT,
+                variables: {
+                    projectSlug: router.query.slug,
+                },
+                fetchPolicy: "network-only",
+            });
+
+            setAllScores(newData);
+
+            return newData;
+        };
+
         getNewScores();
-    }, []);
+    }, [router.query.slug]);
 
     if (!allScores) {
         return null;
@@ -537,10 +538,10 @@ function Dashboard() {
                                  */}
 
                                 <div className="grid grid-cols-3 mt-10">
-                                    <div className="col-span-1">
+                                    <div className="col-span-3">
                                         <h3>Players</h3>
 
-                                        <ul className="mt-10">
+                                        <ul className="mt-5 grid grid-cols-3 gap-5 flex-wrap">
                                             {getAllPlayersObj({
                                                 scores: allScores.scores,
                                                 journey,
@@ -565,7 +566,7 @@ function Dashboard() {
                                                 return (
                                                     <li
                                                         key={player.slug}
-                                                        className={`flex gap-2 items-center border-r-2 border-r-[${playerColor}] py-3`}
+                                                        className={`col-span-1 flex gap-2 items-center border-r-0 border-r-[${playerColor}] py-3`}
                                                     >
                                                         <div>
                                                             <div
@@ -573,7 +574,7 @@ function Dashboard() {
                                                                     background:
                                                                         playerColor,
                                                                 }}
-                                                                className={`p-1 bg-[${playerColor}] w-1 rounded-full`}
+                                                                className={`p-1 bg-[${playerColor}] w-1 rounded-full hidden`}
                                                             ></div>
                                                         </div>
                                                         <div className="flex-1 mr-2">

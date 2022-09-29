@@ -75,10 +75,10 @@ function Project() {
                 <Header
                     className="mt-10"
                     // project={data?.project.name}
-                    routes={{ slug, tab: "dash" }}
+                    routes={{ slug, tab: "progress" }}
                 />
                 <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
-                    {tab === "dash" ? <Dashboard /> : <Evaluation />}
+                    {tab === "progress" ? <Dashboard /> : <Evaluation />}
                 </main>
                 <footer>FOOTER</footer>
             </ProjectWrapper>
