@@ -281,7 +281,7 @@ function Dashboard() {
     //     },
     // });
 
-    getNewScores = async function getNewScores() {
+    const getNewScores = async function getNewScores() {
         const { data: newData } = await client.query({
             query: QUERY_SCORES_BY_PROJECT,
             variables: {
