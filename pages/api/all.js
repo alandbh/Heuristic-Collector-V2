@@ -34,8 +34,12 @@ const QUERY_ALL = gql`
                 }
                 scoreValue
                 note
+                evidenceUrl
             }
             finding {
+                journey {
+                    slug
+                }
                 findingObject
             }
         }
@@ -91,6 +95,7 @@ export default async function handler(req, res) {
                             heuristic: "h_" + score.heuristic.heuristicNumber,
                             scoreValue: score.scoreValue,
                             note: score.note,
+                            evidenceUrl: score.evidenceUrl,
                         };
                     });
 
@@ -113,12 +118,31 @@ export default async function handler(req, res) {
                     journeys[jou.slug][score.heuristic].scoreValue =
                         score.scoreValue;
                     journeys[jou.slug][score.heuristic].note = score.note;
+                    journeys[jou.slug][score.heuristic].evidenceUrl =
+                        score.evidenceUrl;
                 });
 
                 playerOb.scores = journeys;
             });
 
-            playerOb.findings = finding.map((item) => item.findingObject);
+            playerOb.findings = {};
+
+            const allFindings = finding.map((item) => {
+                let findingObj = {};
+                // findingObj = item.findingObject
+                findingObj = {
+                    ...item.findingObject,
+                    journey: item.journey.slug,
+                };
+
+                return findingObj;
+            });
+
+            allJourneys.data.journeys.map((journey) => {
+                playerOb.findings[journey.slug] = allFindings.filter(
+                    (finding) => finding.journey === journey.slug
+                );
+            });
 
             return playerOb;
         }
