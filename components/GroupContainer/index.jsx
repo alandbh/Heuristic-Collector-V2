@@ -293,7 +293,7 @@ export default function GroupContainer({ data }) {
                                     >
                                         <Scroll
                                             activeClass="underline underline-offset-4 hover:text-blue-700"
-                                            className="py-1 block text-primary font-bold hover:text-slate-800"
+                                            className="py-1 block text-primary font-bold hover:text-primary/70"
                                             to={group.id}
                                             spy={true}
                                             smooth={true}
@@ -311,7 +311,7 @@ export default function GroupContainer({ data }) {
                                 <li className="cursor-pointer mt-5">
                                     <Scroll
                                         activeClass="underline underline-offset-4 hover:text-blue-700"
-                                        className="py-1 block text-primary font-bold hover:text-slate-800"
+                                        className="py-1 block text-primary font-bold hover:text-primary/70"
                                         to="findings_section"
                                         spy={true}
                                         smooth={true}
@@ -375,18 +375,26 @@ function SearchBox(data) {
 
         const heuristicElement = document.getElementById(id);
 
-        heuristicElement.classList.add("bg-blue-100", "animate-pulse");
+        heuristicElement.classList.add(
+            "bg-blue-100",
+            "animate-pulse",
+            "text-slate-700"
+        );
 
         heuristicElement.style.boxShadow = "7px 0 0px 24px rgb(219, 234, 254)";
 
         setTimeout(() => {
-            heuristicElement.classList.remove("bg-blue-100", "animate-pulse");
+            heuristicElement.classList.remove(
+                "bg-blue-100",
+                "animate-pulse",
+                "text-slate-700"
+            );
             heuristicElement.style.boxShadow = "none";
         }, 5000);
     }
     return (
         <>
-            <div className="flex items-center gap-2 pl-2 border-slate-200 border text-slate-500 w-full bg-white">
+            <div className=" rounded-md flex items-center gap-2 pl-2 border-slate-200 border text-slate-500 w-full bg-white dark:bg-transparent">
                 <label htmlFor="search">
                     <svg
                         width="24"
@@ -406,7 +414,7 @@ function SearchBox(data) {
                 </label>
 
                 <input
-                    className="h-10 p-2 rounded-md  text-slate-500 w-full"
+                    className="h-10 p-2 rounded-md bg-transparent  text-slate-500 w-full"
                     onChange={(e) => handleSearch(e.target.value)}
                     type="search"
                     name="search"
