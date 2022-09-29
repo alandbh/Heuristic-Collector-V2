@@ -258,7 +258,7 @@ export default function GroupContainer({ data }) {
 
     return (
         <>
-            <div className="gap-5 max-w-5xl mx-auto md:grid grid-cols-3 ">
+            <div className="gap-5 max-w-5xl mx-auto flex flex-col-reverse md:grid md:grid-cols-3 ">
                 <div className="md:col-span-2 flex flex-col gap-20">
                     {data.groups.map((group) => (
                         <HeuristicGroup group={group} key={group.id} />
@@ -270,16 +270,18 @@ export default function GroupContainer({ data }) {
                         getFindings={getFindings}
                     />
                 </div>
-                <div className="relative">
+                <div className="relative mr-4">
                     <div
-                        className={scrollY > 150 ? "sticky top-8" : "relative"}
+                        className={
+                            scrollY > 150 ? "md:sticky top-8" : "relative"
+                        }
                     >
-                        <aside className="mb-10">
+                        <aside className="mb-10 mx-4 md:mx-0">
                             <div>
                                 <SearchBox data={allHeuristics} />
                             </div>
                         </aside>
-                        <aside>
+                        <aside className="hidden md:block">
                             <h1 className="text-slate-400 text-sm uppercase mb-5 border-b-2 pb-3">
                                 Heuristic Groups
                             </h1>
@@ -329,6 +331,21 @@ export default function GroupContainer({ data }) {
 
 function SearchBox(data) {
     const [result, setResult] = useState([]);
+    const [vw, setVw] = useState(1024);
+
+    if (window !== undefined) {
+        window.addEventListener("resize", function () {
+            // viewport and full window dimensions will change
+            setVw(window.innerWidth);
+        });
+    }
+
+    useEffect(() => {
+        if (window !== undefined) {
+            setVw(window.innerWidth);
+        }
+    }, []);
+
     const options = {
         includeScore: true,
         keys: ["name", "description"],
@@ -348,7 +365,7 @@ function SearchBox(data) {
 
     const inputRef = useRef(null);
 
-    console.log("RESULT", result);
+    console.log("RESULT");
 
     function handleClick(id) {
         console.log("clicou", id);
@@ -385,6 +402,7 @@ function SearchBox(data) {
                             fill="currentColor"
                         />
                     </svg>
+                    <span className="sr-only">Search for heuristics</span>
                 </label>
 
                 <input
@@ -411,7 +429,7 @@ function SearchBox(data) {
                                 to={item.item.id}
                                 spy={true}
                                 smooth={true}
-                                offset={-50}
+                                offset={vw < 700 ? -150 : -50}
                                 onClick={() => handleClick(item.item.id)}
                                 tabIndex={0}
                                 href="#"
@@ -419,8 +437,8 @@ function SearchBox(data) {
                                 <b className="text-blue-400">
                                     {item.item.name}
                                 </b>
-                                <span className="truncate block w-full h-8">
-                                    {item.item.description}
+                                <span className=" block w-full mt-2 text-sm">
+                                    {item.item.description.substring(0, 130)}...
                                 </span>
                             </Scroll>
                         </li>

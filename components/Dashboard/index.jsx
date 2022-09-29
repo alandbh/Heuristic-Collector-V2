@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import client from "../../lib/apollo";
 
 import Debugg from "../../lib/Debugg";
@@ -269,16 +269,34 @@ function getUnique(arr, key = null, subkey = null) {
  */
 function Dashboard() {
     const [journey, setJourney] = useState();
+    const [allScores, setAllScores] = useState(null);
     const router = useRouter();
-    const {
-        data: allScores,
-        loading,
-        error,
-    } = useQuery(QUERY_SCORES_BY_PROJECT, {
-        variables: {
-            projectSlug: router.query.slug,
-        },
-    });
+    // const {
+    //     data: allScores,
+    //     loading,
+    //     error,
+    // } = useQuery(QUERY_SCORES_BY_PROJECT, {
+    //     variables: {
+    //         projectSlug: router.query.slug,
+    //     },
+    // });
+
+    getNewScores = async function getNewScores() {
+        const { data: newData } = await client.query({
+            query: QUERY_SCORES_BY_PROJECT,
+            variables: {
+                projectSlug: router.query.slug,
+            },
+            fetchPolicy: "network-only",
+        });
+
+        setAllScores(newData);
+
+        return newData;
+    };
+    useEffect(() => {
+        getNewScores();
+    }, []);
 
     if (!allScores) {
         return null;
@@ -349,7 +367,7 @@ function Dashboard() {
         });
     }
 
-    console.log(getSuccessDone());
+    // console.log(getSuccessDone());
 
     return (
         <>
