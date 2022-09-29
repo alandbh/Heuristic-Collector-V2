@@ -143,12 +143,14 @@ export default async function handler(req, res) {
                     (finding) => finding.journey === journey.slug
                 );
 
-                playerOb.findings[journey.slug] = findingsArr.map(
-                    (finding) => ({
+                playerOb.findings[journey.slug] = {};
+
+                findingsArr.map((finding, index) => {
+                    playerOb.findings[journey.slug][`f_${index + 1}`] = {
                         text: finding.text,
                         theType: finding.theType,
-                    })
-                );
+                    };
+                });
             });
 
             return playerOb;
