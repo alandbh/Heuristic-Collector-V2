@@ -139,8 +139,15 @@ export default async function handler(req, res) {
             });
 
             allJourneys.data.journeys.map((journey) => {
-                playerOb.findings[journey.slug] = allFindings.filter(
+                const findingsArr = allFindings.filter(
                     (finding) => finding.journey === journey.slug
+                );
+
+                playerOb.findings[journey.slug] = findingsArr.map(
+                    (finding) => ({
+                        text: finding.text,
+                        theType: finding.theType,
+                    })
                 );
             });
 
