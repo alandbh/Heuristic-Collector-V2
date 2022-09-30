@@ -393,8 +393,6 @@ function SearchBox(data) {
 
     const inputRef = useRef(null);
 
-    console.log("RESULT");
-
     function handleClick(id) {
         console.log("clicou", id);
 

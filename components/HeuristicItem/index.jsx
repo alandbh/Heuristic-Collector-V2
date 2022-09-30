@@ -137,7 +137,7 @@ function HeuristicItem({ heuristic, id }) {
             setScore(currentScore.scoreValue);
             setText(currentScore.note);
             setEvidenceUrl(currentScore.evidenceUrl);
-            if (currentScore.note || currentScore.scoreValue) {
+            if (currentScore.note || currentScore.scoreValue > 0) {
                 setEnable(true);
             }
             setEmpty(false);
