@@ -183,6 +183,7 @@ function HeuristicItem({ heuristic, id }) {
         function saveValue() {
             if (empty) {
                 // debugger;
+                // return;
                 processChange(
                     client,
                     {

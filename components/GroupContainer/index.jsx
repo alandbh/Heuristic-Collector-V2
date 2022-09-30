@@ -60,6 +60,7 @@ const getUniqueGroups = debounce((arr, key, func) => {
 }, 300);
 
 const debCreateNewScores = debounce((data, router, func) => {
+    // return;
     console.log("groupssss", data.groups);
 
     if (data.groups.length === 0) {
@@ -163,6 +164,7 @@ export default function GroupContainer({ data }) {
     const [findingsList, setFindingsList] = useState(null);
     const [findingsLoading, setFindingsLoading] = useState(true);
     const [empty, setEmpty] = useState(true);
+    const [validJourney, setValidJourney] = useState(true);
     const [groups, setGroups] = useState(null);
     const [newScores, setNewScores] = useState([]);
     const { allScores, getNewScores } = useScoresContext();
@@ -213,7 +215,7 @@ export default function GroupContainer({ data }) {
     useEffect(() => {
         // setEmpty(true);
         getNewScores().then((dataScores) => {
-            console.log("newscores");
+            // console.log("newscores");
 
             if (dataScores.length > 0) {
                 console.log("newscoreswwww", dataScores);
@@ -225,16 +227,33 @@ export default function GroupContainer({ data }) {
         });
 
         function createNewScores() {
+            if (dataJourneys) {
+                console.log("invalid");
+                if (
+                    !dataJourneys.journeys.find(
+                        (journeyObj) => journeyObj.slug === router.query.journey
+                    )
+                ) {
+                    console.log("nao tem", dataJourneys.journeys);
+                    router.replace("/project/", {
+                        query: {
+                            slug: router.query.slug,
+                            player: router.query.player,
+                            journey: dataJourneys.journeys[0].slug,
+                        },
+                        shallow: true,
+                    });
+                    setValidJourney(false);
+                    return;
+                }
+            }
+
             debCreateNewScores(data, router, () => {
+                console.log("debCreateNewScores");
                 setEmpty(false);
             });
         }
-    }, [getNewScores, data, router]);
-
-    /**
-     *
-     * mudar isso para evitar re-rendering
-     */
+    }, [getNewScores, data, router, dataJourneys]);
 
     const [allHeuristics, setAllHeuristics] = useState([]);
 
@@ -254,6 +273,15 @@ export default function GroupContainer({ data }) {
 
     if (!dataJourneys) {
         return null;
+    }
+
+    if (!validJourney) {
+        return (
+            <div className="flex p-20 items-center text-center">
+                This player does not have this journey. <br />
+                Please select another journey or player.
+            </div>
+        );
     }
 
     return (
