@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import ClientOnly from "../lib/ClientOnly";
 import HeuristicList from "../components/HeuristicList";
 import Card from "../components/Card";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 const GET_PLAYERS = gql`
     query MyQuery($playerSlug: String) {
@@ -68,27 +69,28 @@ const QUERY_PROJECTS = gql`
     }
 `;
 
-export default function Home(props) {
+export default withPageAuthRequired(function Projects(props) {
     const { data, loading, error } = useQuery(QUERY_PROJECTS);
     console.log(data?.projects);
+    console.log("withPageAuthRequired", props.user);
     return (
         <>
             <ClientOnly>
                 {/* <HeuristicList query={heuristicQuery} /> */}
                 <div className="m-10 flex flex-wrap gap-10">
-                    {data?.projects?.map((proj) => (
-                        <>
+                    {data?.projects?.map((proj, index) => (
+                        <div key={index}>
                             <Card key={proj.id} data={proj} />
                             <Card key={proj.id} data={proj} />
                             <Card key={proj.id} data={proj} />
                             <Card key={proj.id} data={proj} />
-                        </>
+                        </div>
                     ))}
                 </div>
             </ClientOnly>
         </>
     );
-}
+});
 
 // export async function getStaticProps() {
 //     const res = await client.query({

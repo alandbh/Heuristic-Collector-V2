@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import ClientOnly from "../lib/ClientOnly";
 import HeuristicList from "../components/HeuristicList";
 import Card from "../components/Card";
+import Link from "next/link";
 
 export default function Home(props) {
     return (
@@ -18,9 +19,16 @@ export default function Home(props) {
                         alt={`Heuristic Collector Logo`}
                     />
 
-                    <button className="bg-primary hover:bg-primary/70 text-white/80 uppercase px-8 py-6 rounded-md font-bold h-1 flex items-center">
-                        Log In
-                    </button>
+                    <Link href="/api/auth/login">
+                        <a className="bg-primary hover:bg-primary/70 text-white/80 uppercase px-8 py-6 rounded-md font-bold h-1 flex items-center">
+                            Log In
+                        </a>
+                    </Link>
+                    <Link href="/api/auth/logout">
+                        <a className=" hover:bg-primary/70 text-white/80 uppercase px-8 py-6 rounded-md font-bold h-1 flex items-center">
+                            Log Out
+                        </a>
+                    </Link>
                 </div>
                 <div>sdsds</div>
             </div>
