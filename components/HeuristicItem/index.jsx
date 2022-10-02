@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { gql } from "@apollo/client";
 
 import { useScoresContext } from "../../context/scores";
+import { useCredentialsContext } from "../../context/credentials";
+
 import { useRouter } from "next/router";
 import Range from "../Range";
 import Evidence from "../Evidence";
@@ -121,6 +123,9 @@ function HeuristicItem({ heuristic, id }) {
     const { allScores, setAllScores } = useScoresContext();
     const [boxOpen, setBoxOpen] = useState(false);
     const router = useRouter();
+    const { user, userType } = useCredentialsContext();
+
+    console.log("aaaaaaa", userType);
 
     // debugger;
     // console.log("scores", allScores);
@@ -138,7 +143,9 @@ function HeuristicItem({ heuristic, id }) {
             setText(currentScore.note);
             setEvidenceUrl(currentScore.evidenceUrl);
             if (currentScore.note || currentScore.scoreValue > 0) {
-                setEnable(true);
+                if (userType === "tester") {
+                    setEnable(true);
+                }
             }
             setEmpty(false);
         } else {
@@ -160,7 +167,7 @@ function HeuristicItem({ heuristic, id }) {
             // writeNewScores();
             // console.log("Undefined????");
         }
-    }, [currentScore, router, heuristic]);
+    }, [currentScore, router, heuristic, userType]);
 
     /**
      *
@@ -337,6 +344,7 @@ function HeuristicItem({ heuristic, id }) {
                             max={5}
                             value={score}
                             onChange={(ev) => handleChangeRange(ev)}
+                            disabled={userType === "regular"}
                         />
                         <p
                             className="text-sm text-slate-500"

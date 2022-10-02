@@ -9,6 +9,8 @@ import Dashboard from "../../components/Dashboard";
 import Evaluation from "../../components/Evaluation";
 import Header from "../../components/Header";
 import { ProjectWrapper } from "../../context/project";
+import { CredentialsWrapper } from "../../context/credentials";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 const QUERY_PROJECTS = gql`
     query Projects($slug: String) {
@@ -19,7 +21,7 @@ const QUERY_PROJECTS = gql`
     }
 `;
 
-function Project() {
+function Project({ user }) {
     const router = useRouter();
     const { slug, tab } = router.query || "";
 
@@ -69,21 +71,25 @@ function Project() {
         return <div>NOT FOUND</div>;
     }
 
+    // console.log("user", user);
+
     return (
         <div className="bg-slate-100/70 dark:bg-slate-800/50">
-            <ProjectWrapper data={data}>
-                <Header
-                    className="mt-10"
-                    // project={data?.project.name}
-                    routes={{ slug, tab: "progress" }}
-                />
-                <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
-                    {tab === "progress" ? <Dashboard /> : <Evaluation />}
-                </main>
-                <footer>FOOTER</footer>
-            </ProjectWrapper>
+            <CredentialsWrapper>
+                <ProjectWrapper data={data}>
+                    <Header
+                        className="mt-10"
+                        // project={data?.project.name}
+                        routes={{ slug, tab: "progress" }}
+                    />
+                    <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
+                        {tab === "progress" ? <Dashboard /> : <Evaluation />}
+                    </main>
+                    <footer>FOOTER</footer>
+                </ProjectWrapper>
+            </CredentialsWrapper>
         </div>
     );
 }
 
-export default Project;
+export default withPageAuthRequired(Project);

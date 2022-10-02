@@ -4,6 +4,7 @@ import Spinner from "../Spinner";
 import { ScoresWrapper } from "../../context/scores";
 
 import { useProjectContext } from "../../context/project";
+import { useCredentialsContext } from "../../context/credentials";
 import HeuristicGroup from "../HeuristicGroup";
 import GroupContainer from "../GroupContainer";
 
@@ -45,6 +46,8 @@ function Evaluation() {
         },
     });
 
+    console.log("Evaluation", useCredentialsContext());
+
     if (loading) {
         return (
             <div className="h-[calc(100vh_-_126px)] flex flex-col items-center justify-center">
@@ -60,8 +63,6 @@ function Evaluation() {
     if (data === undefined) {
         return null;
     }
-
-    console.log("Evaluation", data);
 
     return (
         <ScoresWrapper>

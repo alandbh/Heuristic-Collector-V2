@@ -15,6 +15,8 @@ const Range = (props) => {
     let inputStyle = {};
     let dropColor;
 
+    let isDisable = props.disabled || false;
+
     if (Number(props.value) === 0) {
         inputStyle.background =
             "linear-gradient(90deg, lightgrey 20%, grey 20%, grey 40%, lightgrey 40%, lightgrey 60%, grey 60%, grey 80%, lightgrey 80%, lightgrey 100%)";
@@ -85,6 +87,7 @@ const Range = (props) => {
                 max={props.max}
                 value={props.value}
                 onChange={props.onChange}
+                disabled={isDisable}
             />
 
             <span className={styles.dropContainer} style={dropstyles.container}>
