@@ -1,3 +1,4 @@
+import React from "react";
 import HeuristicItem from "../HeuristicItem";
 import { useScoresContext } from "../../context/scores";
 import Donnut from "../Donnut";
@@ -55,4 +56,4 @@ function HeuristicGroup({ group }) {
     );
 }
 
-export default HeuristicGroup;
+export default React.memo(HeuristicGroup);
