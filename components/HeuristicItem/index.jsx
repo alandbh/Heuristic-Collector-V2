@@ -125,7 +125,7 @@ function HeuristicItem({ heuristic, id }) {
     const router = useRouter();
     const { user, userType } = useCredentialsContext();
 
-    console.log("aaaaaaa", userType);
+    // console.log("aaaaaaa", userType);
 
     // debugger;
     // console.log("scores", allScores);
@@ -344,7 +344,7 @@ function HeuristicItem({ heuristic, id }) {
                             max={5}
                             value={score}
                             onChange={(ev) => handleChangeRange(ev)}
-                            disabled={userType === "regular"}
+                            disabled={userType !== "tester"}
                         />
                         <p
                             className="text-sm text-slate-500"
