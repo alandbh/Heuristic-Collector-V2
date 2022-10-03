@@ -7,6 +7,7 @@ import { useProjectContext } from "../../context/project";
 import JourneySelect from "../JourneySelect";
 import PlayerSelect from "../PlayerSelect";
 import ToggleTheme from "../ToggleTheme";
+import LoggedUser from "../LoggedUser";
 
 function Header({ routes, className }) {
     const router = useRouter();
@@ -115,6 +116,7 @@ function Header({ routes, className }) {
                         {/* </Link> */}
                     </nav>
                     <ToggleTheme />
+                    <LoggedUser />
                 </div>
             </div>
             <div className="bg-white dark:bg-slate-800 shadow-md px-5 py-3">
