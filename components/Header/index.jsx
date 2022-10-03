@@ -8,6 +8,7 @@ import JourneySelect from "../JourneySelect";
 import PlayerSelect from "../PlayerSelect";
 import ToggleTheme from "../ToggleTheme";
 import LoggedUser from "../LoggedUser";
+import { useCredentialsContext } from "../../context/credentials";
 
 function Header({ routes, className }) {
     const router = useRouter();
@@ -15,6 +16,10 @@ function Header({ routes, className }) {
     const isProgress = tab === routes.tab;
 
     const { project } = useProjectContext();
+
+    const { given_name, picture } = useCredentialsContext().user;
+
+    console.log("useCredentialsContext", useCredentialsContext().user);
 
     function handleNav(param, value) {
         if (value) {
@@ -116,7 +121,7 @@ function Header({ routes, className }) {
                         {/* </Link> */}
                     </nav>
                     <ToggleTheme />
-                    <LoggedUser />
+                    <LoggedUser picture={picture} name={given_name} />
                 </div>
             </div>
             <div className="bg-white dark:bg-slate-800 shadow-md px-5 py-3">

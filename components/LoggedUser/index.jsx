@@ -1,7 +1,8 @@
 import Image from "next/image";
 import React, { useState } from "react";
+import Link from "next/link";
 
-function LoggedUser() {
+function LoggedUser({ name, picture }) {
     const [popOver, setPopOver] = useState(false);
 
     function handleYes() {
@@ -22,38 +23,37 @@ function LoggedUser() {
             >
                 <Image
                     className="rounded-full overflow-hidden"
-                    src="https://lh3.googleusercontent.com/a-/ACNPEu9KjxVWq0LeckFHND-5dp4FwDR3QXVAoseqs8xpOw=s96-c"
+                    src={picture}
                     width={28}
                     height={28}
-                    alt="avatar"
+                    alt={`${name}'s picture`}
                 />
             </button>
 
             <div
-                className={`absolute flex flex-col items-center gap-2 top-0 right-0 px-6 py-6 bg-white dark:bg-slate-800 shadow-lg ${
+                className={`absolute min-w-[200px] flex flex-col items-center gap-2 top-0 right-0 px-6 py-6 bg-white dark:bg-slate-800 shadow-lg ${
                     popOver ? "block" : "hidden"
                 }`}
             >
                 <span>
                     <Image
-                        src="https://lh3.googleusercontent.com/a-/ACNPEu9KjxVWq0LeckFHND-5dp4FwDR3QXVAoseqs8xpOw=s96-c"
+                        src={picture}
                         width={50}
                         height={50}
-                        alt="avatar"
+                        alt={`${name}'s picture`}
                         className="rounded-full overflow-hidden"
                     />
                 </span>
                 <h2 className="text-sm font-bold whitespace-nowrap">
-                    Hi, AlanVasconcelos!
+                    Hi, {name}!
                 </h2>
                 <h3 className="mt-6">Log out?</h3>
                 <div className="flex justify-around w-full mt-2">
-                    <button
-                        onClick={handleYes}
-                        className="border border-slate-400 px-4 py-1 text-sm rounded-md hover:bg-primary hover:text-white hover:border-none"
-                    >
-                        Yes
-                    </button>
+                    <Link tabIndex={0} href="/api/auth/logout">
+                        <a className="border border-slate-400 px-4 py-1 text-sm rounded-md hover:bg-primary hover:text-white hover:border-transparent">
+                            Yes
+                        </a>
+                    </Link>
                     <button
                         onClick={handleNo}
                         className="text-sm hover:underline underline-offset-2 px-4"
