@@ -31,7 +31,7 @@ function LoggedUser({ name, picture }) {
             </button>
 
             <div
-                className={`absolute min-w-[200px] flex flex-col items-center gap-2 top-0 right-0 px-6 py-6 bg-white dark:bg-slate-800 shadow-lg ${
+                className={`absolute z-10 min-w-[200px] flex flex-col items-center gap-2 top-0 right-0 px-6 py-6 bg-white dark:bg-slate-800 shadow-lg ${
                     popOver ? "block" : "hidden"
                 }`}
             >

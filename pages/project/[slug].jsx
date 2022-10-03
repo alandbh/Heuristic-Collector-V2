@@ -85,7 +85,7 @@ function Project({ user }) {
                     <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
                         {tab === "progress" ? <Dashboard /> : <Evaluation />}
                     </main>
-                    <footer>FOOTER</footer>
+                    <footer className="py-10">{/* FOOTER */}</footer>
                 </ProjectWrapper>
             </CredentialsWrapper>
         </div>
