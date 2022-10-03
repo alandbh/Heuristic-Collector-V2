@@ -3,15 +3,40 @@ import { useRouter } from "next/router";
 import client from "../lib/apollo";
 import { gql, useQuery } from "@apollo/client";
 import { useUser } from "@auth0/nextjs-auth0";
+import { debounce } from "../lib/utils";
 
 const QUERY_USER = gql`
     query getRgaUser($projectSlug: String, $email: String) {
-        rgaUser(where: { email: $email }) {
+        rgaUsers(where: { project: { slug: $projectSlug }, email: $email }) {
+            id
             email
             userType
-            projects(where: { slug: $projectSlug }) {
-                slug
+        }
+    }
+`;
+
+const CREATE_RGAUSER = gql`
+    mutation createNewRgaUser($projectSlug: String, $email: String!) {
+        createRgaUser(
+            data: {
+                project: { connect: { slug: $projectSlug } }
+                email: $email
+                userType: regular
             }
+        ) {
+            id
+            email
+            userType
+        }
+    }
+`;
+
+const PUBLISH_RGAUSER = gql`
+    mutation publishRgaUser($id: ID) {
+        publishRgaUser(where: { id: $id }) {
+            id
+            email
+            userType
         }
     }
 `;
@@ -19,7 +44,8 @@ const QUERY_USER = gql`
 const CredentialsContext = createContext();
 
 async function getRgaUser(email, projectSlug, func) {
-    const { data: userType } = await client.query({
+    // return;
+    const { data: rgaUsersRetrieved } = await client.query({
         query: QUERY_USER,
         variables: {
             projectSlug,
@@ -27,13 +53,32 @@ async function getRgaUser(email, projectSlug, func) {
         },
         fetchPolicy: "network-only",
     });
-
     // setAllScores(newData.scores);
-    func(userType.rgaUser);
-    console.log("RGA USER", userType);
-
-    return userType.rgaUser;
+    console.log("RGA USER RETRIEVED", rgaUsersRetrieved.rgaUsers[0]);
+    func(rgaUsersRetrieved.rgaUsers[0]);
+    return rgaUsersRetrieved.rgaUsers[0];
 }
+
+const createNewRgaUser = debounce(async (projectSlug, email, setRgaUser) => {
+    // return;
+    const { data: newRgaUser } = await client.mutate({
+        mutation: CREATE_RGAUSER,
+        variables: {
+            projectSlug,
+            email,
+        },
+    });
+    console.log("newRgaUser", newRgaUser);
+    // console.log("NEW RGA USER", newRgaUser.rgaUser);
+
+    const { data: newRgaUserPublished } = await client.mutate({
+        mutation: PUBLISH_RGAUSER,
+        variables: {
+            id: newRgaUser.createRgaUser.id,
+        },
+    });
+    setRgaUser(newRgaUserPublished.publishRgaUser);
+}, 2000);
 
 export function CredentialsWrapper({ children }) {
     const [rgaUser, setRgaUser] = useState(null);
@@ -57,11 +102,16 @@ export function CredentialsWrapper({ children }) {
     //     },
     // });
 
-    if (!rgaUser) {
-        return null;
-    }
+    useEffect(() => {
+        if (rgaUser === undefined) {
+            console.log("noneRgaUser", rgaUser);
+            // return null;
+            createNewRgaUser(router.query.slug, user.email, setRgaUser);
+        }
+    }, [rgaUser, router.query.slug, user.email]);
 
-    console.log("userType", rgaUser?.userType);
+    // console.log("userType", rgaUser?.userType);
+    console.log("NewRgaUserPublisehed", rgaUser);
 
     return (
         <CredentialsContext.Provider
