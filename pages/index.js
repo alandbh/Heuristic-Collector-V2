@@ -19,7 +19,7 @@ export default function Home(props) {
                         alt={`Heuristic Collector Logo`}
                     />
 
-                    <Link href="/api/auth/login">
+                    <Link href="/projects">
                         <a className="bg-primary hover:bg-primary/70 text-white/80 uppercase px-8 py-6 rounded-md font-bold h-1 flex items-center">
                             Log In
                         </a>
