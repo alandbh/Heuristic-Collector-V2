@@ -92,7 +92,7 @@ export default withPageAuthRequired(function Projects(props) {
                         />
                     </div>
                 </div>
-                <div className="m-10 flex flex-wrap gap-10">
+                <div className="m-10 mt-28 flex flex-wrap gap-10">
                     {data?.projects?.map((proj) => (
                         <Card key={proj.id} data={proj} />
                     ))}
