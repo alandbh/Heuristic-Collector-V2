@@ -1,8 +1,6 @@
-import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { useProjectContext } from "../../context/project";
 import JourneySelect from "../JourneySelect";
 import PlayerSelect from "../PlayerSelect";
@@ -18,8 +16,6 @@ function Header({ routes, className }) {
     const { project } = useProjectContext();
 
     const { given_name, picture } = useCredentialsContext().user;
-
-    console.log("useCredentialsContext", useCredentialsContext().user);
 
     function handleNav(param, value) {
         if (value) {

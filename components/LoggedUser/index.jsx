@@ -2,13 +2,9 @@ import Image from "next/image";
 import React, { useState } from "react";
 import Link from "next/link";
 
-function LoggedUser({ name, picture }) {
+function LoggedUser({ name, picture = "/vercel.svg", size = 28 }) {
     const [popOver, setPopOver] = useState(false);
 
-    function handleYes() {
-        console.log("hanlde yes");
-        setPopOver(false);
-    }
     function handleNo() {
         console.log("hanlde No");
         setPopOver(false);
@@ -19,13 +15,14 @@ function LoggedUser({ name, picture }) {
                 onClick={() => {
                     setPopOver((prev) => !prev);
                 }}
-                className="w-7 h-7 flex items-center"
+                className="flex items-center"
+                style={{ width: size, height: size }}
             >
                 <Image
                     className="rounded-full overflow-hidden"
                     src={picture}
-                    width={28}
-                    height={28}
+                    width={size}
+                    height={size}
                     alt={`${name}'s picture`}
                 />
             </button>
