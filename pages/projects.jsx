@@ -102,6 +102,8 @@ export default withPageAuthRequired(function Projects(props) {
     );
 });
 
+// test
+
 // export async function getStaticProps() {
 //     const res = await client.query({
 //         query: heuristicQuery,
