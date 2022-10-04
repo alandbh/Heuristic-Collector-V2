@@ -1,6 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
 import ClientOnly from "../lib/ClientOnly";
-import HeuristicList from "../components/HeuristicList";
 import Card from "../components/Card";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useUser } from "@auth0/nextjs-auth0";
