@@ -11,11 +11,13 @@ import { useCredentialsContext } from "../../context/credentials";
 function Header({ routes, className }) {
     const router = useRouter();
     const { slug, tab } = router.query || "";
-    const isProgress = tab === routes.tab;
+    const isProgress = tab === routes?.tab || "";
 
-    const { project } = useProjectContext();
+    const { project } = useProjectContext() || { project: { name: "" } };
 
-    const { given_name, picture } = useCredentialsContext().user;
+    const { given_name, picture } = useCredentialsContext()?.user;
+
+    console.log("useCredentialsContext()", useCredentialsContext());
 
     function handleNav(param, value) {
         if (value) {

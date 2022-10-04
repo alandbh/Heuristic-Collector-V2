@@ -7,6 +7,9 @@ import HeuristicList from "../components/HeuristicList";
 import Card from "../components/Card";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useUser } from "@auth0/nextjs-auth0";
+import Link from "next/link";
+import Logo from "../components/Logo";
+import LoggedUser from "../components/LoggedUser";
 
 const GET_PLAYERS = gql`
     query MyQuery($playerSlug: String) {
@@ -82,6 +85,18 @@ export default withPageAuthRequired(function Projects(props) {
         <>
             <ClientOnly>
                 {/* <HeuristicList query={heuristicQuery} /> */}
+                {/* <Header /> */}
+                <div className="flex px-10 w-full justify-between my-10">
+                    <Logo />
+
+                    <div className="flex items-center gap-5">
+                        <LoggedUser
+                            picture={useUser()?.user?.picture}
+                            name={useUser()?.user?.given_name}
+                            size={40}
+                        />
+                    </div>
+                </div>
                 <div className="m-10 flex flex-wrap gap-10">
                     {data?.projects?.map((proj) => (
                         <Card key={proj.id} data={proj} />
