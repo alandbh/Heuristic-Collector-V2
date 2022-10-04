@@ -21,7 +21,7 @@ export default function Home(props) {
                         </a>
                     </Link>
                 </div>
-                <div className="grid grid-cols-8">
+                <div className="md:grid grid-cols-8">
                     <div className="col-span-3">aaa</div>
                     <div className="col-span-5">
                         <P>
