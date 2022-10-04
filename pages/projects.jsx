@@ -3,7 +3,6 @@ import ClientOnly from "../lib/ClientOnly";
 import Card from "../components/Card";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useUser } from "@auth0/nextjs-auth0";
-import Link from "next/link";
 import Logo from "../components/Logo";
 import LoggedUser from "../components/LoggedUser";
 
