@@ -1,5 +1,3 @@
-import Head from "next/head";
-import Image from "next/image";
 import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import ClientOnly from "../lib/ClientOnly";
