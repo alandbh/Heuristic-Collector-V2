@@ -1,5 +1,4 @@
 import { gql, useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
 import ClientOnly from "../lib/ClientOnly";
 import HeuristicList from "../components/HeuristicList";
 import Card from "../components/Card";
