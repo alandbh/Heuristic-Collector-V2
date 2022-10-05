@@ -283,10 +283,19 @@ function Section(props) {
         className = "",
         reverse = false,
     } = props;
+
+    const gridObj = {
+        12: "grid-cols-12",
+        8: "grid-cols-8",
+        4: "grid-cols-4",
+        3: "grid-cols-3",
+    };
+
+    const gridClass = gridObj[cols];
     return (
         <div className={`mb-${mb} mt-${mt} bg-${bg} px-5`}>
             <section
-                className={`max-w-5xl  py-${py} ${
+                className={`max-w-5xl ${gridClass} py-${py} ${
                     reverse && "flex flex-col-reverse"
                 }  mx-auto md:grid grid-cols-${cols}  gap-${gap} ${className}`}
             >
