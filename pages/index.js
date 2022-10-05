@@ -183,7 +183,7 @@ export default function Home(props) {
                         </div>
                     </Section>
 
-                    <Section bgClass="bg-blue-600">
+                    <Section bgClass="bg-blue-600" mb={0}>
                         <div className="col-span-8 pt-1 text-center">
                             <h1 className="text-4xl my-20 text-white/90">
                                 Concept and Architecture
@@ -216,19 +216,22 @@ export default function Home(props) {
                         </div>
                     </Section>
 
-                    <Section py={20}>
-                        <div className="col-span-5 mb-10">
-                            <h1 className="text-4xl mb-10">
-                                Managing the data
-                            </h1>
+                    <Section py={20} bgClass="bg-blue-900" mtClass={0}>
+                        <h1 className="text-4xl col-span-8 text-white/90 text-center my-20">
+                            Managing the data
+                        </h1>
+                        <div className="col-span-4 mb-10 ">
                             <P>
-                                All data collected is stored in a Google Sheets
-                                document in raw and human-readable format.
+                                <span className="text-white/90">
+                                    All data collected is stored in a Google
+                                    Sheets document in raw and human-readable
+                                    format.
+                                </span>
                             </P>
                         </div>
 
-                        <div className="col-span-3">
-                            <div className="w-52 mx-auto">
+                        <div className="col-span-4">
+                            <div className="w-52 mx-auto mb-10 md:mb-0">
                                 <picture>
                                     <source
                                         srcSet="/googlesheets.svg"
@@ -238,19 +241,23 @@ export default function Home(props) {
                                 </picture>
                             </div>
                         </div>
+                        <div className="fullPage col-span-8 w-[100vw] relative pb-20 flex justify-end opacity-80 dark:opacity-100 dark:mix-blend-multiply mix-blend-luminosityyy inverttt">
+                            <picture className="w-[100%] mx-auto bg-blue-200">
+                                <source srcSet="/sheet.png" type="image/webp" />
+                                <img
+                                    className="w-full mix-blend-multiply"
+                                    src="/sheet.png"
+                                    alt=""
+                                />
+                            </picture>
+                        </div>
                     </Section>
-                    <div className="col-span-8 relative mt-12 flex justify-end opacity-80 dark:opacity-100 dark:mix-blend-multiply mix-blend-luminosityyy inverttt">
-                        <picture className="w-[100%] mx-auto">
-                            <source srcSet="/sheet.png" type="image/webp" />
-                            <img className="w-full" src="/sheet.png" alt="" />
-                        </picture>
-                    </div>
                 </div>
             </div>
         </>
     );
 }
-
+//calc((100vw - 1024px + 1rem)/2 * -1)
 // export async function getStaticProps() {
 //     const res = await client.query({
 //         query: heuristicQuery,
@@ -280,9 +287,9 @@ function Section(props) {
     const {
         cols = 8,
         gap = 10,
-        mt = 20,
+        mtClass = "mt-10",
         mb = 20,
-        py = 4,
+        pyClass = "py-4",
         bgClass = "",
         className = "",
         reverse = false,
@@ -297,9 +304,7 @@ function Section(props) {
 
     const gridClass = "grid-cols-" + cols;
     // const bgClass = "bg-" + bg;
-    const mtClass = "mt-" + mt;
     const mbClass = "mb-" + mb;
-    const pyClass = "py-" + py;
     const gapClass = "gap-" + gap;
     return (
         <div className={`${mbClass} ${mtClass} ${bgClass} px-5`}>

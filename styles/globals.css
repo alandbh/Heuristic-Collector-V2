@@ -19,6 +19,30 @@ a {
   box-sizing: border-box;
 }
 
+.fullPage {
+  margin-left: calc((100vw - 1024px + 0px)/2 * -1);
+  
+}
+
+@media (max-width: 1024px) {
+  .fullPage {
+    margin-left: calc((100vw - 64rem + 40px)/2 * -1);
+  }
+}
+@media (max-width: 768px) {
+  .fullPage {
+    /* margin-left: calc((100vw - 768px + 40px)/2 * -1); */
+    margin-left: -20px;
+  }
+
+}
+@media (max-width: 425px) {
+  .fullPage {
+    /* margin-left: calc((100vw - 425px + 40px)/2 * -1); */
+    margin-left: -20px;
+  }
+
+}
 /* @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
