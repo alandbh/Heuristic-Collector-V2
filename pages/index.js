@@ -7,6 +7,13 @@ export default function Home(props) {
     console.log("credential", useUser().user);
 
     // const { given_name, picture } = useCredentialsContext().user;
+
+    const userObj = useUser()?.user;
+
+    if (userObj !== undefined) {
+        const { given_name, picture } = userObj;
+    }
+
     return (
         <>
             <div className="flex flex-col  px-0">
@@ -19,11 +26,14 @@ export default function Home(props) {
                                 {useUser().user ? "Enter " : "Log In"}
                             </a>
                         </Link>
-                        <LoggedUser
-                            picture={useUser()?.user?.picture}
-                            name={useUser()?.user?.given_name}
-                            size={40}
-                        />
+
+                        {userObj && (
+                            <LoggedUser
+                                picture={userObj.picture}
+                                name={userObj.given_name}
+                                size={40}
+                            />
+                        )}
                     </div>
                 </div>
                 <div className="my-20">
