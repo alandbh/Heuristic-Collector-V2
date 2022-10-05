@@ -5,6 +5,7 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useUser } from "@auth0/nextjs-auth0";
 import Logo from "../components/Logo";
 import LoggedUser from "../components/LoggedUser";
+import Link from "next/link";
 
 const GET_PLAYERS = gql`
     query MyQuery($playerSlug: String) {
@@ -82,7 +83,11 @@ export default withPageAuthRequired(function Projects(props) {
                 {/* <HeuristicList query={heuristicQuery} /> */}
                 {/* <Header /> */}
                 <div className="flex px-10 w-full justify-between my-10">
-                    <Logo />
+                    <Link href={`/`}>
+                        <a>
+                            <Logo />
+                        </a>
+                    </Link>
 
                     <div className="flex items-center gap-5">
                         <LoggedUser

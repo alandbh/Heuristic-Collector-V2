@@ -9,7 +9,7 @@ export default function Home(props) {
     // const { given_name, picture } = useCredentialsContext().user;
     return (
         <>
-            <div className="flex flex-col  px-4">
+            <div className="flex flex-col  px-0">
                 <div className="flex w-full max-w-5xl mx-auto justify-between my-10">
                     <Logo />
 
@@ -26,7 +26,7 @@ export default function Home(props) {
                         />
                     </div>
                 </div>
-                <div className=" px-4 my-20">
+                <div className="my-20">
                     <Section mt={10}>
                         <div className="col-span-3 max-w-[300px] mx-auto md:mx-0 mb-10">
                             <video
@@ -60,7 +60,7 @@ export default function Home(props) {
                             <div className="mt-10 h-11">
                                 <Link href="/projects">
                                     <a className="mt-5 border border-primary text-primary hover:bg-primary/80 hover:text-white/90 uppercase px-7 py-3 rounded-md font-bold items-center">
-                                        Get Started
+                                        Check it out
                                     </a>
                                 </Link>
                             </div>
@@ -122,7 +122,7 @@ export default function Home(props) {
                             </P>
                             <P>
                                 If you have found something interesting beyond
-                                the heuristic, you can register it easely.
+                                the heuristics, you can register it easily.
                             </P>
                             <P>
                                 Moreover, if you stumbled upon any blockers, you
@@ -172,6 +172,65 @@ export default function Home(props) {
                             </video>
                         </div>
                     </Section>
+
+                    <Section bg="[#5582c4]">
+                        <div className="col-span-8 text-center">
+                            <h1 className="text-4xl my-20 text-white/90">
+                                Concept and Architecture
+                            </h1>
+
+                            <div className="w-md">
+                                <p className="text-lg mb-4 text-white/90 ">
+                                    We needed to deal with three entities:
+                                    Players, Heuristics, and Journeys.
+                                </p>
+                                <p className="text-lg mb-4 text-white/90 ">
+                                    Each retailer (or player) was evaluated in
+                                    one or more journeys. So, the list of
+                                    heuristics could vary according to the
+                                    journey.
+                                </p>
+                            </div>
+
+                            <picture>
+                                <source
+                                    srcSet="/architecture.svg"
+                                    type="image/webp"
+                                />
+                                <img src="/architecture.svg" alt="" />
+                            </picture>
+                        </div>
+                    </Section>
+
+                    <Section py={20}>
+                        <div className="col-span-5">
+                            <h1 className="text-4xl mb-10">
+                                Managing the data
+                            </h1>
+                            <P>
+                                All data collected is stored in a Google Sheets
+                                document in raw and human-readable format.
+                            </P>
+                        </div>
+
+                        <div className="col-span-3">
+                            <div className="w-52 mx-auto">
+                                <picture>
+                                    <source
+                                        srcSet="/googlesheets.svg"
+                                        type="image/webp"
+                                    />
+                                    <img src="/googlesheets.svg" alt="" />
+                                </picture>
+                            </div>
+                        </div>
+                    </Section>
+                    <div className="col-span-8 relative mt-12 flex justify-end opacity-80 dark:opacity-100 dark:mix-blend-multiply mix-blend-luminosityyy inverttt">
+                        <picture className="w-[100%] mx-auto">
+                            <source srcSet="/sheet.png" type="image/webp" />
+                            <img className="w-full" src="/sheet.png" alt="" />
+                        </picture>
+                    </div>
                 </div>
             </div>
         </>
@@ -214,9 +273,9 @@ function Section(props) {
         className = "",
     } = props;
     return (
-        <div className={`mb-${mb} mt-${mt}`}>
+        <div className={`mb-${mb} mt-${mt} bg-${bg}`}>
             <section
-                className={`max-w-5xl  py-${py} bg-${bg} mx-auto md:grid grid-cols-${cols}  gap-${gap} ${className}`}
+                className={`max-w-5xl  py-${py}  mx-auto md:grid grid-cols-${cols}  gap-${gap} ${className}`}
             >
                 {props.children}
             </section>
