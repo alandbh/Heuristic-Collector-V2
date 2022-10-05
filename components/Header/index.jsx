@@ -42,7 +42,7 @@ function Header({ routes, className }) {
     return (
         <header>
             <div className="bg-primary flex justify-between px-5 items-center h-12">
-                <Link href={`/`}>
+                <Link href={`/projects`}>
                     <a>
                         <div className="py-1 hidden sm:block">
                             <Image
