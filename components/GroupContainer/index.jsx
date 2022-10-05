@@ -229,22 +229,26 @@ export default function GroupContainer({ data }) {
         function createNewScores() {
             if (dataJourneys) {
                 console.log("invalid");
-                if (
-                    !dataJourneys.journeys.find(
-                        (journeyObj) => journeyObj.slug === router.query.journey
-                    )
-                ) {
-                    console.log("nao tem", dataJourneys.journeys);
-                    router.replace("/project/", {
-                        query: {
-                            slug: router.query.slug,
-                            player: router.query.player,
-                            journey: dataJourneys.journeys[0].slug,
-                        },
-                        shallow: true,
-                    });
-                    setValidJourney(false);
-                    return;
+
+                if (dataJourneys.journeys.length > 0) {
+                    if (
+                        !dataJourneys.journeys.find(
+                            (journeyObj) =>
+                                journeyObj.slug === router.query.journey
+                        )
+                    ) {
+                        console.log("nao tem", dataJourneys.journeys);
+                        router.replace("/project/", {
+                            query: {
+                                slug: router.query.slug,
+                                player: router.query.player,
+                                journey: dataJourneys.journeys[0].slug,
+                            },
+                            shallow: true,
+                        });
+                        setValidJourney(false);
+                        return;
+                    }
                 }
             }
 
