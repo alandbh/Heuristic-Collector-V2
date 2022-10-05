@@ -373,7 +373,7 @@ function Dashboard() {
     return (
         <>
             <div className="gap-5 max-w-6xl mx-auto md:grid grid-cols-4 ">
-                <div className="md:col-span-3 flex flex-col gap-20">
+                <div className="md:col-span-4 flex flex-col gap-20">
                     <section className="mx-3">
                         <header className="flex justify-between mb-6 items-center px-4 gap-3">
                             <h1 className="text-xl font-bold">
@@ -603,65 +603,89 @@ function Dashboard() {
                                             })}
                                         </ul>
                                     </div>
-                                    <div className="col-span-2">
+                                    {/* <div className="col-span-2">
                                         <h3>Player progress</h3>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </li>
                         </ul>
                     </section>
                 </div>
-                <div>
+                {/* <div>
                     <h1 className="text-2xl">Categories</h1>
-                    {/* <Debugg data={allScores} /> */}
-                </div>
+                    
+                </div> */}
             </div>
 
-            <div>Zeroes</div>
-            <Debugg
-                data={
-                    getZeroedScores({
-                        scores: allScores?.scores,
-                    }).length
-                }
-            ></Debugg>
+            {/* 
+            *
+            *
+            * 
+            * 
+            * 
+            * 
+            
+            ------------------------------
 
-            <div>All Scores length</div>
-            <Debugg
-                data={
-                    getAllScores({
+            
+            Just for debugging 
+
+            ------------------------------
+            *
+            *
+            * 
+            * 
+            * 
+            
+            */}
+
+            <pre className="hidden">
+                <div>Zeroes</div>
+                <Debugg
+                    data={
+                        getZeroedScores({
+                            scores: allScores?.scores,
+                        }).length
+                    }
+                ></Debugg>
+
+                <div>All Scores length</div>
+                <Debugg
+                    data={
+                        getAllScores({
+                            scores: allScores?.scores,
+                        }).length
+                    }
+                ></Debugg>
+                <div>All Players</div>
+                <Debugg data={getAllPlayers(allScores.scores)}></Debugg>
+                <div>All Successfully Completed</div>
+                <Debugg
+                    data={getCompletedPlayersSucessfully({
                         scores: allScores?.scores,
-                    }).length
-                }
-            ></Debugg>
-            <div>All Players</div>
-            <Debugg data={getAllPlayers(allScores.scores)}></Debugg>
-            <div>All Successfully Completed</div>
-            <Debugg
-                data={getCompletedPlayersSucessfully({
-                    scores: allScores?.scores,
-                })}
-            ></Debugg>
-            <div>All Completed</div>
-            <Debugg
-                data={getCompletedPlayers({
-                    scores: allScores?.scores,
-                    journey: "desktop",
-                })}
-            ></Debugg>
-            <div>All Un-Completed</div>
-            <Debugg
-                data={getUncompletedPlayers({
-                    scores: allScores?.scores,
-                })}
-            ></Debugg>
-            <div>All Blockers</div>
-            <Debugg
-                data={getBlockedPlayers({
-                    scores: allScores.scores,
-                    journey: "desktop",
-                })}
-            ></Debugg>
+                    })}
+                ></Debugg>
+                <div>All Completed</div>
+                <Debugg
+                    data={getCompletedPlayers({
+                        scores: allScores?.scores,
+                        journey: "desktop",
+                    })}
+                ></Debugg>
+                <div>All Un-Completed</div>
+                <Debugg
+                    data={getUncompletedPlayers({
+                        scores: allScores?.scores,
+                    })}
+                ></Debugg>
+                <div>All Blockers</div>
+                <Debugg
+                    data={getBlockedPlayers({
+                        scores: allScores.scores,
+                        journey: "desktop",
+                    })}
+                ></Debugg>
+            </pre>
         </>
     );
 }
