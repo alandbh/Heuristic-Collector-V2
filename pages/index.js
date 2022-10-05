@@ -10,7 +10,7 @@ export default function Home(props) {
     return (
         <>
             <div className="flex flex-col  px-0">
-                <div className="flex w-full max-w-5xl mx-auto justify-between my-10">
+                <div className="flex w-full max-w-5xl mx-auto justify-between my-10 px-4">
                     <Logo />
 
                     <div className="flex items-center gap-5">
@@ -67,7 +67,7 @@ export default function Home(props) {
                         </div>
                     </Section>
 
-                    <Section>
+                    <Section reverse>
                         <div className="col-span-5">
                             <P className="font-bold text-3xl">
                                 Typos? Not a biq dieal! 🤓
@@ -76,7 +76,7 @@ export default function Home(props) {
                                 Fuzzy search to quickly find the heuristic. No
                                 need to type the exact term. 🙌🏽
                             </P>
-                            <div className="mt-10">
+                            <div className="mt-10 h-11">
                                 <Link href="/projects">
                                     <a className="mt-5 border border-primary text-primary hover:bg-primary/80 hover:text-white/90 uppercase px-7 py-3 rounded-md font-bold h-1 items-center">
                                         Get Started
@@ -102,7 +102,7 @@ export default function Home(props) {
                     </Section>
 
                     <Section>
-                        <div className="col-span-3 max-w-[300px] mx-auto md:mx-0">
+                        <div className="col-span-3 max-w-[300px] mx-auto md:mx-0 mb-10">
                             <video
                                 className="shadow-xl"
                                 playsInline
@@ -128,7 +128,7 @@ export default function Home(props) {
                                 Moreover, if you stumbled upon any blockers, you
                                 can register it too.
                             </P>
-                            <div className="mt-10">
+                            <div className="mt-10 h-11">
                                 <Link href="/projects">
                                     <a className="mt-5 border border-primary text-primary hover:bg-primary/80 hover:text-white/90 uppercase px-7 py-3 rounded-md font-bold h-1 items-center">
                                         Get Started
@@ -138,7 +138,7 @@ export default function Home(props) {
                         </div>
                     </Section>
 
-                    <Section>
+                    <Section reverse>
                         <div className="col-span-5">
                             <P className="font-bold text-3xl">
                                 Producers, we hear you.
@@ -148,7 +148,7 @@ export default function Home(props) {
                                 in progress.
                             </P>
                             <small>(experimental)</small>
-                            <div className="mt-10">
+                            <div className="mt-10 h-11">
                                 <Link href="/projects">
                                     <a className="mt-5 border border-primary text-primary hover:bg-primary/80 hover:text-white/90 uppercase px-7 py-3 rounded-md font-bold h-1 items-center">
                                         Get Started
@@ -174,7 +174,7 @@ export default function Home(props) {
                     </Section>
 
                     <Section bg="[#5582c4]">
-                        <div className="col-span-8 text-center">
+                        <div className="col-span-8 pt-1 text-center">
                             <h1 className="text-4xl my-20 text-white/90">
                                 Concept and Architecture
                             </h1>
@@ -203,7 +203,7 @@ export default function Home(props) {
                     </Section>
 
                     <Section py={20}>
-                        <div className="col-span-5">
+                        <div className="col-span-5 mb-10">
                             <h1 className="text-4xl mb-10">
                                 Managing the data
                             </h1>
@@ -268,14 +268,17 @@ function Section(props) {
         gap = 10,
         mt = 20,
         mb = 20,
-        py = 0,
+        py = 4,
         bg = "transparent",
         className = "",
+        reverse = false,
     } = props;
     return (
-        <div className={`mb-${mb} mt-${mt} bg-${bg}`}>
+        <div className={`mb-${mb} mt-${mt} bg-${bg} px-5`}>
             <section
-                className={`max-w-5xl  py-${py}  mx-auto md:grid grid-cols-${cols}  gap-${gap} ${className}`}
+                className={`max-w-5xl  py-${py} ${
+                    reverse && "flex flex-col-reverse"
+                }  mx-auto md:grid grid-cols-${cols}  gap-${gap} ${className}`}
             >
                 {props.children}
             </section>
