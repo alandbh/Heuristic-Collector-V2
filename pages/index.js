@@ -183,7 +183,7 @@ export default function Home(props) {
                         </div>
                     </Section>
 
-                    <Section bg="[#5582c4]">
+                    <Section bgClass="bg-blue-600">
                         <div className="col-span-8 pt-1 text-center">
                             <h1 className="text-4xl my-20 text-white/90">
                                 Concept and Architecture
@@ -202,12 +202,16 @@ export default function Home(props) {
                                 </p>
                             </div>
 
-                            <picture>
+                            <picture className="text-blue-500">
                                 <source
                                     srcSet="/architecture.svg"
                                     type="image/webp"
                                 />
-                                <img src="/architecture.svg" alt="" />
+                                <img
+                                    className="text-blue-500"
+                                    src="/architecture.svg"
+                                    alt=""
+                                />
                             </picture>
                         </div>
                     </Section>
@@ -279,7 +283,7 @@ function Section(props) {
         mt = 20,
         mb = 20,
         py = 4,
-        bg = "transparent",
+        bgClass = "",
         className = "",
         reverse = false,
     } = props;
@@ -292,7 +296,7 @@ function Section(props) {
     };
 
     const gridClass = "grid-cols-" + cols;
-    const bgClass = "bg-" + bg;
+    // const bgClass = "bg-" + bg;
     const mtClass = "mt-" + mt;
     const mbClass = "mb-" + mb;
     const pyClass = "py-" + py;
