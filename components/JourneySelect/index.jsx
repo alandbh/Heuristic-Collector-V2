@@ -29,8 +29,8 @@ function JourneySelect() {
         useProjectContext();
     const { data, loading, error } = useQuery(QUERY_JOURNEYS, {
         variables: {
-            playerSlug: currentPlayer.slug,
-            projectSlug: currentProject.slug,
+            playerSlug: currentPlayer?.slug,
+            projectSlug: currentProject?.slug,
         },
     });
 
