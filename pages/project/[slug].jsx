@@ -17,22 +17,20 @@ const QUERY_PROJECTS = gql`
         project(where: { slug: $slug }) {
             slug
             name
+            id
         }
     }
 `;
 
 function Project({ user }) {
     const router = useRouter();
-    const { slug, tab } = router.query || "";
+    const { slug, tab, player } = router.query || "";
 
     const { data, loading, error } = useQuery(QUERY_PROJECTS, {
         variables: {
             slug,
         },
     });
-
-    // console.log("url", router.asPath.split("#").pop());
-    // console.log("data", data);
 
     if (slug === undefined) {
         return (

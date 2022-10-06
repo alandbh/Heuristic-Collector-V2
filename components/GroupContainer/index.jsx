@@ -5,6 +5,7 @@ import { Link as Scroll } from "react-scroll";
 import Fuse from "fuse.js";
 import HeuristicGroup from "../HeuristicGroup";
 import { useScoresContext } from "../../context/scores";
+import { useProjectContext } from "../../context/project";
 import { getUnicItem, debounce, useScroll } from "../../lib/utils";
 import Findings from "../Findings";
 import client from "../../lib/apollo";
@@ -59,43 +60,51 @@ const getUniqueGroups = debounce((arr, key, func) => {
     // func();
 }, 300);
 
-const debCreateNewScores = debounce((data, router, func) => {
-    // return;
-    console.log("groupssss", data.groups);
+const debCreateNewScores = debounce(
+    (data, project, currentPlayer, currentJourney, func) => {
+        // return;
+        console.log("groupssss", data.groups);
 
-    if (data.groups.length === 0) {
-        return null;
-    }
+        if (data.groups.length === 0) {
+            return null;
+        }
+        if (!currentJourney) {
+            console.log("dataa null");
+            return null;
+        }
 
-    data.groups.forEach((group) => {
-        group.heuristic.forEach((heurisric) => {
-            return (multiString =
-                multiString +
-                stringCreateFunc(
-                    heurisric.id,
-                    router.query.slug,
-                    router.query.player,
-                    router.query.journey
-                ));
+        data.groups.forEach((group) => {
+            group.heuristic.forEach((heurisric) => {
+                return (multiString =
+                    multiString +
+                    stringCreateFunc(
+                        heurisric.id,
+                        project.id,
+                        currentPlayer.id,
+                        currentJourney.id
+                    ));
+            });
         });
-    });
 
-    stringCreate = `
+        stringCreate = `
     mutation createMultipleScores {
        ${multiString}
     }
     `;
 
-    MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
+        MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
 
-    client
-        .mutate({
-            mutation: MUTATION_CREATE_MANY_SCORE,
-        })
-        .then((data) => {
-            publishNewScores(func);
-        });
-}, 500);
+        client
+            .mutate({
+                mutation: MUTATION_CREATE_MANY_SCORE,
+            })
+            .then((data) => {
+                console.log("dataaa", data);
+                publishNewScores(func);
+            });
+    },
+    500
+);
 
 function publishNewScores(func) {
     const PUBLISH_STRING = gql`
@@ -128,15 +137,15 @@ let MUTATION_CREATE_MANY_SCORE;
 
 const stringCreateFunc = (
     heuristicId,
-    projectSlug,
-    playerSlug,
-    journeySlug
+    projectId,
+    playerId,
+    journeyId
 ) => `createScore(
     data: {
         scoreValue: 0
-        project: { connect: { slug: "${projectSlug}" } }
-        player: { connect: { slug: "${playerSlug}" } }
-        journey: { connect: { slug: "${journeySlug}" } }
+        project: { connect: { id: "${projectId}" } }
+        player: { connect: { id: "${playerId}" } }
+        journey: { connect: { id: "${journeyId}" } }
         evidenceUrl: ""
         note: ""
         heuristic: { connect: { id: "${heuristicId}" } }
@@ -212,6 +221,9 @@ export default function GroupContainer({ data }) {
      * ------------------------------
      */
 
+    const { project, currentPlayer, currentJourney } = useProjectContext();
+    console.log("useProjectContext", useProjectContext());
+
     useEffect(() => {
         // setEmpty(true);
         getNewScores().then((dataScores) => {
@@ -252,12 +264,26 @@ export default function GroupContainer({ data }) {
                 }
             }
 
-            debCreateNewScores(data, router, () => {
-                console.log("debCreateNewScores");
-                setEmpty(false);
-            });
+            debCreateNewScores(
+                data,
+                project,
+                currentPlayer,
+                currentJourney,
+                () => {
+                    console.log("debCreateNewScores");
+                    setEmpty(false);
+                }
+            );
         }
-    }, [getNewScores, data, router, dataJourneys]);
+    }, [
+        getNewScores,
+        data,
+        router,
+        dataJourneys,
+        project,
+        currentPlayer,
+        currentJourney,
+    ]);
 
     const [allHeuristics, setAllHeuristics] = useState([]);
 
