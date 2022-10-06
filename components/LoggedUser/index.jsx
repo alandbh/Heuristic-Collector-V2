@@ -1,20 +1,43 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-function LoggedUser({ name, picture = "/vercel.svg", size = 28 }) {
+function LoggedUser({ name, email, picture = "/vercel.svg", size = 28 }) {
     const [popOver, setPopOver] = useState(false);
+    const popUpRef = useRef(null);
 
-    function handleNo() {
-        console.log("hanlde No");
-        setPopOver(false);
+    function handlePopOver() {
+        setPopOver((prev) => !prev);
+        console.log("click ");
     }
+
+    const closePopOverCallBack = useCallback(
+        (e) => {
+            if (e) {
+                console.log("click fora Esc?", e.key);
+                setPopOver(false);
+            }
+            if (popUpRef && popOver) {
+                if (!popUpRef.current?.contains(e.target)) {
+                    console.log("click fora");
+                    setPopOver(false);
+                }
+            }
+            window.removeEventListener("click", closePopOverCallBack, true);
+            window.removeEventListener("keydown", closePopOverCallBack, true);
+        },
+        [popOver]
+    );
+
+    if (window !== undefined) {
+        window.addEventListener("click", closePopOverCallBack, true);
+        window.addEventListener("keydown", closePopOverCallBack, true);
+    }
+
     return (
-        <div className="relative top-0">
+        <div ref={popUpRef} className="relative top-0">
             <button
-                onClick={() => {
-                    setPopOver((prev) => !prev);
-                }}
+                onClick={handlePopOver}
                 className="flex items-center"
                 style={{ width: size, height: size }}
             >
@@ -44,6 +67,7 @@ function LoggedUser({ name, picture = "/vercel.svg", size = 28 }) {
                 <h2 className="text-sm font-bold whitespace-nowrap">
                     Hi, {name}!
                 </h2>
+                <p>{email}</p>
                 <h3 className="mt-6">Log out?</h3>
                 <div className="flex justify-around w-full mt-2">
                     <Link tabIndex={0} href="/api/auth/logout">
@@ -52,7 +76,7 @@ function LoggedUser({ name, picture = "/vercel.svg", size = 28 }) {
                         </a>
                     </Link>
                     <button
-                        onClick={handleNo}
+                        onClick={() => setPopOver(false)}
                         className="text-sm hover:underline underline-offset-2 px-4"
                     >
                         No

@@ -93,6 +93,7 @@ export default withPageAuthRequired(function Projects(props) {
                         <LoggedUser
                             picture={useUser()?.user?.picture}
                             name={useUser()?.user?.given_name}
+                            email={useUser()?.user?.email}
                             size={40}
                         />
                     </div>

@@ -15,7 +15,7 @@ function Header({ routes, className }) {
 
     const { currentProject } = useProjectContext() || { project: { name: "" } };
 
-    const { given_name, picture } = useCredentialsContext()?.user;
+    const { given_name, picture, email } = useCredentialsContext()?.user;
 
     console.log("useCredentialsContext()", useCredentialsContext());
 
@@ -119,7 +119,11 @@ function Header({ routes, className }) {
                         {/* </Link> */}
                     </nav>
                     <ToggleTheme />
-                    <LoggedUser picture={picture} name={given_name} />
+                    <LoggedUser
+                        picture={picture}
+                        name={given_name}
+                        email={email}
+                    />
                 </div>
             </div>
             <div className="bg-white dark:bg-slate-800 shadow-md px-5 py-3">
