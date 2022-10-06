@@ -222,7 +222,7 @@ export default function GroupContainer({ data }) {
      */
 
     const { project, currentPlayer, currentJourney } = useProjectContext();
-    console.log("useProjectContext", useProjectContext());
+    // console.log("useProjectContext", useProjectContext());
 
     useEffect(() => {
         // setEmpty(true);
@@ -230,7 +230,7 @@ export default function GroupContainer({ data }) {
             // console.log("newscores");
 
             if (dataScores.length > 0) {
-                console.log("newscoreswwww", dataScores);
+                // console.log("newscoreswwww", dataScores);
                 setEmpty(false);
             } else {
                 createNewScores();
@@ -295,7 +295,7 @@ export default function GroupContainer({ data }) {
             });
         });
 
-        console.log("allHeuristics", heuristicsArr);
+        // console.log("allHeuristics", heuristicsArr);
         setAllHeuristics(heuristicsArr);
     }, [data.groups]);
 

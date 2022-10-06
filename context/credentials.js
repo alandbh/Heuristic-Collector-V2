@@ -54,7 +54,7 @@ async function getRgaUser(email, projectSlug, func) {
         fetchPolicy: "network-only",
     });
     // setAllScores(newData.scores);
-    console.log("RGA USER RETRIEVED", rgaUsersRetrieved.rgaUsers[0]);
+    // console.log("RGA USER RETRIEVED", rgaUsersRetrieved.rgaUsers[0]);
     func(rgaUsersRetrieved.rgaUsers[0]);
     return rgaUsersRetrieved.rgaUsers[0];
 }
@@ -111,7 +111,7 @@ export function CredentialsWrapper({ children }) {
     }, [rgaUser, router.query.slug, user.email]);
 
     // console.log("userType", rgaUser?.userType);
-    console.log("NewRgaUserPublisehed", rgaUser);
+    // console.log("NewRgaUserPublisehed", rgaUser);
 
     return (
         <CredentialsContext.Provider

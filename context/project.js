@@ -57,8 +57,8 @@ export function ProjectWrapper({ children, data }) {
     }
 
     // console.log("url", router.asPath.split("#").pop());
-    console.log("currentPlayer", currentPlayer.players[0]);
-    console.log("currentJourney", currentJourney.journeys[0]);
+    // console.log("currentPlayer", currentPlayer.players[0]);
+    // console.log("currentJourney", currentJourney.journeys[0]);
 
     return (
         <ProjectContext.Provider
