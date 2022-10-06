@@ -40,10 +40,10 @@ const modal_style = {
 function PlayerSelect() {
     const [selected, setSelected] = useState(null);
     const router = useRouter();
-    const { project } = useProjectContext();
+    const { currentProject } = useProjectContext();
     const { data, loading, error } = useQuery(QUERY_PLAYERS, {
         variables: {
-            projectSlug: project.slug,
+            projectSlug: currentProject.slug,
         },
     });
 

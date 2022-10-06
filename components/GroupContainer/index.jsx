@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { Link as Scroll } from "react-scroll";
@@ -168,7 +168,7 @@ const stringCreateFunc = (
  *
  */
 
-export default function GroupContainer({ data }) {
+function GroupContainer({ data }) {
     const router = useRouter();
     const [findingsList, setFindingsList] = useState(null);
     const [findingsLoading, setFindingsLoading] = useState(true);
@@ -221,7 +221,8 @@ export default function GroupContainer({ data }) {
      * ------------------------------
      */
 
-    const { project, currentPlayer, currentJourney } = useProjectContext();
+    const { currentProject, currentPlayer, currentJourney } =
+        useProjectContext();
     // console.log("useProjectContext", useProjectContext());
 
     useEffect(() => {
@@ -266,7 +267,7 @@ export default function GroupContainer({ data }) {
 
             debCreateNewScores(
                 data,
-                project,
+                currentProject,
                 currentPlayer,
                 currentJourney,
                 () => {
@@ -280,7 +281,7 @@ export default function GroupContainer({ data }) {
         data,
         router,
         dataJourneys,
-        project,
+        currentProject,
         currentPlayer,
         currentJourney,
     ]);
@@ -326,6 +327,9 @@ export default function GroupContainer({ data }) {
                         data={findingsList}
                         router={router}
                         getFindings={getFindings}
+                        currentJourney={currentJourney}
+                        currentPlayer={currentPlayer}
+                        currentProject={currentProject}
                     />
                 </div>
                 <div className="relative mr-4">
@@ -386,6 +390,8 @@ export default function GroupContainer({ data }) {
         </>
     );
 }
+
+export default React.memo(GroupContainer);
 
 function SearchBox(data) {
     const [result, setResult] = useState([]);

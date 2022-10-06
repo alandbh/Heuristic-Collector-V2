@@ -13,7 +13,7 @@ function Header({ routes, className }) {
     const { slug, tab } = router.query || "";
     const isProgress = tab === routes?.tab || "";
 
-    const { project } = useProjectContext() || { project: { name: "" } };
+    const { currentProject } = useProjectContext() || { project: { name: "" } };
 
     const { given_name, picture } = useCredentialsContext()?.user;
 
@@ -124,7 +124,7 @@ function Header({ routes, className }) {
             </div>
             <div className="bg-white dark:bg-slate-800 shadow-md px-5 py-3">
                 <div className="flex items-center gap-8 justify-between sm:justify-start">
-                    <b className="hidden sm:inline">{project.name}</b>
+                    <b className="hidden sm:inline">{currentProject.name}</b>
                     <svg
                         className="hidden sm:inline"
                         width="21"

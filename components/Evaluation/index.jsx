@@ -36,12 +36,12 @@ const QUERY_GROUPS = gql`
 `;
 
 function Evaluation() {
-    const { project } = useProjectContext();
+    const { currentProject } = useProjectContext();
     const router = useRouter();
 
     const { data, loading, error } = useQuery(QUERY_GROUPS, {
         variables: {
-            projectSlug: project.slug,
+            projectSlug: currentProject.slug,
             journeySlug: router.query.journey,
         },
     });

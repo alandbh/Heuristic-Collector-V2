@@ -25,11 +25,12 @@ const QUERY_JOURNEYS = gql`
 function JourneySelect() {
     const [selected, setSelected] = useState(null);
     const router = useRouter();
-    const { project } = useProjectContext();
+    const { currentProject, currentPlayer, currentJourney } =
+        useProjectContext();
     const { data, loading, error } = useQuery(QUERY_JOURNEYS, {
         variables: {
-            playerSlug: router.query.player,
-            projectSlug: router.query.slug,
+            playerSlug: currentPlayer.slug,
+            projectSlug: currentProject.slug,
         },
     });
 

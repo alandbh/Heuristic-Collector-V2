@@ -7,6 +7,7 @@ const QUERY_CURRENT_PLAYER = gql`
         players(where: { project: { slug: $projectSlug }, slug: $playerSlug }) {
             id
             name
+            slug
         }
     }
 `;
@@ -63,7 +64,7 @@ export function ProjectWrapper({ children, data }) {
     return (
         <ProjectContext.Provider
             value={{
-                project: data.project,
+                currentProject: data.project,
                 currentPlayer: currentPlayer.players[0],
                 currentJourney: currentJourney.journeys[0],
             }}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import FindingBlock from "../FindingBlock";
 import { BtnSmallPrimary } from "../Button";
@@ -19,14 +19,14 @@ const MUTATION_FINDINGS = gql`
 const MUTATION_CREATE_FINDINGS = gql`
     mutation createNewFinding(
         $playerSlug: String
-        $journeySlug: String
+        $journeyId: ID
         $projectSlug: String
     ) {
         createFinding(
             data: {
                 project: { connect: { slug: $projectSlug } }
                 player: { connect: { slug: $playerSlug } }
-                journey: { connect: { slug: $journeySlug } }
+                journey: { connect: { id: $journeyId } }
                 findingObject: { text: "", theType: "neutral" }
             }
         ) {
@@ -53,8 +53,17 @@ const MUTATION_DELETE_FINDING = gql`
     }
 `;
 
-function Findings({ data, router, getFindings }) {
+function Findings({
+    data,
+    router,
+    getFindings,
+    currentPlayer,
+    currentJourney,
+    currentProject,
+}) {
     const [findings, setFindings] = useState(data?.findings || []);
+
+    // console.log("currentProjectaaaa", currentProject);
 
     const [findingsLoading, setFindingsLoading] = useState(false);
 
@@ -74,8 +83,8 @@ function Findings({ data, router, getFindings }) {
         doMutate(
             client,
             {
-                playerSlug: router.query.player,
-                journeySlug: router.query.journey,
+                playerSlug: currentPlayer.slug,
+                journeyId: currentJourney.id,
                 projectSlug: router.query.slug,
             },
             MUTATION_CREATE_FINDINGS,
@@ -155,7 +164,7 @@ function Findings({ data, router, getFindings }) {
     );
 }
 
-export default Findings;
+export default React.memo(Findings);
 
 function doMutate(
     client,
