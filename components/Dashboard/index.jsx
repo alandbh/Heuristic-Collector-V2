@@ -11,6 +11,7 @@ import Switch, { SwitchMono } from "../Switch";
 const QUERY_SCORES_BY_PROJECT = gql`
     query GetScores(
         $projectSlug: String # $journeySlug: String # $playerSlug: String
+        $skipScores: Int
     ) {
         scores(
             where: {
@@ -18,7 +19,8 @@ const QUERY_SCORES_BY_PROJECT = gql`
                 project: { slug: $projectSlug }
                 # journey: { slug: $journeySlug }
             }
-            first: 1000
+            first: 999999 # skip: $skip
+            skip: $skipScores
         ) {
             id
             scoreValue
@@ -42,6 +44,17 @@ const QUERY_SCORES_BY_PROJECT = gql`
         }
     }
 `;
+
+const QUERY_TOTAL_OF_SCORES = gql`
+    query getTotalOfScores($projectSlug: String) {
+        scoresConnection(where: { project: { slug: $projectSlug } }) {
+            aggregate {
+                count
+            }
+        }
+    }
+`;
+const QUERY_PAGINATION = 100;
 
 function getZeroedScores(params) {
     const { scores, journey, player } = params;
@@ -260,6 +273,14 @@ function getUnique(arr, key = null, subkey = null) {
     return [...new Set(arr)];
 }
 
+function getAllJourneys(allScores) {
+    const _allJourneys = allScores.map((score) => {
+        return score.journey;
+    });
+
+    return getUnique(_allJourneys, "slug");
+}
+
 /**
  *
  * ------------------------------------
@@ -267,71 +288,118 @@ function getUnique(arr, key = null, subkey = null) {
  * COMPONENT
  * -------------------------------------
  */
+
+let _pagination;
+
 function Dashboard() {
     const [journey, setJourney] = useState();
-    const [allScores, setAllScores] = useState(null);
+    const [totalOfScores, setTotalOfScores] = useState(null);
+    const [allScoresDuplicated, setAllScoresDuplicated] = useState([]);
+    const [allScores, setAllScores] = useState([]);
+    const [loadingDash, setLoadingDash] = useState(true);
     const router = useRouter();
-    // const {
-    //     data: allScores,
-    //     loading,
-    //     error,
-    // } = useQuery(QUERY_SCORES_BY_PROJECT, {
-    //     variables: {
-    //         projectSlug: router.query.slug,
-    //     },
-    // });
 
     useEffect(() => {
-        const getNewScores = async function getNewScores() {
-            const { data: newData } = await client.query({
-                query: QUERY_SCORES_BY_PROJECT,
+        setLoadingDash(true);
+        const getTotalOfScores = async function getTotalOfScores() {
+            const { data: dataTotal } = await client.query({
+                query: QUERY_TOTAL_OF_SCORES,
                 variables: {
                     projectSlug: router.query.slug,
                 },
                 fetchPolicy: "network-only",
             });
 
-            setAllScores(newData);
+            setTotalOfScores(dataTotal.scoresConnection.aggregate.count);
 
-            return newData;
+            // console.log("dataTotal", dataTotal);
         };
 
-        getNewScores();
-    }, [router.query.slug]);
+        getTotalOfScores();
+
+        if (totalOfScores) {
+            _pagination = Math.ceil(totalOfScores / 100);
+        }
+        const getNewScores = async function getNewScores(skipScores) {
+            const { data: newData } = await client.query({
+                query: QUERY_SCORES_BY_PROJECT,
+                variables: {
+                    projectSlug: router.query.slug,
+                    skipScores,
+                },
+                fetchPolicy: "network-only",
+                skip: true,
+            });
+            setLoadingDash(true);
+
+            setAllScoresDuplicated((prev) => [...prev, ...newData.scores]);
+
+            return newData.scores;
+        };
+
+        for (let i = 0; i < _pagination; i++) {
+            let itemsToSkip = i * 100;
+
+            doSetTimeout(itemsToSkip);
+            // if (i === QUERY_PAGINATION - 2) {
+            //     console.log("ter", i);
+            //     setLoadingDash(false);
+            // }
+
+            // getNewScores(100);
+        }
+
+        function doSetTimeout(itemsToSkip) {
+            setTimeout(function () {
+                console.log("skipp - ", itemsToSkip);
+                getNewScores(itemsToSkip);
+            }, 200);
+        }
+    }, [router.query.slug, totalOfScores]);
+
+    // return null
+
+    useEffect(() => {
+        console.log("allScoresDuplicated", allScoresDuplicated);
+        const allScoresUnique = getUnique(allScoresDuplicated, "id");
+
+        setAllScores(allScoresUnique);
+        // setLoadingDash(false);
+    }, [allScoresDuplicated]);
+
+    useEffect(() => {
+        console.log("comecou");
+        const timeout = setTimeout(() => {
+            setLoadingDash(false);
+        }, _pagination * 200);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    });
 
     if (!allScores) {
         return null;
     }
 
+    const allJourneysSlug = getAllJourneys(allScores).map(
+        (score) => score.slug
+    );
+
+    console.log("allScores", allScores);
+
     const scoresMobile = getAllScores({
-        scores: allScores.scores,
+        scores: allScores,
         journey: "mobile",
     });
 
-    // const scoresByPlayer = getAllScores({
-    //     scores: allScores.scores,
-    //     player: "carrefour",
-    //     journey: "desktop",
-    // });
-
-    // const zeroedPlayersScored = getZeroedScores({
-    //     scores: allScores.scores,
-    //     player: "carrefour",
-    //     journey: "desktop",
-    // });
-
-    // const percentage =
-    //     ((scoresByPlayer.length - zeroedPlayersScored.length) /
-    //         scoresByPlayer.length) *
-    //     100;
-
     const zeroedScores = getZeroedScores({
-        scores: allScores.scores,
+        scores: allScores,
         journey,
     }).length;
 
     const scoresAmount = getAllScores({
-        scores: allScores.scores,
+        scores: allScores,
         journey,
     }).length;
 
@@ -339,13 +407,13 @@ function Dashboard() {
 
     const getPercentageDone = function (player) {
         const total = getPlayerPercentage({
-            scores: allScores.scores,
+            scores: allScores,
             journey,
             player,
         }).total;
 
         const sum = getPlayerPercentage({
-            scores: allScores.scores,
+            scores: allScores,
             journey,
             player,
         }).sum;
@@ -363,16 +431,30 @@ function Dashboard() {
 
     function getSuccessDone() {
         return getCompletedPlayersSucessfully({
-            scores: allScores.scores,
+            scores: allScores,
             journey,
         });
     }
 
     // console.log(getSuccessDone());
 
+    // if (loadingDash || loadingDash === undefined) {
+    //     return <div>LOADING....</div>;
+    // }
+
     return (
         <>
-            <div className="gap-5 max-w-6xl mx-auto md:grid grid-cols-4 ">
+            <h1 className={`${loadingDash ? "opacity-100" : "opacity-0"}`}>
+                LOADING...
+            </h1>
+            <div
+                style={{ transition: ".5s", transitionDelay: ".5s" }}
+                className={`${
+                    loadingDash
+                        ? "opacity-0 translate-y-6"
+                        : "opacity-100 translate-y-0"
+                } gap-5 max-w-6xl mx-auto md:grid grid-cols-4`}
+            >
                 <div className="md:col-span-4 flex flex-col gap-20">
                     <section className="mx-3">
                         <header className="flex justify-between mb-6 items-center px-4 gap-3">
@@ -383,15 +465,15 @@ function Dashboard() {
                             <div className="text-lg flex items-center gap-5">
                                 <b className="whitespace-nowrap text-sm md:text-xl">
                                     {getAllScores({
-                                        scores: allScores?.scores,
+                                        scores: allScores,
                                     }).length -
                                         getZeroedScores({
-                                            scores: allScores?.scores,
+                                            scores: allScores,
                                         }).length}{" "}
                                     of{" "}
                                     {
                                         getAllScores({
-                                            scores: allScores?.scores,
+                                            scores: allScores,
                                         }).length
                                     }
                                 </b>
@@ -399,15 +481,15 @@ function Dashboard() {
                                 <Donnut
                                     total={
                                         getAllScores({
-                                            scores: allScores?.scores,
+                                            scores: allScores,
                                         }).length
                                     }
                                     sum={
                                         getAllScores({
-                                            scores: allScores?.scores,
+                                            scores: allScores,
                                         }).length -
                                         getZeroedScores({
-                                            scores: allScores?.scores,
+                                            scores: allScores,
                                         }).length
                                     }
                                     radius={25}
@@ -422,8 +504,7 @@ function Dashboard() {
                                     <SwitchMono
                                         options={[
                                             "overall",
-                                            "desktop",
-                                            "mobile",
+                                            ...allJourneysSlug,
                                         ]}
                                         onChange={(journey) =>
                                             onChangeJourney(journey)
@@ -443,7 +524,7 @@ function Dashboard() {
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getCompletedPlayers({
-                                                        scores: allScores?.scores,
+                                                        scores: allScores,
                                                         journey,
                                                     }).length
                                                 }
@@ -464,7 +545,7 @@ function Dashboard() {
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getBlockedPlayers({
-                                                        scores: allScores.scores,
+                                                        scores: allScores,
                                                         journey,
                                                     }).length
                                                 }
@@ -477,7 +558,7 @@ function Dashboard() {
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getUncompletedPlayers({
-                                                        scores: allScores?.scores,
+                                                        scores: allScores,
                                                         journey,
                                                     }).length
                                                 }
@@ -506,13 +587,13 @@ function Dashboard() {
                                             <Donnut
                                                 total={
                                                     getAllPlayers(
-                                                        allScores.scores,
+                                                        allScores,
                                                         journey
                                                     ).length
                                                 }
                                                 sum={
                                                     getBlockedPlayers({
-                                                        scores: allScores.scores,
+                                                        scores: allScores,
                                                         journey,
                                                     }).length
                                                 }
@@ -543,7 +624,7 @@ function Dashboard() {
 
                                         <ul className="mt-5 grid grid-cols-3 gap-5 flex-wrap">
                                             {getAllPlayersObj({
-                                                scores: allScores.scores,
+                                                scores: allScores,
                                                 journey,
                                             }).map((player) => {
                                                 let playerColor;
@@ -640,11 +721,12 @@ function Dashboard() {
             */}
 
             <pre className="hidden">
+                {/* <Debugg data={allScores} /> */}
                 <div>Zeroes</div>
                 <Debugg
                     data={
                         getZeroedScores({
-                            scores: allScores?.scores,
+                            scores: allScores,
                         }).length
                     }
                 ></Debugg>
@@ -653,35 +735,35 @@ function Dashboard() {
                 <Debugg
                     data={
                         getAllScores({
-                            scores: allScores?.scores,
+                            scores: allScores,
                         }).length
                     }
                 ></Debugg>
                 <div>All Players</div>
-                <Debugg data={getAllPlayers(allScores.scores)}></Debugg>
+                <Debugg data={getAllPlayers(allScores)}></Debugg>
                 <div>All Successfully Completed</div>
                 <Debugg
                     data={getCompletedPlayersSucessfully({
-                        scores: allScores?.scores,
+                        scores: allScores,
                     })}
                 ></Debugg>
                 <div>All Completed</div>
                 <Debugg
                     data={getCompletedPlayers({
-                        scores: allScores?.scores,
+                        scores: allScores,
                         journey: "desktop",
                     })}
                 ></Debugg>
                 <div>All Un-Completed</div>
                 <Debugg
                     data={getUncompletedPlayers({
-                        scores: allScores?.scores,
+                        scores: allScores,
                     })}
                 ></Debugg>
                 <div>All Blockers</div>
                 <Debugg
                     data={getBlockedPlayers({
-                        scores: allScores.scores,
+                        scores: allScores,
                         journey: "desktop",
                     })}
                 ></Debugg>
