@@ -115,6 +115,8 @@ export default Switch;
 function SwitchMono({ onChange, options, selected }) {
     const [option, setOption] = useState(selected);
 
+    console.log("options", options);
+
     function handleOnChangeMono(ev) {
         console.log(ev.target.value);
         setOption(ev.target.value);
@@ -141,13 +143,14 @@ function SwitchMono({ onChange, options, selected }) {
                 ></div>
                 <div
                     className={`container flex w-[${
-                        (options.length - 1) * 100
+                        options.length * 100
                     }px] justify-between items-center font-bold z-10  text-xs leading-8 uppercase dark:text-white/60`}
                 >
                     {options.map((_option, index) => (
                         <label
+                            style={{ flex: "0 0 100px" }}
                             key={index}
-                            className="flex w-[100px] items-center justify-center grow cursor-pointer"
+                            className="flex w-[100px] items-center justify-center cursor-pointer"
                         >
                             <input
                                 type="radio"
