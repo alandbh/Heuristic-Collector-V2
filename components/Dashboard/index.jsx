@@ -453,7 +453,7 @@ function Dashboard() {
                     loadingDash
                         ? "opacity-0 translate-y-6"
                         : "opacity-100 translate-y-0"
-                } gap-5 max-w-6xl mx-auto md:grid grid-cols-4`}
+                } gap-5 max-w-6xl min-w-full mx-auto md:grid grid-cols-4`}
             >
                 <div className="md:col-span-4 flex flex-col gap-20">
                     <section className="mx-3">
@@ -499,7 +499,7 @@ function Dashboard() {
                         </header>
 
                         <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
-                            <li className="md:w-[700px]">
+                            <li className=" mx-auto">
                                 <div>
                                     <SwitchMono
                                         options={[
@@ -620,9 +620,11 @@ function Dashboard() {
 
                                 <div className="grid grid-cols-3 mt-10">
                                     <div className="col-span-3">
-                                        <h3>Players</h3>
+                                        <h3 className="font-bold text-2xl text-center mt-20">
+                                            Progress by Player
+                                        </h3>
 
-                                        <ul className="mt-5 grid grid-cols-3 gap-5 flex-wrap">
+                                        <ul className="mt-10 mb-10 md:grid md:grid-cols-4 md:max-w-4xl mx-auto gap-5 flex-wrap">
                                             {getAllPlayersObj({
                                                 scores: allScores,
                                                 journey,
