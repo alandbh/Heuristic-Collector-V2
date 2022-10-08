@@ -55,7 +55,7 @@ function Header({ routes, className }) {
                         <div className="block sm:hidden bg-red-600 h-6 w-6"></div>
                     </a>
                 </Link>
-                <div className="flex gap-5 items-center ">
+                <div className="flex gap-3 md:gap-5 items-center ">
                     <nav className="border-white/50 border rounded-full flex font-bold text-white">
                         {/* <Link href={`/project/${routes.slug}`}> */}
                         {/* <a href={`/project/${routes.slug}`}> */}

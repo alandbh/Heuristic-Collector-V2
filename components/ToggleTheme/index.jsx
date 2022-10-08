@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 function ToggleTheme(props) {
     const [dark, setDark] = useState(false);
+    const [focus, setFocus] = useState(false);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -33,12 +34,14 @@ function ToggleTheme(props) {
     }
     return (
         <label
-            className="cursor-pointer hover:bg-black/20 transition p-2 rounded-full"
+            className={`${
+                focus ? "bg-black/20" : "bg-transparent"
+            } cursor-pointer w-[30px] h-[30px] hover:bg-black/20 transition p-1 rounded-full`}
             htmlFor="toggleTheme"
         >
             {dark ? (
                 <svg
-                    width="20"
+                    width="21"
                     height="21"
                     viewBox="0 0 20 21"
                     fill="none"
@@ -52,10 +55,11 @@ function ToggleTheme(props) {
                 </svg>
             ) : (
                 <svg
-                    width="20"
+                    width="21"
                     height="21"
                     viewBox="0 0 20 21"
                     fill="none"
+                    className="mt-[2px]"
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <path
@@ -74,6 +78,8 @@ function ToggleTheme(props) {
                 name="toggleTheme"
                 id="toggleTheme"
                 checked={dark}
+                onFocus={() => setFocus(true)}
+                onBlur={() => setFocus(false)}
                 onChange={() => handleChange()}
             />
         </label>
