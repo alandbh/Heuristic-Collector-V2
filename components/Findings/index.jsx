@@ -60,6 +60,7 @@ function Findings({
     currentPlayer,
     currentJourney,
     currentProject,
+    disable = false,
 }) {
     const [findings, setFindings] = useState(data?.findings || []);
 
@@ -144,6 +145,7 @@ function Findings({
                                 client={client}
                                 mutationEdit={MUTATION_FINDINGS}
                                 mutationDelete={MUTATION_DELETE_FINDING}
+                                disable={disable}
                             />
                         </li>
                     );
@@ -157,6 +159,7 @@ function Findings({
                         status={addButtonStatus}
                         textActive={addButtonText}
                         onClick={handleAddOneMoreFinding}
+                        disabled={disable}
                     />
                 </li>
             </ul>

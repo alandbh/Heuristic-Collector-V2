@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Switch({ onChange, options, selected }) {
+function Switch({ onChange, options, selected, disable = false }) {
     const [option, setOption] = useState(selected);
 
     function handleOnChange(ev) {
@@ -22,12 +22,20 @@ function Switch({ onChange, options, selected }) {
 
     return (
         <>
-            <div className="wrapper flex  w-fit border dark:border-white/60 h-8 rounded-full relative">
+            <div
+                className={`wrapper flex  w-fit border dark:border-white/60 h-8 rounded-full relative ${
+                    disable && "opacity-50"
+                }`}
+            >
                 <div
                     className={`bubble z-0 transition duration-200 rounded-full top-[2px] h-[26px] absolute ${getBubblePosition()}`}
                 ></div>
                 <div className="container flex w-[408px] justify-between items-center font-bold z-10  text-xs leading-8 uppercase dark:text-white/60">
-                    <label className="flex w-[100px] items-center justify-center grow cursor-pointer">
+                    <label
+                        className={`flex w-[100px] items-center justify-center grow cursor-pointer ${
+                            disable && "cursor-default"
+                        }`}
+                    >
                         <input
                             type="radio"
                             className="sr-only"
@@ -35,6 +43,7 @@ function Switch({ onChange, options, selected }) {
                             value={options[0]}
                             checked={option === options[0]}
                             onChange={(ev) => handleOnChange(ev)}
+                            disabled={disable}
                         />
                         <span
                             className={
@@ -44,7 +53,11 @@ function Switch({ onChange, options, selected }) {
                             {options[0]}
                         </span>
                     </label>
-                    <label className="flex w-[100px] items-center justify-center grow cursor-pointer">
+                    <label
+                        className={`flex w-[100px] items-center justify-center grow cursor-pointer ${
+                            disable && "cursor-default"
+                        }`}
+                    >
                         <input
                             type="radio"
                             className="sr-only"
@@ -52,6 +65,7 @@ function Switch({ onChange, options, selected }) {
                             value={options[1]}
                             checked={option === options[1]}
                             onChange={(ev) => handleOnChange(ev)}
+                            disabled={disable}
                         />
                         <span
                             className={
@@ -62,7 +76,11 @@ function Switch({ onChange, options, selected }) {
                         </span>
                     </label>
 
-                    <label className="flex w-[100px] items-center justify-center grow cursor-pointer">
+                    <label
+                        className={`flex w-[100px] items-center justify-center grow cursor-pointer ${
+                            disable && "cursor-default"
+                        }`}
+                    >
                         <input
                             type="radio"
                             className="sr-only"
@@ -70,6 +88,7 @@ function Switch({ onChange, options, selected }) {
                             value={options[2]}
                             checked={option === options[2]}
                             onChange={(ev) => handleOnChange(ev)}
+                            disabled={disable}
                         />
                         <span
                             className={
@@ -80,7 +99,11 @@ function Switch({ onChange, options, selected }) {
                         </span>
                     </label>
 
-                    <label className="flex w-[100px] items-center justify-center grow cursor-pointer">
+                    <label
+                        className={`flex w-[100px] items-center justify-center grow cursor-pointer ${
+                            disable && "cursor-default"
+                        }`}
+                    >
                         <input
                             type="radio"
                             className="sr-only"
@@ -88,6 +111,7 @@ function Switch({ onChange, options, selected }) {
                             value={options[3]}
                             checked={option === options[3]}
                             onChange={(ev) => handleOnChange(ev)}
+                            disabled={disable}
                         />
                         <span
                             className={
@@ -112,7 +136,7 @@ export default Switch;
  *
  */
 
-function SwitchMono({ onChange, options, selected }) {
+function SwitchMono({ onChange, options, selected, disable = false }) {
     const [option, setOption] = useState(selected);
 
     console.log("options", options);
@@ -159,6 +183,7 @@ function SwitchMono({ onChange, options, selected }) {
                                 value={options[index]}
                                 checked={option === options[index]}
                                 onChange={(ev) => handleOnChangeMono(ev)}
+                                disabled={disable}
                             />
                             <span
                                 className={

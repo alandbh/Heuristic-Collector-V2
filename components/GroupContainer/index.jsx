@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
+import { useCredentialsContext } from "../../context/credentials";
 import { Link as Scroll } from "react-scroll";
 import Fuse from "fuse.js";
 import HeuristicGroup from "../HeuristicGroup";
@@ -177,6 +178,7 @@ function GroupContainer({ data }) {
     const [groups, setGroups] = useState(null);
     const [newScores, setNewScores] = useState([]);
     const { allScores, getNewScores } = useScoresContext();
+    const { user, userType } = useCredentialsContext();
     const {
         data: dataJourneys,
         loading,
@@ -330,6 +332,7 @@ function GroupContainer({ data }) {
                         currentJourney={currentJourney}
                         currentPlayer={currentPlayer}
                         currentProject={currentProject}
+                        disable={userType !== "tester"}
                     />
                 </div>
                 <div className="relative mr-4">

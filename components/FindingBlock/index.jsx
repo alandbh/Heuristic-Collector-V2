@@ -10,6 +10,7 @@ function FindingBlock({
     client,
     mutationEdit,
     mutationDelete,
+    disable = false,
 }) {
     const [text, setText] = useState(finding.findingObject.text || "");
 
@@ -104,6 +105,7 @@ function FindingBlock({
                         onChange={(ev) => {
                             onChangeText(ev.target.value);
                         }}
+                        disabled={disable}
                     ></textarea>
                     <div
                         className={`flex ${
@@ -118,20 +120,25 @@ function FindingBlock({
                                 <button
                                     className="border px-4 rounded-full h-7 text-red-500 border-red-500 hover:bg-red-700/10"
                                     onClick={() => doDeleteFinding(true)}
+                                    disabled={disable}
                                 >
                                     Yes
                                 </button>
                                 <button
                                     className="px-4 h-7  hover:underline"
                                     onClick={() => doDeleteFinding(false)}
+                                    disabled={disable}
                                 >
                                     No
                                 </button>
                             </div>
                         ) : (
                             <button
-                                className="text-red-500 "
+                                className={`text-red-500 ${
+                                    disable && "opacity-30"
+                                }`}
                                 onClick={handleClickDelete}
+                                disabled={disable}
                             >
                                 Delete
                             </button>
@@ -155,6 +162,7 @@ function FindingBlock({
                                             onChangeTheType(theType)
                                         }
                                         selected={theType}
+                                        disable={disable}
                                     />
                                 </div>
                             </div>
