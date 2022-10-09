@@ -11,6 +11,7 @@ function Evidence({
     onSaveEvidence,
     status,
     hid,
+    disabled = false,
 }) {
     const urlRef = useRef(null);
     const collapseRef = useRef(null);
@@ -56,6 +57,7 @@ function Evidence({
                     </label>
                     <input
                         id={"evidenceUrl_" + hid}
+                        disabled={disabled}
                         type="text"
                         placeholder="https://"
                         value={evidenceUrl || ""}
@@ -75,6 +77,7 @@ function Evidence({
                     </label>
                     <textarea
                         id={"noteText_" + hid}
+                        disabled={disabled}
                         className="w-full border border-slate-300 dark:border-slate-500 p-2 h-28 text-slate-500 dark:text-slate-300 rounded-md"
                         rows="3"
                         value={text || ""}
@@ -90,6 +93,7 @@ function Evidence({
                     onClick={() => onSaveEvidence()}
                     textActive="Save Evidence"
                     textFinished="Evidence Saved"
+                    disabled={disabled}
                 />
             </div>
         </div>

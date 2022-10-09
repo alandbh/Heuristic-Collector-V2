@@ -143,8 +143,8 @@ function HeuristicItem({ heuristic, id }) {
             setText(currentScore.note);
             setEvidenceUrl(currentScore.evidenceUrl);
             if (currentScore.note || currentScore.scoreValue > 0) {
+                setEnable(true);
                 if (userType === "tester") {
-                    setEnable(true);
                 }
             }
             setEmpty(false);
@@ -388,6 +388,7 @@ function HeuristicItem({ heuristic, id }) {
                         onSaveEvidence={onSaveEvidence}
                         status={status}
                         hid={heuristic.id}
+                        disabled={userType !== "tester"}
                     />
                 </div>
             </div>
