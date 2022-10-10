@@ -1,3 +1,4 @@
+import React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useProjectContext } from "../../context/project";
@@ -37,7 +38,7 @@ const modal_style = {
     },
 };
 
-function PlayerSelect() {
+function PlayerSelect({ compact }) {
     const [selected, setSelected] = useState(null);
     const router = useRouter();
     const { currentProject } = useProjectContext();
@@ -123,7 +124,10 @@ function PlayerSelect() {
     return (
         <div>
             <div className="flex flex-col gap-2">
-                <label className="text-gray-400 text-xs" htmlFor="openModal">
+                <label
+                    className={`text-gray-400 text-xs ${compact && "hidden"}`}
+                    htmlFor="openModal"
+                >
                     Select a Player
                 </label>
                 <div className="flex gap-2 items-center content-center">
@@ -163,7 +167,7 @@ function PlayerSelect() {
                 onClick={() => closeModal(modalRef)}
             >
                 <div>
-                    <h3 className="text-3xl text-center font-bold">
+                    <h3 className={`text-3xl text-center font-bold `}>
                         Select a player
                     </h3>
                     <ul
@@ -200,4 +204,4 @@ function PlayerSelect() {
     );
 }
 
-export default PlayerSelect;
+export default React.memo(PlayerSelect);

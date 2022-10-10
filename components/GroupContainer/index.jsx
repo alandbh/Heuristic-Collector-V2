@@ -338,7 +338,7 @@ function GroupContainer({ data }) {
                 <div className="relative mr-4">
                     <div
                         className={
-                            scrollY > 150 ? "md:sticky top-8" : "relative"
+                            scrollY > 150 ? "md:sticky top-20" : "relative"
                         }
                     >
                         <aside className="mb-10 mx-4 md:mx-0">

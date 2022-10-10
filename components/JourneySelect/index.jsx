@@ -1,3 +1,4 @@
+import React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useProjectContext } from "../../context/project";
@@ -22,7 +23,7 @@ const QUERY_JOURNEYS = gql`
     }
 `;
 
-function JourneySelect() {
+function JourneySelect({ compact = false }) {
     const [selected, setSelected] = useState(null);
     const router = useRouter();
     const { currentProject, currentPlayer, currentJourney } =
@@ -119,7 +120,10 @@ function JourneySelect() {
     return (
         <div>
             <div className="flex flex-col gap-2">
-                <label className="text-gray-400 text-xs" htmlFor="openModal">
+                <label
+                    className={`text-gray-400 text-xs ${compact && "hidden"}`}
+                    htmlFor="openModal"
+                >
                     Select a Journey
                 </label>
                 <div className="flex gap-2 items-center content-center">
@@ -181,4 +185,4 @@ function JourneySelect() {
     );
 }
 
-export default JourneySelect;
+export default React.memo(JourneySelect);

@@ -7,17 +7,21 @@ import PlayerSelect from "../PlayerSelect";
 import ToggleTheme from "../ToggleTheme";
 import LoggedUser from "../LoggedUser";
 import { useCredentialsContext } from "../../context/credentials";
+import { useScroll } from "../../lib/utils";
 
 function Header({ routes, className }) {
     const router = useRouter();
     const { slug, tab } = router.query || "";
     const isProgress = tab === routes?.tab || "";
+    const [scrollY, setScrollY] = useScroll();
+
+    // console.log(scrollY);
 
     const { currentProject } = useProjectContext() || { project: { name: "" } };
 
     const { given_name, picture, email } = useCredentialsContext()?.user;
 
-    console.log("useCredentialsContext()", useCredentialsContext());
+    // console.log("useCredentialsContext()", useCredentialsContext());
 
     function handleNav(param, value) {
         if (value) {
@@ -40,8 +44,12 @@ function Header({ routes, className }) {
     const LINK_CLASSES = `border flex gap-2 align-middle items-center py-1 px-4 md:px-5 rounded-full transition-all text-xs md:text-sm `;
 
     return (
-        <header>
-            <div className="bg-primary flex justify-between px-5 items-center h-12">
+        <header className={`${scrollY > 200 && "sticky top-0"} z-10`}>
+            <div
+                className={`bg-primary flex justify-between px-5 items-center h-12 ${
+                    scrollY > 200 && "hidden"
+                }`}
+            >
                 <Link href={`/projects`}>
                     <a>
                         <div className="py-1 hidden sm:block">
@@ -126,7 +134,11 @@ function Header({ routes, className }) {
                     />
                 </div>
             </div>
-            <div className="bg-white dark:bg-slate-800 shadow-md px-5 py-3">
+            <div
+                className={`bg-white dark:bg-slate-800 shadow-md px-5 ${
+                    scrollY > 200 ? "py-0 sticky" : "py-3"
+                }`}
+            >
                 <div className="flex items-center gap-8 justify-between sm:justify-start">
                     <b className="hidden sm:inline">{currentProject.name}</b>
                     <svg
@@ -148,8 +160,8 @@ function Header({ routes, className }) {
 
                     {!isProgress ? (
                         <>
-                            <PlayerSelect />
-                            <JourneySelect />
+                            <PlayerSelect compact={scrollY > 200} />
+                            <JourneySelect compact={scrollY > 200} />
                         </>
                     ) : (
                         <h2 className="text-2xl font-bold">Progress</h2>
