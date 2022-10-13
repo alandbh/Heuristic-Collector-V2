@@ -432,6 +432,18 @@ function SearchBox(data) {
 
     const inputRef = useRef(null);
 
+    function getOffsetScroll() {
+        if (scrollY > 200) {
+            // return vw < 700 ? -120 : -20;
+            // console.log("mais que 200");
+            return vw < 700 ? -200 : -90;
+        }
+        // console.log("MENOS que 200");
+
+        return vw < 700 ? -170 : -170;
+        // return vw < 700 ? -600 : -160;
+    }
+
     function handleClick(id) {
         console.log("clicou", id);
 
@@ -459,7 +471,7 @@ function SearchBox(data) {
     }
     return (
         <>
-            <div className=" rounded-md flex items-center gap-2 pl-2 border-slate-200 border text-slate-500 w-full bg-white dark:bg-transparent">
+            <div className="rounded-md flex items-center gap-2 pl-2 border-slate-200 border text-slate-500 w-full bg-white dark:bg-transparent">
                 <label htmlFor="search">
                     <svg
                         width="24"
@@ -489,8 +501,8 @@ function SearchBox(data) {
                     accessKey="s"
                 />
             </div>
-            <div className="px-1">
-                <ul className="bg-white shadow-md px-1">
+            <div className="px-1 relative">
+                <ul className="bg-white shadow-md px-1 absolute z-10">
                     {result?.map((item, index) => (
                         <li
                             key={index}
@@ -500,12 +512,12 @@ function SearchBox(data) {
                                 activeClass="hover:text-blue-700"
                                 className="py-1 px-4 w-full block text-slate-500 hover:text-slate-800 focus:bg-blue-100 focus:outline-none"
                                 to={item.item.id}
-                                spy={true}
+                                spy={false}
                                 smooth={true}
-                                offset={vw < 700 ? -150 : -50}
+                                offset={getOffsetScroll()}
                                 onClick={() => handleClick(item.item.id)}
                                 tabIndex={0}
-                                href="#"
+                                href={"#" + item.item.id}
                             >
                                 <b className="text-blue-400">
                                     {item.item.name}

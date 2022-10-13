@@ -35,8 +35,6 @@ function JourneySelect({ compact = false }) {
         },
     });
 
-    console.log("router.query.player");
-
     const modalRef = useRef(null);
     // const [modalOpen, setModalOpen] = useDetectOutsideClick(modalRef, true);
     useEffect(() => {
