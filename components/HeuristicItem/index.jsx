@@ -374,7 +374,7 @@ function HeuristicItem({ heuristic, id }) {
                                 />
                             </svg>
                             {boxOpen ? "Close" : "Add Evidence"}{" "}
-                            {(text || evidenceUrl) && "*"}
+                            {(text || evidenceUrl) && "✓"}
                         </span>
                     </button>
 
