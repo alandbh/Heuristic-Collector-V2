@@ -12,6 +12,7 @@ import Findings from "../Findings";
 import client from "../../lib/apollo";
 import SearchBox from "../SearchBox";
 import Debugg from "../../lib/Debugg";
+import Donnut from "../Donnut";
 
 const QUERY_JOURNEYS = gql`
     query GetGroups($playerSlug: String, $projectSlug: String) {
@@ -391,7 +392,22 @@ function GroupContainer({ data }) {
                                 </li>
                             </ul>
 
-                            <Debugg data={allScores} />
+                            <h1 className="text-lg font-bold mt-10 text-center mb-5">
+                                Total Scored by {currentPlayer.name}
+                            </h1>
+
+                            <div className="flex justify-center items-center flex-col">
+                                <Donnut
+                                    total={getTotals(allScores).total}
+                                    sum={getTotals(allScores).sum}
+                                    radius={60}
+                                />
+
+                                <p className="font-bold">
+                                    {getTotals(allScores).sum} of{" "}
+                                    {getTotals(allScores).total}
+                                </p>
+                            </div>
                         </aside>
                     </div>
                 </div>
@@ -401,3 +417,16 @@ function GroupContainer({ data }) {
 }
 
 export default React.memo(GroupContainer);
+
+function getTotals(allScores) {
+    let total = allScores?.length * 5;
+    let sum = 0;
+    allScores?.map((score) => {
+        sum += score.scoreValue;
+    });
+
+    return {
+        total,
+        sum,
+    };
+}
