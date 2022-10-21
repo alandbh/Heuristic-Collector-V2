@@ -47,8 +47,8 @@ const QUERY_ALL = gql`
 `;
 
 const QUERY_JOURNEYS = gql`
-    query {
-        journeys(where: { project: { slug: "retail-30" } }) {
+    query getAllJourneys($projectSlug: String) {
+        journeys(where: { project: { slug: $projectSlug } }) {
             name
             slug
         }
@@ -68,10 +68,10 @@ const QUERY_JOURNEYS = gql`
 
 export default async function handler(req, res) {
     const { project } = req.query;
-    const allJourneys = await getData(QUERY_JOURNEYS);
+    const allJourneys = await getData(QUERY_JOURNEYS, { projectSlug: project });
     const allPlayers = await getData(QUERY_ALL, { projectSlug: project });
 
-    console.log(req.query);
+    console.log(project);
     // console.log(allPlayers.data.players[0].finding);
 
     const newPlayerArr = allPlayers.data.players.map(
