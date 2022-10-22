@@ -1,6 +1,6 @@
 // import { ApolloProvider } from "@apollo/client";
 import React from "react";
-import { UserProvider } from "@auth0/nextjs-auth0";
+// import { UserProvider } from "@auth0/nextjs-auth0";
 import { ApolloProvider } from "@apollo/client";
 import client from "../lib/apollo";
 
@@ -14,11 +14,11 @@ if (typeof window !== "undefined") {
 }
 function MyApp({ Component, pageProps }) {
     return (
-        <UserProvider>
-            <ApolloProvider client={client}>
-                <Component {...pageProps} />
-            </ApolloProvider>
-        </UserProvider>
+        // <UserProvider>
+        <ApolloProvider client={client}>
+            <Component {...pageProps} />
+        </ApolloProvider>
+        // </UserProvider>
     );
 }
 

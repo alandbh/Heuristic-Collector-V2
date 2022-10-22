@@ -1,19 +1,39 @@
 import Link from "next/link";
 import Logo from "../components/Logo";
-import LoggedUser from "../components/LoggedUser";
-import { useUser } from "@auth0/nextjs-auth0";
+// import LoggedUser from "../components/LoggedUser";
+// import { useUser } from "@auth0/nextjs-auth0";
 import Head from "next/head";
 
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../lib/firebase";
+import { useRouter } from "next/router";
+
 export default function Home(props) {
-    console.log("credential", useUser().user);
+    // console.log("credential", useUser().user);
 
     // const { given_name, picture } = useCredentialsContext().user;
 
-    const userObj = useUser()?.user;
+    // const userObj = useUser()?.user;
 
-    if (userObj !== undefined) {
-        const { given_name, picture } = userObj;
-    }
+    // if (userObj !== undefined) {
+    //     const { given_name, picture } = userObj;
+    // }
+
+    const googleProvider = new GoogleAuthProvider();
+    const [user, loading] = useAuthState(auth);
+    const router = useRouter();
+
+    const googleLogin = async () => {
+        try {
+            const { user } = await signInWithPopup(auth, googleProvider);
+
+            console.log(user);
+            router.push("/projects");
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
         <>
@@ -44,18 +64,21 @@ export default function Home(props) {
 
                     <div className="flex items-center gap-5">
                         <Link href="/projects">
-                            <a className="bg-primary text-sm hover:bg-primary/70 text-white/80 uppercase px-6 py-5 rounded-md font-bold h-1 flex items-center">
+                            {/* <a className="bg-primary text-sm hover:bg-primary/70 text-white/80 uppercase px-6 py-5 rounded-md font-bold h-1 flex items-center">
                                 {useUser().user ? "Enter " : "Log In"}
+                            </a> */}
+                            <a className="bg-primary text-sm hover:bg-primary/70 text-white/80 uppercase px-6 py-5 rounded-md font-bold h-1 flex items-center">
+                                Login
                             </a>
                         </Link>
 
-                        {userObj && (
+                        {/* {userObj && (
                             <LoggedUser
                                 picture={userObj.picture}
                                 name={userObj.given_name}
                                 size={40}
                             />
-                        )}
+                        )} */}
                     </div>
                 </div>
                 <div className="my-20">

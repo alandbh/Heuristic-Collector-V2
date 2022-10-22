@@ -9,8 +9,8 @@ import Dashboard from "../../components/Dashboard";
 import Evaluation from "../../components/Evaluation";
 import Header from "../../components/Header";
 import { ProjectWrapper } from "../../context/project";
-import { CredentialsWrapper } from "../../context/credentials";
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+// import { CredentialsWrapper } from "../../context/credentials";
+// import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 const QUERY_PROJECTS = gql`
     query Projects($slug: String) {
@@ -99,21 +99,22 @@ function Project({ user }) {
                     ></link>
                 </Head>
             </Head>
-            <CredentialsWrapper>
-                <ProjectWrapper data={data}>
-                    <Header
-                        // className="mt-20"
-                        // project={data?.project.name}
-                        routes={{ slug, tab: "progress" }}
-                    />
-                    <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
-                        {tab === "progress" ? <Dashboard /> : <Evaluation />}
-                    </main>
-                    <footer className="py-10">{/* FOOTER */}</footer>
-                </ProjectWrapper>
-            </CredentialsWrapper>
+            {/* <CredentialsWrapper> */}
+            <ProjectWrapper data={data}>
+                <Header
+                    // className="mt-20"
+                    // project={data?.project.name}
+                    routes={{ slug, tab: "progress" }}
+                />
+                <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
+                    {tab === "progress" ? <Dashboard /> : <Evaluation />}
+                </main>
+                <footer className="py-10">{/* FOOTER */}</footer>
+            </ProjectWrapper>
+            {/* </CredentialsWrapper> */}
         </div>
     );
 }
 
-export default withPageAuthRequired(Project);
+// export default withPageAuthRequired(Project);
+export default Project;

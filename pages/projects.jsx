@@ -1,10 +1,10 @@
 import { gql, useQuery } from "@apollo/client";
 import ClientOnly from "../lib/ClientOnly";
 import Card from "../components/Card";
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { useUser } from "@auth0/nextjs-auth0";
+// import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+// import { useUser } from "@auth0/nextjs-auth0";
 import Logo from "../components/Logo";
-import LoggedUser from "../components/LoggedUser";
+// import LoggedUser from "../components/LoggedUser";
 import Link from "next/link";
 import Head from "next/head";
 
@@ -70,13 +70,13 @@ const QUERY_PROJECTS = gql`
     }
 `;
 
-export default withPageAuthRequired(function Projects(props) {
+function Projects(props) {
     const { data, loading, error } = useQuery(QUERY_PROJECTS);
     console.log(data?.projects);
-    console.log("withPageAuthRequired", props.user);
-    const { user, error: errorUser, isLoading } = useUser();
+    // console.log("withPageAuthRequired", props.user);
+    // const { user, error: errorUser, isLoading } = useUser();
 
-    console.log("user", user);
+    // console.log("user", user);
 
     return (
         <>
@@ -112,12 +112,12 @@ export default withPageAuthRequired(function Projects(props) {
                     </Link>
 
                     <div className="flex items-center gap-5">
-                        <LoggedUser
+                        {/* <LoggedUser
                             picture={useUser()?.user?.picture}
                             name={useUser()?.user?.given_name}
                             email={useUser()?.user?.email}
                             size={40}
-                        />
+                        /> */}
                     </div>
                 </div>
                 <div className="m-10 mt-28 flex flex-wrap gap-10">
@@ -128,7 +128,9 @@ export default withPageAuthRequired(function Projects(props) {
             </ClientOnly>
         </>
     );
-});
+}
+
+export default Projects;
 
 // test
 

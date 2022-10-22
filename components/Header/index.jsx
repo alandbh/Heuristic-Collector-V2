@@ -5,8 +5,8 @@ import { useProjectContext } from "../../context/project";
 import JourneySelect from "../JourneySelect";
 import PlayerSelect from "../PlayerSelect";
 import ToggleTheme from "../ToggleTheme";
-import LoggedUser from "../LoggedUser";
-import { useCredentialsContext } from "../../context/credentials";
+// import LoggedUser from "../LoggedUser";
+// import { useCredentialsContext } from "../../context/credentials";
 import { useScroll } from "../../lib/utils";
 
 function Header({ routes, className }) {
@@ -127,11 +127,11 @@ function Header({ routes, className }) {
                         {/* </Link> */}
                     </nav>
                     <ToggleTheme />
-                    <LoggedUser
+                    {/* <LoggedUser
                         picture={picture}
                         name={given_name}
                         email={email}
-                    />
+                    /> */}
                 </div>
             </div>
             <div
