@@ -1,7 +1,7 @@
 import styles from "./Donnut.module.css";
 
 function Donnut({
-    total,
+    total = 100,
     sum = 0,
     radius = 34,
     thick = 6,
@@ -9,7 +9,7 @@ function Donnut({
 }) {
     // const radius = 34;
     const circ = 2 * Math.PI * radius;
-    const percent = (sum / total) * 100;
+    const percent = isNaN((sum / total) * 100) ? 1 : (sum / total) * 100;
     const size = radius * 2 + thick * 2 + 4;
     const fontSize = () => {
         return radius / 3 < 12 ? 12 : radius / 3;
