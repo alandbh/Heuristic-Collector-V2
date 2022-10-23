@@ -1,10 +1,14 @@
 import { gql, useQuery } from "@apollo/client";
 import ClientOnly from "../lib/ClientOnly";
 import Card from "../components/Card";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../lib/firebase";
+import { useRouter } from "next/router";
+
 // import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import { useUser } from "@auth0/nextjs-auth0";
 import Logo from "../components/Logo";
-// import LoggedUser from "../components/LoggedUser";
+import LoggedUser from "../components/LoggedUser";
 import Link from "next/link";
 import Head from "next/head";
 
@@ -63,6 +67,7 @@ const QUERY_PROJECTS = gql`
             name
             slug
             year
+            public
             thumbnail {
                 url
             }
@@ -73,10 +78,36 @@ const QUERY_PROJECTS = gql`
 function Projects(props) {
     const { data, loading, error } = useQuery(QUERY_PROJECTS);
     console.log(data?.projects);
+    const [user, loadingUser] = useAuthState(auth);
+    const router = useRouter();
     // console.log("withPageAuthRequired", props.user);
     // const { user, error: errorUser, isLoading } = useUser();
 
-    // console.log("user", user);
+    console.log("user-", user);
+
+    if (typeof window !== "undefined") {
+        if (!user && !loadingUser) {
+            router.push("/login");
+            // return;
+        }
+    }
+
+    if (!user) {
+        // router.push("/login");
+        return null;
+    }
+
+    // console.log(data.projects);
+
+    const projectsToMap = data?.projects.filter((project) => {
+        if (!isUserAuthorized(user)) {
+            return project.public === true;
+        }
+
+        return true;
+    });
+
+    // console.log("projectsMap", projectsToMap);
 
     return (
         <>
@@ -112,16 +143,17 @@ function Projects(props) {
                     </Link>
 
                     <div className="flex items-center gap-5">
-                        {/* <LoggedUser
-                            picture={useUser()?.user?.picture}
-                            name={useUser()?.user?.given_name}
-                            email={useUser()?.user?.email}
+                        <LoggedUser
+                            picture={user?.photoURL}
+                            name={user?.displayName.split(" ")[0]}
+                            email={user?.email}
                             size={40}
-                        /> */}
+                            auth={auth}
+                        />
                     </div>
                 </div>
                 <div className="m-10 mt-28 flex flex-wrap gap-10">
-                    {data?.projects?.map((proj) => (
+                    {projectsToMap?.map((proj) => (
                         <Card key={proj.id} data={proj} />
                     ))}
                 </div>
@@ -131,6 +163,17 @@ function Projects(props) {
 }
 
 export default Projects;
+
+function isUserAuthorized(user) {
+    if (
+        user?.email.includes("alandbh@gmail.com") ||
+        user?.email.includes("alanfuncionario@gmail.com") ||
+        user?.email.includes("cindy.gcp.rga") ||
+        user?.email.includes("@rga.com")
+    ) {
+        return true;
+    }
+}
 
 // test
 

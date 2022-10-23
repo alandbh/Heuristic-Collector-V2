@@ -4,7 +4,7 @@ import Spinner from "../Spinner";
 import { ScoresWrapper } from "../../context/scores";
 
 import { useProjectContext } from "../../context/project";
-import { useCredentialsContext } from "../../context/credentials";
+// import { useCredentialsContext } from "../../context/credentials";
 import HeuristicGroup from "../HeuristicGroup";
 import GroupContainer from "../GroupContainer";
 
@@ -46,7 +46,7 @@ function Evaluation() {
         },
     });
 
-    console.log("Evaluation", useCredentialsContext());
+    // console.log("Evaluation", useCredentialsContext());
 
     if (loading) {
         return (

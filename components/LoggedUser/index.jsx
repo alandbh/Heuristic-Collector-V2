@@ -2,7 +2,7 @@ import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-function LoggedUser({ name, email, picture = "/vercel.svg", size = 28 }) {
+function LoggedUser({ name, email, picture = "/vercel.svg", size = 28, auth }) {
     const [popOver, setPopOver] = useState(false);
     const popUpRef = useRef(null);
 
@@ -51,7 +51,7 @@ function LoggedUser({ name, email, picture = "/vercel.svg", size = 28 }) {
             </button>
 
             <div
-                className={`absolute z-10 min-w-[200px] flex flex-col items-center gap-2 top-0 right-0 px-6 py-6 bg-white dark:bg-slate-800 shadow-lg ${
+                className={`absolute z-10 min-w-[250px] flex flex-col items-center gap-2 top-0 right-0 px-6 py-6 bg-white dark:bg-slate-800 shadow-lg ${
                     popOver ? "block" : "hidden"
                 }`}
             >
@@ -67,14 +67,22 @@ function LoggedUser({ name, email, picture = "/vercel.svg", size = 28 }) {
                 <h2 className="text-sm font-bold whitespace-nowrap">
                     Hi, {name}!
                 </h2>
-                <p>{email}</p>
+                <p className="text-slate-400 text-sm">{email}</p>
                 <h3 className="mt-6">Log out?</h3>
                 <div className="flex justify-around w-full mt-2">
-                    <Link tabIndex={0} href="/api/auth/logout">
+                    {/* <Link tabIndex={0} href="/api/auth/logout">
                         <a className="border border-slate-400 px-4 py-1 text-sm rounded-md hover:bg-primary hover:text-white hover:border-transparent">
                             Yes
                         </a>
-                    </Link>
+                    </Link> */}
+                    <button
+                        className="border border-slate-400 px-4 py-1 text-sm rounded-md hover:bg-primary hover:text-white hover:border-transparent"
+                        onClick={() => {
+                            auth.signOut();
+                        }}
+                    >
+                        Yes
+                    </button>
                     <button
                         onClick={() => setPopOver(false)}
                         className="text-sm hover:underline underline-offset-2 px-4"

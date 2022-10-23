@@ -181,7 +181,7 @@ function GroupContainer({ data }) {
     const [groups, setGroups] = useState(null);
     const [newScores, setNewScores] = useState([]);
     const { getNewScores } = useScoresContext();
-    const { user, userType } = useCredentialsContext();
+    const { userType } = useCredentialsContext();
     const [allScores, setAllScores] = useState(null);
     const {
         data: dataJourneys,

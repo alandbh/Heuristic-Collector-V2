@@ -291,7 +291,7 @@ function getAllJourneys(allScores) {
 
 let _pagination;
 
-function Dashboard() {
+function Dashboard({ auth }) {
     const [journey, setJourney] = useState();
     const [totalOfScores, setTotalOfScores] = useState(null);
     const [allScoresDuplicated, setAllScoresDuplicated] = useState([]);

@@ -5,11 +5,11 @@ import { useProjectContext } from "../../context/project";
 import JourneySelect from "../JourneySelect";
 import PlayerSelect from "../PlayerSelect";
 import ToggleTheme from "../ToggleTheme";
-// import LoggedUser from "../LoggedUser";
+import LoggedUser from "../LoggedUser";
 // import { useCredentialsContext } from "../../context/credentials";
 import { useScroll } from "../../lib/utils";
 
-function Header({ routes, className }) {
+function Header({ routes, className, auth }) {
     const router = useRouter();
     const { slug, tab } = router.query || "";
     const isProgress = tab === routes?.tab || "";
@@ -19,7 +19,7 @@ function Header({ routes, className }) {
 
     const { currentProject } = useProjectContext() || { project: { name: "" } };
 
-    const { given_name, picture, email } = useCredentialsContext()?.user;
+    const { displayName: given_name, photoURL: picture, email } = auth.user;
 
     // console.log("useCredentialsContext()", useCredentialsContext());
 
@@ -127,11 +127,12 @@ function Header({ routes, className }) {
                         {/* </Link> */}
                     </nav>
                     <ToggleTheme />
-                    {/* <LoggedUser
+                    <LoggedUser
                         picture={picture}
-                        name={given_name}
+                        name={given_name.split(" ")[0]}
                         email={email}
-                    /> */}
+                        auth={auth.auth}
+                    />
                 </div>
             </div>
             <div

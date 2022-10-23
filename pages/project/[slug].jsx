@@ -9,8 +9,10 @@ import Dashboard from "../../components/Dashboard";
 import Evaluation from "../../components/Evaluation";
 import Header from "../../components/Header";
 import { ProjectWrapper } from "../../context/project";
-// import { CredentialsWrapper } from "../../context/credentials";
+import { CredentialsWrapper } from "../../context/credentials";
 // import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../lib/firebase";
 
 const QUERY_PROJECTS = gql`
     query Projects($slug: String) {
@@ -22,8 +24,9 @@ const QUERY_PROJECTS = gql`
     }
 `;
 
-function Project({ user }) {
+function Project() {
     const router = useRouter();
+    const [user, loadingUser] = useAuthState(auth);
     const { slug, tab, player } = router.query || "";
 
     const { data, loading, error } = useQuery(QUERY_PROJECTS, {
@@ -71,6 +74,18 @@ function Project({ user }) {
 
     // console.log("user", user);
 
+    if (typeof window !== "undefined") {
+        if (!user && !loadingUser) {
+            router.push("/login");
+            // return;
+        }
+    }
+
+    if (!user) {
+        // router.push("/login");
+        return null;
+    }
+
     return (
         <div className="bg-slate-100/70 dark:bg-slate-800/50">
             <Head>
@@ -99,19 +114,20 @@ function Project({ user }) {
                     ></link>
                 </Head>
             </Head>
-            {/* <CredentialsWrapper> */}
-            <ProjectWrapper data={data}>
-                <Header
-                    // className="mt-20"
-                    // project={data?.project.name}
-                    routes={{ slug, tab: "progress" }}
-                />
-                <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
-                    {tab === "progress" ? <Dashboard /> : <Evaluation />}
-                </main>
-                <footer className="py-10">{/* FOOTER */}</footer>
-            </ProjectWrapper>
-            {/* </CredentialsWrapper> */}
+            <CredentialsWrapper>
+                <ProjectWrapper data={data}>
+                    <Header
+                        // className="mt-20"
+                        // project={data?.project.name}
+                        routes={{ slug, tab: "progress" }}
+                        auth={{ user, loadingUser, auth }}
+                    />
+                    <main className="mt-10 min-h-[calc(100vh_-_126px)] flex flex-col items-center">
+                        {tab === "progress" ? <Dashboard /> : <Evaluation />}
+                    </main>
+                    <footer className="py-10">{/* FOOTER */}</footer>
+                </ProjectWrapper>
+            </CredentialsWrapper>
         </div>
     );
 }

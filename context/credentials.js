@@ -5,6 +5,9 @@ import { gql, useQuery } from "@apollo/client";
 import { useUser } from "@auth0/nextjs-auth0";
 import { debounce } from "../lib/utils";
 
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../lib/firebase";
+
 const QUERY_USER = gql`
     query getRgaUser($projectSlug: String, $email: String) {
         rgaUsers(where: { project: { slug: $projectSlug }, email: $email }) {
@@ -83,7 +86,8 @@ const createNewRgaUser = debounce(async (projectSlug, email, setRgaUser) => {
 export function CredentialsWrapper({ children }) {
     const [rgaUser, setRgaUser] = useState(null);
     const router = useRouter();
-    const { user, error: errorUser, isLoading } = useUser();
+    const [user, loadingUser] = useAuthState(auth);
+    // const { user, error: errorUser, isLoading } = useUser();
 
     useEffect(() => {
         if (user) {
@@ -103,14 +107,16 @@ export function CredentialsWrapper({ children }) {
     // });
 
     useEffect(() => {
-        if (rgaUser === undefined) {
-            console.log("noneRgaUser", rgaUser);
-            // return null;
-            createNewRgaUser(router.query.slug, user.email, setRgaUser);
+        if (user) {
+            if (rgaUser === undefined) {
+                console.log("noneRgaUser", rgaUser);
+                // return null;
+                createNewRgaUser(router.query.slug, user.email, setRgaUser);
+            }
         }
-    }, [rgaUser, router.query.slug, user.email]);
+    }, [rgaUser, router.query.slug, user]);
 
-    // console.log("userType", rgaUser?.userType);
+    console.log("userType", rgaUser?.userType);
     // console.log("NewRgaUserPublisehed", rgaUser);
 
     return (
