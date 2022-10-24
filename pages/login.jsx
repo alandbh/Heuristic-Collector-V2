@@ -3,6 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../lib/firebase";
 import { useRouter } from "next/router";
 import Logo from "../components/Logo";
+import Link from "next/link";
 
 function Login() {
     const googleProvider = new GoogleAuthProvider();
@@ -33,7 +34,11 @@ function Login() {
             {!user && (
                 <div className="flex w-full h-full justify-center absolute">
                     <div className="flex flex-col pt-40 items-center">
-                        <Logo />
+                        <Link href={"/"}>
+                            <a>
+                                <Logo />
+                            </a>
+                        </Link>
                         <h1 className="text-xl my-10 pt-40">
                             Please, use your R/GA credentials
                         </h1>
