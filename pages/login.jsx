@@ -39,10 +39,10 @@ function Login() {
                                 <Logo />
                             </a>
                         </Link>
-                        <h1 className="text-xl my-10 pt-40">
+                        <h1 className="text-xl my-10 pt-20 hidden">
                             Please, use your R/GA credentials
                         </h1>
-                        <div className="flex justify-center">
+                        <div className="flex justify-center mt-20">
                             <button
                                 className="hover:bg-blue-100 hover:text-blue-700 transition-all py-4 px-8 border border-blue-200 flex gap-4 text-slate-500 font-bold rounded "
                                 onClick={googleLogin}
