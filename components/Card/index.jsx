@@ -6,7 +6,7 @@ import React from "react";
 
 function Card({ data }) {
     return (
-        <div className="max-w-[300px] transition-shadow rounded overflow-hidden shadow-md hover:shadow-xl dark:bg-slate-800">
+        <div className="md:max-w-[300px] max-w-[150px] transition-shadow rounded overflow-hidden shadow-md hover:shadow-xl dark:bg-slate-800">
             <Link href={`/project/${data.slug}`}>
                 <a>
                     <Image
@@ -17,8 +17,8 @@ function Card({ data }) {
                         src={data.thumbnail.url}
                         alt=""
                     />
-                    <div className="px-6 py-4">
-                        <div className="font-bold dark:text-white/70 text-xl mb-2">
+                    <div className="px-3 py-2 md:px-6 md:py-4">
+                        <div className="font-bold dark:text-white/70 text-md md:text-xl mb-2">
                             {data.name}
                         </div>
                         <div className="text-md dark:text-white/50">

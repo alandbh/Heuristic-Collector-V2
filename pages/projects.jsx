@@ -135,7 +135,7 @@ function Projects(props) {
             <ClientOnly>
                 {/* <HeuristicList query={heuristicQuery} /> */}
                 {/* <Header /> */}
-                <div className="flex px-10 w-full justify-between my-10">
+                <div className="flex px-4 w-full justify-between my-10">
                     <Link href={`/`}>
                         <a>
                             <Logo />
@@ -152,7 +152,7 @@ function Projects(props) {
                         />
                     </div>
                 </div>
-                <div className="m-10 mt-28 flex flex-wrap gap-10">
+                <div className="m-4 mt-20 md:m-10 md:mt-28 flex flex-wrap gap-5 md:gap-10 justify-center">
                     {projectsToMap?.map((proj) => (
                         <Card key={proj.id} data={proj} />
                     ))}
