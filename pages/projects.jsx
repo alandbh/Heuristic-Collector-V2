@@ -11,6 +11,7 @@ import Logo from "../components/Logo";
 import LoggedUser from "../components/LoggedUser";
 import Link from "next/link";
 import Head from "next/head";
+import Debugg from "../lib/Debugg";
 
 const GET_PLAYERS = gql`
     query MyQuery($playerSlug: String) {
@@ -68,6 +69,12 @@ const QUERY_PROJECTS = gql`
             slug
             year
             public
+            journeys(first: 1) {
+                slug
+            }
+            players(first: 1) {
+                slug
+            }
             thumbnail {
                 url
             }
@@ -108,6 +115,10 @@ function Projects(props) {
     });
 
     // console.log("projectsMap", projectsToMap);
+    if (projectsToMap === undefined) {
+        return null;
+    }
+    // projectsToMap
 
     return (
         <>

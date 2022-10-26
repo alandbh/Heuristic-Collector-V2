@@ -3,11 +3,14 @@ import Link from "next/link";
 import React from "react";
 
 // import { Container } from './styles';
+//  http://localhost:3000/project/dummy?player=americanas&journey=desktop
 
 function Card({ data }) {
     return (
         <div className="md:max-w-[300px] max-w-[150px] transition-shadow rounded overflow-hidden shadow-md hover:shadow-xl dark:bg-slate-800">
-            <Link href={`/project/${data.slug}`}>
+            <Link
+                href={`/project/${data.slug}?player=${data.players[0].slug}&journey=${data.journeys[0].slug}`}
+            >
                 <a>
                     <Image
                         className="w-full"
