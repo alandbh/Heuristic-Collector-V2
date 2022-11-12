@@ -367,7 +367,7 @@ function GroupContainer({ data }) {
                                             to={group.id}
                                             spy={true}
                                             smooth={true}
-                                            offset={-50}
+                                            offset={-200}
                                         >
                                             {group.name}
                                         </Scroll>
