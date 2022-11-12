@@ -46,7 +46,8 @@ function SearchBox(data) {
         }
         // console.log("MENOS que 200");
 
-        return vw < 700 ? -170 : -170;
+        // return vw < 700 ? -210 : -210;
+        return -210;
         // return vw < 700 ? -600 : -160;
     }
 
