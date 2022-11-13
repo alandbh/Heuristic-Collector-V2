@@ -63,7 +63,7 @@ const heuristicQuery = gql`
 
 const QUERY_PROJECTS = gql`
     query {
-        projects {
+        projects(orderBy: createdAt_DESC) {
             id
             name
             slug
