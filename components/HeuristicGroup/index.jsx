@@ -2,6 +2,14 @@ import React from "react";
 import HeuristicItem from "../HeuristicItem";
 import { useScoresContext } from "../../context/scores";
 import Donnut from "../Donnut";
+import { useRouter } from "next/router";
+
+function isANotApplicableHeuristic(heuristic, playerSlug) {
+    return heuristic.not_applicaple_players
+        .map((player) => player.slug)
+        .includes(playerSlug);
+}
+
 /**
  *
  * HEURISTIC GROUP
@@ -10,6 +18,12 @@ import Donnut from "../Donnut";
 
 function HeuristicGroup({ group }) {
     const { allScores } = useScoresContext();
+    const router = useRouter();
+
+    const heuristicsToMap = group.heuristic.filter(
+        (heuristic) =>
+            !isANotApplicableHeuristic(heuristic, router.query.player)
+    );
 
     if (!allScores) {
         return null;
@@ -32,11 +46,11 @@ function HeuristicGroup({ group }) {
                 </h1>
                 <div className="text-lg flex items-center gap-5">
                     <b className="whitespace-nowrap text-sm md:text-xl">
-                        {groupTotalSore} of {5 * group.heuristic.length}
+                        {groupTotalSore} of {5 * heuristicsToMap.length}
                     </b>
 
                     <Donnut
-                        total={5 * group.heuristic.length}
+                        total={5 * heuristicsToMap.length}
                         sum={groupTotalSore}
                         radius={25}
                         thick={3}
@@ -44,13 +58,15 @@ function HeuristicGroup({ group }) {
                 </div>
             </header>
             <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
-                {group.heuristic.map((heuristicItem) => (
-                    <HeuristicItem
-                        key={heuristicItem.id}
-                        id={heuristicItem.id}
-                        heuristic={heuristicItem}
-                    />
-                ))}
+                {heuristicsToMap.map((heuristicItem) => {
+                    return (
+                        <HeuristicItem
+                            key={heuristicItem.id}
+                            id={heuristicItem.id}
+                            heuristic={heuristicItem}
+                        />
+                    );
+                })}
             </ul>
         </section>
     );

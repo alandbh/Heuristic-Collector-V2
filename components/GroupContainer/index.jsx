@@ -51,13 +51,19 @@ const QUERY_FINDINGS = gql`
 
 // let selectedJourney;
 
-const uniqueHeuristics = [];
+function isANotApplicableHeuristic(heuristic, playerSlug) {
+    return heuristic.not_applicaple_players
+        .map((player) => player.slug)
+        .includes(playerSlug);
+}
+
+// const uniqueHeuristics = [];
 let groupsMapped = null;
 
 const getUniqueGroups = debounce((arr, key, func) => {
     groupsMapped = getUnicItem(arr, key);
 
-    console.log("unique", groupsMapped);
+    // console.log("unique", groupsMapped);
 
     func(groupsMapped);
 
@@ -78,11 +84,14 @@ const debCreateNewScores = debounce(
         }
 
         data.groups.forEach((group) => {
-            group.heuristic.forEach((heurisric) => {
+            group.heuristic.forEach((heuristic) => {
+                if (isANotApplicableHeuristic(heuristic, currentPlayer.slug)) {
+                    return;
+                }
                 return (multiString =
                     multiString +
                     stringCreateFunc(
-                        heurisric.id,
+                        heuristic.id,
                         project.id,
                         currentPlayer.id,
                         currentJourney.id
@@ -298,8 +307,8 @@ function GroupContainer({ data }) {
     useEffect(() => {
         let heuristicsArr = [];
         data.groups.map((group) => {
-            group.heuristic.map((heurisric) => {
-                heuristicsArr.push(heurisric);
+            group.heuristic.map((heuristic) => {
+                heuristicsArr.push(heuristic);
             });
         });
 

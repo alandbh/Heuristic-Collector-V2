@@ -30,6 +30,9 @@ const QUERY_GROUPS = gql`
                     name
                 }
                 description
+                not_applicaple_players {
+                    slug
+                }
             }
         }
     }
@@ -63,6 +66,8 @@ function Evaluation() {
     if (data === undefined) {
         return null;
     }
+
+    // console.log({ data });
 
     return (
         <ScoresWrapper>

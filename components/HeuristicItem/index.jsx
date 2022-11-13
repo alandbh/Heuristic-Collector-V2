@@ -22,7 +22,7 @@ import {
     MUTATION_CREATE_SCORE,
 } from "../../lib/mutations";
 
-const newEmptyScores = [];
+// const newEmptyScores = [];
 
 const uniqueScores = [];
 
@@ -71,39 +71,39 @@ let stringCreate = "";
 
 let MUTATION_CREATE_MANY_SCORE;
 
-const writeNewScores = debounce(async () => {
-    const newEmptyScoresArray = getUnicScores(newEmptyScores);
-    // console.log("NEW", getUnicScores(newEmptyScores));
+// const writeNewScores = debounce(async () => {
+//     const newEmptyScoresArray = getUnicScores(newEmptyScores);
+//     // console.log("NEW", getUnicScores(newEmptyScores));
 
-    // console.log(newEmptyScores);
-    newEmptyScoresArray.forEach((score) => {
-        return (multiString =
-            multiString +
-            stringCreateFunc(
-                score.projectSlug,
-                score.playerSlug,
-                score.journeySlug,
-                score.heuristicId
-            ));
-    });
+//     // console.log(newEmptyScores);
+//     newEmptyScoresArray.forEach((score) => {
+//         return (multiString =
+//             multiString +
+//             stringCreateFunc(
+//                 score.projectSlug,
+//                 score.playerSlug,
+//                 score.journeySlug,
+//                 score.heuristicId
+//             ));
+//     });
 
-    stringCreate = `
-    mutation createMultipleScores {
-       ${multiString}
-    }
-    `;
+//     stringCreate = `
+//     mutation createMultipleScores {
+//        ${multiString}
+//     }
+//     `;
 
-    const stringMut = stringCreate.replace(/  |\r\n|\n|\r/gm, "");
-    // console.log("stringCreate", stringCreate);
+//     const stringMut = stringCreate.replace(/  |\r\n|\n|\r/gm, "");
+//     // console.log("stringCreate", stringCreate);
 
-    MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
+//     MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
 
-    const { data } = await client.mutate({
-        mutation: MUTATION_CREATE_MANY_SCORE,
-    });
+//     const { data } = await client.mutate({
+//         mutation: MUTATION_CREATE_MANY_SCORE,
+//     });
 
-    console.log("SALVOUUUU", data);
-}, 3000);
+//     console.log("SALVOUUUU", data);
+// }, 3000);
 
 /**
  *
@@ -159,7 +159,7 @@ function HeuristicItem({ heuristic, id }) {
                 scoreValue: 0,
             };
 
-            newEmptyScores.push(newEmptyScore);
+            // newEmptyScores.push(newEmptyScore);
             // localStorage.setItem(
             //     "new_empty_scores",
             //     JSON.stringify(newEmptyScores)
@@ -191,18 +191,18 @@ function HeuristicItem({ heuristic, id }) {
             if (empty) {
                 // debugger;
                 // return;
-                processChange(
-                    client,
-                    {
-                        projectSlug: router.query.slug,
-                        playerSlug: router.query.player,
-                        journeySlug: router.query.journey,
-                        heuristicId: heuristic.id,
-                        scoreValue: Number(ev.target.value),
-                    },
-                    MUTATION_CREATE_SCORE,
-                    true
-                );
+                // processChange(
+                //     client,
+                //     {
+                //         projectSlug: router.query.slug,
+                //         playerSlug: router.query.player,
+                //         journeySlug: router.query.journey,
+                //         heuristicId: heuristic.id,
+                //         scoreValue: Number(ev.target.value),
+                //     },
+                //     MUTATION_CREATE_SCORE,
+                //     true
+                // );
             } else {
                 processChange(
                     client,
