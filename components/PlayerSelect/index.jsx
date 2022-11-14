@@ -10,10 +10,11 @@ const QUERY_PLAYERS = gql`
     query Projects($projectSlug: String) {
         project(where: { slug: $projectSlug }) {
             slug
-            players {
+            players(first: 1000) {
                 id
                 name
                 slug
+                department
                 logo {
                     url
                 }
@@ -97,7 +98,7 @@ function PlayerSelect({ compact }) {
             modal.style.opacity = 0;
             modal.style.opacity = 1;
             modal.style.zIndex = 9;
-            modal.children[0].style.transform = "translateY(-20vh)";
+            modal.children[0].style.transform = "translateY(-2vh)";
         });
     }
 
@@ -162,7 +163,7 @@ function PlayerSelect({ compact }) {
             </div>
 
             <div
-                className="w-full h-full fixed top-0 left-0 bg-white/90 dark:bg-black/90 items-center justify-center transition-all opacity-0 hidden py-5 flex-col"
+                className="w-full h-full fixed top-0 left-0 bg-white/90 dark:bg-black/90 items-center justify-center transition-all opacity-0 hidden py-5aaa flex-col"
                 ref={modalRef}
                 onClick={() => closeModal(modalRef)}
             >
