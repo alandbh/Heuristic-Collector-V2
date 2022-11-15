@@ -333,7 +333,9 @@ function HeuristicItem({ heuristic, id }) {
             </div>
             <div>
                 <h2 className="text-lg mb-2 font-bold">{heuristic.name}</h2>
-                <p className="text-sm break-all">{heuristic.description}</p>
+                <p className="text-sm break-all whitespace-pre-wrap">
+                    {heuristic.description}
+                </p>
 
                 <div className="flex flex-col gap-3 justify-between">
                     <div className="max-w-sm">
