@@ -57,6 +57,16 @@ function isANotApplicableHeuristic(heuristic, playerSlug) {
         .includes(playerSlug);
 }
 
+function isPresentInThisJourney(heuristic, journeySlug) {
+    if (heuristic.journeys.length === 0) {
+        return true;
+    } else {
+        return heuristic.journeys
+            .map((journey) => journey.slug)
+            .includes(journeySlug);
+    }
+}
+
 // const uniqueHeuristics = [];
 let groupsMapped = null;
 
@@ -86,6 +96,10 @@ const debCreateNewScores = debounce(
         data.groups.forEach((group) => {
             group.heuristic.forEach((heuristic) => {
                 if (isANotApplicableHeuristic(heuristic, currentPlayer.slug)) {
+                    return;
+                }
+
+                if (!isPresentInThisJourney(heuristic, currentJourney.slug)) {
                     return;
                 }
                 return (multiString =

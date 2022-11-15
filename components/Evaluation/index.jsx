@@ -30,6 +30,9 @@ const QUERY_GROUPS = gql`
                     name
                 }
                 description
+                journeys {
+                    slug
+                }
                 not_applicaple_players {
                     slug
                 }

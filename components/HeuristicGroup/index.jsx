@@ -9,6 +9,15 @@ function isANotApplicableHeuristic(heuristic, playerSlug) {
         .map((player) => player.slug)
         .includes(playerSlug);
 }
+function isPresentInThisJourney(heuristic, journeySlug) {
+    if (heuristic.journeys.length === 0) {
+        return true;
+    } else {
+        return heuristic.journeys
+            .map((journey) => journey.slug)
+            .includes(journeySlug);
+    }
+}
 
 /**
  *
@@ -22,7 +31,8 @@ function HeuristicGroup({ group }) {
 
     const heuristicsToMap = group.heuristic.filter(
         (heuristic) =>
-            !isANotApplicableHeuristic(heuristic, router.query.player)
+            !isANotApplicableHeuristic(heuristic, router.query.player) &&
+            isPresentInThisJourney(heuristic, router.query.journey)
     );
 
     if (!allScores) {
