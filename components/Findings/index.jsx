@@ -18,14 +18,14 @@ const MUTATION_FINDINGS = gql`
 
 const MUTATION_CREATE_FINDINGS = gql`
     mutation createNewFinding(
-        $playerSlug: String
+        $playerId: ID
         $journeyId: ID
         $projectSlug: String
     ) {
         createFinding(
             data: {
                 project: { connect: { slug: $projectSlug } }
-                player: { connect: { slug: $playerSlug } }
+                player: { connect: { id: $playerId } }
                 journey: { connect: { id: $journeyId } }
                 findingObject: { text: "", theType: "neutral" }
             }
@@ -80,11 +80,12 @@ function Findings({
     }
 
     function handleAddOneMoreFinding() {
+        // console.log("playerr", currentPlayer.id);
         setFindingsLoading(true);
         doMutate(
             client,
             {
-                playerSlug: currentPlayer.slug,
+                playerId: currentPlayer.id,
                 journeyId: currentJourney.id,
                 projectSlug: router.query.slug,
             },
@@ -179,6 +180,7 @@ function doMutate(
 ) {
     // console.log(client, variables, mutationString, isCreate, setFindings);
     console.log("verb", verb);
+    console.log({ setFindings });
     client
         .mutate({
             mutation: mutationString,
