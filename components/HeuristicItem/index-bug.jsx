@@ -129,7 +129,10 @@ const writeNewScores = debounce(async (func) => {
 
     const PUBLISH_STRING = gql`
         mutation publishManyScores {
-            publishManyScoresConnection(first: 1000, where: { scoreValue: 1 }) {
+            publishManyScoresConnection(
+                first: 10000
+                where: { scoreValue: 1 }
+            ) {
                 edges {
                     node {
                         id

@@ -17,7 +17,7 @@ const QUERY_SCORES = gql`
                 project: { slug: $projectSlug }
                 journey: { slug: $journeySlug }
             }
-            first: 1000
+            first: 10000
         ) {
             id
             scoreValue

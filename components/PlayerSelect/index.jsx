@@ -10,7 +10,7 @@ const QUERY_PLAYERS = gql`
     query Projects($projectSlug: String) {
         project(where: { slug: $projectSlug }) {
             slug
-            players(first: 1000) {
+            players(first: 10000) {
                 id
                 name
                 slug

@@ -21,10 +21,10 @@ async function getData(query, variables) {
 
 const QUERY_ALL = gql`
     query getAllPlayers($projectSlug: String) {
-        players(where: { project: { slug: $projectSlug } }) {
+        players(where: { project: { slug: $projectSlug } }, first: 10000) {
             id
             name
-            scores(first: 1000) {
+            scores(first: 10000) {
                 journey {
                     name
                     slug
