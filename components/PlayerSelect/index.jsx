@@ -163,7 +163,7 @@ function PlayerSelect({ compact }) {
             </div>
 
             <div
-                className="w-full h-full fixed top-0 left-0 bg-white/90 dark:bg-black/90 items-center justify-center transition-all opacity-0 hidden py-5aaa flex-col"
+                className="w-full h-full fixed top-0 left-0 bg-white/90 dark:bg-black/90 items-center justify-center transition-all opacity-0 hidden py-5aaa flex-col pt-[120px] md:pt-0"
                 ref={modalRef}
                 onClick={() => closeModal(modalRef)}
             >
@@ -173,7 +173,7 @@ function PlayerSelect({ compact }) {
                     </h3>
                     <ul
                         className="bg-white dark:bg-slate-700 flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5 border-l-1 border border-y-0 border-r-0"
-                        style={{ maxHeight: "calc(100vh - 40px)" }}
+                        style={{ maxHeight: "calc(100vh - 100px)" }}
                     >
                         {data?.project?.players?.map((player, index) => (
                             <li

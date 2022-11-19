@@ -186,7 +186,7 @@ function Header({ routes, className, auth }) {
                 className="z-10 fixed w-full top-0 -translate-y-20 opacity-0"
             >
                 <div
-                    className={`bg-white dark:bg-slate-800 shadow-md px-5 py-1`}
+                    className={`bg-white dark:bg-slate-800 shadow-md px-5 py-3 md:py-1`}
                 >
                     <div className="flex items-center gap-8 justify-between sm:justify-start">
                         <b className="hidden sm:inline">

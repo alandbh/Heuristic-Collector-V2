@@ -331,7 +331,7 @@ function HeuristicItem({ heuristic, id }) {
             <div>
                 <b className="text-xl">{heuristic.heuristicNumber}</b>
             </div>
-            <div>
+            <div className="w-full">
                 <h2 className="text-lg mb-2 font-bold">{heuristic.name}</h2>
                 <p className="text-sm break-all whitespace-pre-wrap">
                     {heuristic.description}
