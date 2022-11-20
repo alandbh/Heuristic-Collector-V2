@@ -1,10 +1,8 @@
+import React, { useMemo, useRef } from "react";
 import Head from "next/head";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { gql, useQuery } from "@apollo/client";
-import ClientOnly from "../../lib/ClientOnly";
 
-import Link from "next/link";
 import Dashboard from "../../components/Dashboard";
 import Evaluation from "../../components/Evaluation";
 import Header from "../../components/Header";
@@ -13,6 +11,8 @@ import { CredentialsWrapper } from "../../context/credentials";
 // import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../lib/firebase";
+import { Link as Scroll, animateScroll } from "react-scroll";
+import { useScroll } from "../../lib/utils";
 
 const QUERY_PROJECTS = gql`
     query Projects($slug: String) {
@@ -126,6 +126,7 @@ function Project() {
                         {tab === "progress" ? <Dashboard /> : <Evaluation />}
                     </main>
                     <footer className="py-10">{/* FOOTER */}</footer>
+                    <Gototop />
                 </ProjectWrapper>
             </CredentialsWrapper>
         </div>
@@ -134,3 +135,38 @@ function Project() {
 
 // export default withPageAuthRequired(Project);
 export default Project;
+
+function Gototop() {
+    const [scrollY, setScrollY] = useScroll();
+    const goToUpRef = useRef(null);
+
+    if (goToUpRef.current !== null) {
+        if (scrollY > 200) {
+            goToUpRef.current.classList.add("transition-all");
+            goToUpRef.current.classList.remove("translate-y-20");
+            goToUpRef.current.classList.remove("opacity-0");
+        } else {
+            goToUpRef.current.classList.add("opacity-0");
+            goToUpRef.current.classList.add("translate-y-20");
+        }
+    }
+
+    const scroll = animateScroll;
+    return (
+        <div
+            ref={goToUpRef}
+            className="translate-y-20 bg-slate-700 fixed left-4 bottom-4 w-12 h-12"
+        >
+            <button
+                className="w-full h-full text-white/70 text-4xl"
+                onClick={() => {
+                    scroll.scrollToTop();
+                }}
+            >
+                ᐞ
+            </button>
+        </div>
+    );
+}
+
+export { Gototop };
