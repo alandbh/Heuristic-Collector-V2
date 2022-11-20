@@ -22,7 +22,7 @@ const QUERY_GROUPS = gql`
             journeys(where: { slug: $journeySlug }) {
                 name
             }
-            heuristic {
+            heuristic(first: 10000) {
                 name
                 id
                 heuristicNumber
@@ -51,6 +51,8 @@ function Evaluation() {
             journeySlug: router.query.journey,
         },
     });
+
+    // const dataToPass = useMemo(() => data, [data]);
 
     // console.log("Evaluation", useCredentialsContext());
 
