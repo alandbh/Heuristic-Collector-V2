@@ -122,9 +122,9 @@ function Findings({
                     <p>
                         This is a space for you to put some useful findings
                         regarding this player, that are not described in none of
-                        the heuristics above. It could be a good thing (like
-                        this player allows credit card scanning) or a bad one
-                        (the face recognition does not work properly).
+                        the heuristics above. It could be a good thing (ex: this
+                        player allows credit card scanning) or a bad one (the
+                        face recognition does not work properly).
                     </p>
                 </div>
             </header>
