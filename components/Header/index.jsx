@@ -175,9 +175,9 @@ function Header({ routes, className, auth }) {
         );
     } else {
         setTimeout(() => {
-            headerRef.current.classList.add("transition-all");
-            headerRef.current.classList.remove("-translate-y-20");
-            headerRef.current.classList.remove("opacity-0");
+            headerRef.current?.classList.add("transition-all");
+            headerRef.current?.classList.remove("-translate-y-20");
+            headerRef.current?.classList.remove("opacity-0");
         }, 500);
 
         return (
