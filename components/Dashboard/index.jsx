@@ -353,7 +353,7 @@ function Dashboard({ auth }) {
             setTimeout(function () {
                 console.log("skipp - ", itemsToSkip);
                 getNewScores(itemsToSkip);
-            }, 200);
+            }, 500);
         }
     }, [router.query.slug, totalOfScores]);
 
