@@ -37,8 +37,6 @@ function HeuristicGroup({ group }) {
         )
         .sort((a, b) => a.heuristicNumber - b.heuristicNumber);
 
-    console.log("heuristicsToMap", heuristicsToMap);
-
     if (!allScores) {
         return null;
     }
