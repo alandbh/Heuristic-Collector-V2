@@ -29,11 +29,15 @@ function HeuristicGroup({ group }) {
     const { allScores } = useScoresContext();
     const router = useRouter();
 
-    const heuristicsToMap = group.heuristic.filter(
-        (heuristic) =>
-            !isANotApplicableHeuristic(heuristic, router.query.player) &&
-            isPresentInThisJourney(heuristic, router.query.journey)
-    );
+    const heuristicsToMap = group.heuristic
+        .filter(
+            (heuristic) =>
+                !isANotApplicableHeuristic(heuristic, router.query.player) &&
+                isPresentInThisJourney(heuristic, router.query.journey)
+        )
+        .sort((a, b) => a.heuristicNumber - b.heuristicNumber);
+
+    console.log("heuristicsToMap", heuristicsToMap);
 
     if (!allScores) {
         return null;
