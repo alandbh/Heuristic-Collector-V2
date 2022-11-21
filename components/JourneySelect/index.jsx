@@ -109,7 +109,7 @@ function JourneySelect({ compact = false }) {
     }
 
     if (error) {
-        return <div>SOMETHING WENT WRONG: {error.message}</div>;
+        return <div>SOMETHING WENT WRONG: Please, reload the page.</div>;
     }
     if (data === undefined) {
         return null;
