@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link as Scroll } from "react-scroll";
+import { useProjectContext } from "../../context/project";
 import Fuse from "fuse.js";
 
 function SearchBox(data) {
     const [result, setResult] = useState([]);
     const [vw, setVw] = useState(1024);
+    const { currentProject, currentPlayer, currentJourney } =
+        useProjectContext();
 
     if (window !== undefined) {
         window.addEventListener("resize", function () {
@@ -29,7 +32,17 @@ function SearchBox(data) {
     };
 
     if (data) {
-        const fuse = new Fuse(data.data, options);
+        const heuristicsByJourney = data.data.filter((heuristic) => {
+            // Filtering the heuristics by the current journey and if journey is empty.
+            return (
+                heuristic.journeys.filter(
+                    (journey) => journey.slug === currentJourney.slug
+                ).length > 0 || heuristic.journeys.length === 0
+            );
+        });
+        const fuse = new Fuse(heuristicsByJourney, options);
+
+        // console.log("fuse", heuristicsByJourney);
 
         function handleSearch(term) {
             setResult(fuse.search(term));
@@ -141,4 +154,4 @@ function SearchBox(data) {
     );
 }
 
-export default SearchBox;
+export default React.memo(SearchBox);
