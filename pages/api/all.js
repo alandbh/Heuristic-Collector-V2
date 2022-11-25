@@ -24,6 +24,7 @@ const QUERY_ALL = gql`
         players(where: { project: { slug: $projectSlug } }, first: 10000) {
             id
             name
+            slug
             department
             scores(first: 10000) {
                 journey {
@@ -76,10 +77,11 @@ export default async function handler(req, res) {
     // console.log(allPlayers.data.players[0].finding);
 
     const newPlayerArr = allPlayers.data.players.map(
-        ({ id, name, department, scores, finding }) => {
+        ({ id, name, slug, department, scores, finding }) => {
             const playerOb = {};
             playerOb.id = id;
             playerOb.name = name;
+            playerOb.slug = slug;
             playerOb.department = department;
 
             const journeys = {};

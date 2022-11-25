@@ -95,7 +95,7 @@ function getAllScores(params) {
     if (scores && journey && player) {
         allScores = scores?.filter(
             (score) =>
-                score.player.slug === player && score.journey.slug === journey
+                score.playerName === player && score.journey.slug === journey
         );
     } else if (scores && journey) {
         allScores = scores?.filter((score) => score.journey.slug === journey);
@@ -303,86 +303,90 @@ function Dashboard({ auth }) {
     const [loadingDash, setLoadingDash] = useState(true);
     const router = useRouter();
 
-    // useEffect(() => {
-
-    //     fetch(
-    //         `${window.location.origin}/api/all?project=${router.query.slug}`
-    //     ).then((data) => {
-    //         data.json().then((result) => {
-    //             setApiResult(result);
-    //         });
-    //     });
-    // }, []);
-
-    // console.log("apiResult", getAllScoresApi(apiResult));
-
     useEffect(() => {
         setLoadingDash(true);
-        const getTotalOfScores = async function getTotalOfScores() {
-            const { data: dataTotal } = await client.query({
-                query: QUERY_TOTAL_OF_SCORES,
-                variables: {
-                    projectSlug: router.query.slug,
-                },
-                fetchPolicy: "network-only",
+
+        fetch(
+            `${window.location.origin}/api/all?project=${router.query.slug}`
+        ).then((data) => {
+            data.json().then((result) => {
+                setApiResult(result);
+
+                setTotalOfScores(getAllScoresApi(apiResult).length);
+                setAllScores(getAllScoresApi(apiResult));
             });
+        });
+    }, []);
 
-            setTotalOfScores(dataTotal.scoresConnection.aggregate.count);
+    console.log("apiResult", getAllScoresApi(apiResult));
 
-            // console.log("dataTotal", dataTotal);
-        };
+    // useEffect(() => {
+    // setLoadingDash(true);
+    // const getTotalOfScores = async function getTotalOfScores() {
+    //     const { data: dataTotal } = await client.query({
+    //         query: QUERY_TOTAL_OF_SCORES,
+    //         variables: {
+    //             projectSlug: router.query.slug,
+    //         },
+    //         fetchPolicy: "network-only",
+    //     });
 
-        getTotalOfScores();
+    //     setTotalOfScores(dataTotal.scoresConnection.aggregate.count);
 
-        if (totalOfScores) {
-            _pagination = Math.ceil(totalOfScores / 100);
-        }
-        const getNewScores = async function getNewScores(skipScores) {
-            const { data: newData } = await client.query({
-                query: QUERY_SCORES_BY_PROJECT,
-                variables: {
-                    projectSlug: router.query.slug,
-                    skipScores,
-                },
-                fetchPolicy: "network-only",
-                skip: true,
-            });
-            setLoadingDash(true);
+    //     // console.log("dataTotal", dataTotal);
+    // };
 
-            setAllScoresDuplicated((prev) => [...prev, ...newData.scores]);
+    // getTotalOfScores();
 
-            return newData.scores;
-        };
+    // if (totalOfScores) {
+    //     _pagination = Math.ceil(totalOfScores / 100);
+    // }
+    // const getNewScores = async function getNewScores(skipScores) {
+    //     const { data: newData } = await client.query({
+    //         query: QUERY_SCORES_BY_PROJECT,
+    //         variables: {
+    //             projectSlug: router.query.slug,
+    //             skipScores,
+    //         },
+    //         fetchPolicy: "network-only",
+    //         skip: true,
+    //     });
+    //     setLoadingDash(true);
 
-        for (let i = 0; i < _pagination; i++) {
-            let itemsToSkip = i * 100;
+    //     setAllScoresDuplicated((prev) => [...prev, ...newData.scores]);
 
-            doSetTimeout(itemsToSkip);
-            // if (i === QUERY_PAGINATION - 2) {
-            //     console.log("ter", i);
-            //     setLoadingDash(false);
-            // }
+    //     return newData.scores;
+    // };
 
-            // getNewScores(100);
-        }
+    // for (let i = 0; i < _pagination; i++) {
+    //     let itemsToSkip = i * 100;
 
-        function doSetTimeout(itemsToSkip) {
-            setTimeout(function () {
-                console.log("skipp - ", itemsToSkip);
-                getNewScores(itemsToSkip);
-            }, 500);
-        }
-    }, [router.query.slug, totalOfScores]);
+    //     doSetTimeout(itemsToSkip);
+    //     // if (i === QUERY_PAGINATION - 2) {
+    //     //     console.log("ter", i);
+    //     //     setLoadingDash(false);
+    //     // }
+
+    //     // getNewScores(100);
+    // }
+
+    // function doSetTimeout(itemsToSkip) {
+    //     setTimeout(function () {
+    //         console.log("skipp - ", itemsToSkip);
+    //         getNewScores(itemsToSkip);
+    //     }, 500);
+    // }
+    // }, [router.query.slug, totalOfScores]);
 
     // return null
 
-    useEffect(() => {
-        console.log("allScoresDuplicated", allScoresDuplicated);
-        const allScoresUnique = getUnique(allScoresDuplicated, "id");
+    // useEffect(() => {
+    //     console.log("allScoresDuplicated", allScoresDuplicated);
+    //     const allScoresUnique = getUnique(allScoresDuplicated, "id");
 
-        setAllScores(allScoresUnique);
-        // setLoadingDash(false);
-    }, [allScoresDuplicated]);
+    //     setAllScores(allScoresUnique);
+    //     // setLoadingDash(false);
+    // }, [allScoresDuplicated]);
 
     useEffect(() => {
         console.log("comecou");
