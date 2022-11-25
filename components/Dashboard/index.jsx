@@ -7,7 +7,9 @@ import Debugg from "../../lib/Debugg";
 import Donnut from "../Donnut";
 import Progress from "../Progress";
 import Switch, { SwitchMono } from "../Switch";
+import { getAllScoresApi } from "../../lib/utils";
 
+// console.log(apiResult);
 const QUERY_SCORES_BY_PROJECT = gql`
     query GetScores(
         $projectSlug: String # $journeySlug: String # $playerSlug: String
@@ -83,6 +85,7 @@ function getZeroedScores(params) {
 
 function getAllScores(params) {
     const { scores, journey, player } = params;
+
     const scoresByJourneyAndPlayer = scores?.filter(
         (score) =>
             score.player.slug === player && score.journey.slug === journey
@@ -296,8 +299,22 @@ function Dashboard({ auth }) {
     const [totalOfScores, setTotalOfScores] = useState(null);
     const [allScoresDuplicated, setAllScoresDuplicated] = useState([]);
     const [allScores, setAllScores] = useState([]);
+    const [apiResult, setApiResult] = useState([]);
     const [loadingDash, setLoadingDash] = useState(true);
     const router = useRouter();
+
+    // useEffect(() => {
+
+    //     fetch(
+    //         `${window.location.origin}/api/all?project=${router.query.slug}`
+    //     ).then((data) => {
+    //         data.json().then((result) => {
+    //             setApiResult(result);
+    //         });
+    //     });
+    // }, []);
+
+    // console.log("apiResult", getAllScoresApi(apiResult));
 
     useEffect(() => {
         setLoadingDash(true);
