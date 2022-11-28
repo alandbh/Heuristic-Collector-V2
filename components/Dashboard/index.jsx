@@ -9,6 +9,15 @@ import Progress from "../Progress";
 import Switch, { SwitchMono } from "../Switch";
 import { getAllScoresApi, getAllFindingsApi } from "../../lib/utils";
 
+const QUERY_ALL_JOURNEYS = gql`
+    query getAllJourneys($projectSlug: String) {
+        journeys(where: { project: { slug: $projectSlug } }, first: 10000) {
+            name
+            slug
+        }
+    }
+`;
+
 // console.log(apiResult);
 const QUERY_SCORES_BY_PROJECT = gql`
     query GetScores(
@@ -220,30 +229,43 @@ function getUncompletedPlayers(params) {
 }
 
 function getBlockedPlayers(params) {
-    const { scores, journey } = params;
+    const { findings, journey } = params;
 
-    let selectedScores;
-    let blocked = [];
+    const allBlockers = findings.filter((finding) =>
+        finding.findings.some((findingObj) => findingObj.theType === "blocker")
+    );
 
-    if (journey) {
-        selectedScores = getAllScores({ scores, journey });
-    } else {
-        selectedScores = scores;
-    }
-
-    selectedScores.map((score) => {
-        const finding = score.player.finding.find(
-            (found) => found.findingObject.theType === "blocker"
-        );
-        if (finding !== undefined) {
-            blocked.push({
-                playerSlug: score.playerSlug,
-                theType: finding.findingObject.theType,
-            });
-        }
+    const playersWithBlockers = allBlockers.map((blocker) => {
+        return {
+            playerSlug: blocker.playerSlug,
+            playerName: blocker.playerName,
+        };
     });
 
-    return getUnique(blocked, "playerSlug");
+    // let selectedScores;
+    // let blocked = [];
+
+    // if (journey) {
+    //     selectedScores = getAllScores({ scores, journey });
+    // } else {
+    //     selectedScores = scores;
+    // }
+
+    // selectedScores.map((score) => {
+    //     const finding = score.player.finding.find(
+    //         (found) => found.findingObject.theType === "blocker"
+    //     );
+    //     if (finding !== undefined) {
+    //         blocked.push({
+    //             playerSlug: score.playerSlug,
+    //             theType: finding.findingObject.theType,
+    //         });
+    //     }
+    // });
+
+    // return getUnique(blocked, "playerSlug");
+
+    return playersWithBlockers;
 }
 
 function hasBlocker(playerObj) {
@@ -277,11 +299,14 @@ function getUnique(arr, key = null, subkey = null) {
 }
 
 function getAllJourneys(allScores) {
-    const _allJourneys = allScores.map((score) => {
-        return score.journeySlug;
-    });
+    var _allJourneys = [
+        ...new Set(allScores.map((score) => score.journeySlug)),
+    ];
+    // const _allJourneys = allScores.map((score) => {
+    //     return score.journeySlug;
+    // });
 
-    return getUnique(_allJourneys, "journeySlug");
+    return _allJourneys;
 }
 
 /**
@@ -300,24 +325,35 @@ function Dashboard({ auth }) {
     const [allScoresDuplicated, setAllScoresDuplicated] = useState([]);
     const [allScores, setAllScores] = useState([]);
     const [apiResult, setApiResult] = useState([]);
+    const [allFindings, setAllFindings] = useState([]);
     const [loadingDash, setLoadingDash] = useState(true);
     const router = useRouter();
+
+    const {
+        data: allJourneysData,
+        loading: allJourneysLoading,
+        error: allJourneysError,
+    } = useQuery(QUERY_ALL_JOURNEYS, {
+        variables: {
+            projectSlug: router.query.slug,
+        },
+    });
 
     useEffect(() => {
         setLoadingDash(true);
 
-        fetch(
-            `${window.location.origin}/api/all?project=${router.query.slug}`
-        ).then((data) => {
+        fetch(`/api/all?project=${router.query.slug}`).then((data) => {
             data.json().then((result) => {
                 setApiResult(result);
 
-                setTotalOfScores(getAllScoresApi(apiResult).length);
-                setAllScores(getAllScoresApi(apiResult));
+                setTotalOfScores(getAllScoresApi(result).length);
+                setAllScores(getAllScoresApi(result));
+                setAllFindings(getAllFindingsApi(result));
+                console.log("allScores", result);
             });
         });
-        console.log("apiResult", getAllFindingsApi(apiResult));
-    }, [apiResult, router.query.slug]);
+        // console.log("allFindings", allFindings);
+    }, [router.query.slug]);
 
     // useEffect(() => {
     // setLoadingDash(true);
@@ -398,15 +434,15 @@ function Dashboard({ auth }) {
         };
     });
 
-    if (!allScores) {
+    if ((!allScores, allJourneysLoading, allJourneysError)) {
         return null;
     }
 
-    const allJourneysSlug = getAllJourneys(allScores).map(
-        (score) => score.slug
+    const allJourneysSlug = allJourneysData?.journeys.map(
+        (journey) => journey.slug
     );
 
-    console.log("allScores", allScores);
+    console.log("allJourneysSlug", allJourneysSlug);
 
     const scoresMobile = getAllScores({
         scores: allScores,
@@ -484,12 +520,127 @@ function Dashboard({ auth }) {
                             </h1>
                             <div className="text-lg flex items-center gap-5">
                                 <b className="whitespace-nowrap text-sm md:text-xl">
-                                    {getAllScores({
-                                        scores: allScores,
-                                    }).length -
-                                        getZeroedScores({
-                                            scores: allScores,
-                                        }).length}{" "}
+                                    {allScores.length -
+                                        getZeroedScores({ scores: allScores })
+                                            .length}{" "}
+                                    of {allScores.length}
+                                </b>
+
+                                <Donnut
+                                    total={allScores.length}
+                                    sum={
+                                        allScores.length -
+                                        getZeroedScores({ scores: allScores })
+                                            .length
+                                    }
+                                    radius={25}
+                                    thick={3}
+                                ></Donnut>
+                            </div>
+                        </header>
+                        <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
+                            <li className=" mx-auto">
+                                <div>
+                                    <SwitchMono
+                                        options={[
+                                            "overall",
+                                            ...allJourneysSlug,
+                                        ]}
+                                        onChange={(journey) =>
+                                            onChangeJourney(journey)
+                                        }
+                                        selected={"overall"}
+                                    />
+                                </div>
+
+                                {/* 
+                                    Big Numbers
+                                    ------------------
+                                */}
+
+                                <div className="flex gap-10 flex-col items-center justify-center mt-20">
+                                    <div className="flex flex-wrap gap-4 justify-between md:gap-10 text-center w-auto">
+                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px]">
+                                            <div className="text-4xl font-bold">
+                                                {
+                                                    getCompletedPlayers({
+                                                        scores: allScores,
+                                                        journey,
+                                                    }).length
+                                                }
+                                            </div>
+                                            <div className="text-xs md:text-md">
+                                                Done
+                                            </div>
+                                        </div>
+                                        {/* <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-green-600">
+                                            <div className="text-4xl font-bold">
+                                                {getSuccessDone().length}
+                                            </div>
+                                            <div className="text-xs md:text-md">
+                                                Successfully Done
+                                            </div>
+                                        </div> */}
+                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-red-500">
+                                            <div className="text-4xl font-bold">
+                                                {
+                                                    getBlockedPlayers({
+                                                        findings: allFindings,
+                                                        journey,
+                                                    }).length
+                                                }
+                                            </div>
+                                            <div className="text-xs md:text-md">
+                                                With Blockers
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-blue-600">
+                                            <div className="text-4xl font-bold">
+                                                {
+                                                    getUncompletedPlayers({
+                                                        scores: allScores,
+                                                        journey,
+                                                    }).length
+                                                }
+                                            </div>
+                                            <div className="text-xs md:text-md">
+                                                In Progress
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+            <Debugg data={allScores}></Debugg>
+        </>
+    );
+
+    return (
+        <>
+            <h1 className={`${loadingDash ? "opacity-100" : "opacity-0"}`}>
+                LOADING...
+            </h1>
+            <div
+                style={{ transition: ".5s", transitionDelay: ".5s" }}
+                className={`${
+                    loadingDash
+                        ? "opacity-0 translate-y-6"
+                        : "opacity-100 translate-y-0"
+                } gap-5 max-w-6xl min-w-full mx-auto md:grid grid-cols-4`}
+            >
+                <div className="md:col-span-4 flex flex-col gap-20">
+                    <section className="mx-3">
+                        <header className="flex justify-between mb-6 items-center px-4 gap-3">
+                            <h1 className="text-xl font-bold">
+                                <div className="h-[5px] bg-primary w-10 mb-1"></div>
+                                Analysis progress
+                            </h1>
+                            <div className="text-lg flex items-center gap-5">
+                                <b className="whitespace-nowrap text-sm md:text-xl">
+                                    {allScores.length - allScores.length.length}{" "}
                                     of{" "}
                                     {
                                         getAllScores({
