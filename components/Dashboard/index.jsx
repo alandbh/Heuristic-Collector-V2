@@ -340,7 +340,7 @@ function Dashboard({ auth }) {
                 } gap-5 max-w-6xl min-w-full mx-auto md:grid grid-cols-4`}
             >
                 <div className="md:col-span-4 flex flex-col gap-20">
-                    <section className="mx-3">
+                    <section className="mx-3 h-screen mb-96">
                         <header className="flex justify-between mb-6 items-center px-4 gap-3">
                             <h1 className="text-xl font-bold">
                                 <div className="h-[5px] bg-primary w-10 mb-1"></div>
@@ -509,7 +509,7 @@ function Dashboard({ auth }) {
 
                                  */}
 
-                                <div className="grid grid-cols-3 mt-10">
+                                <div className="grid grid-cols-3 mt-10 mb-40">
                                     <div className="col-span-3">
                                         <h3 className="font-bold text-2xl text-center mt-20">
                                             Progress by Player
