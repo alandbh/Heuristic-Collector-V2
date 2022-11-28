@@ -132,34 +132,38 @@ function getAllPlayersObj(params) {
         scores,
         journey,
     });
-    const playersArr = scoresByJourney.map((score) => score.player);
+    const playersArr = scoresByJourney.map((score) => {
+        return { playerName: score.playerName, playerSlug: score.playerSlug };
+    });
 
-    return getUnique(playersArr, "slug");
+    // return all unique players without any duplicates
+
+    return [
+        ...new Map(
+            playersArr.map((player) => [player.playerSlug, player])
+        ).values(),
+    ];
+
+    // return [...new Set(playersArr)];
+
+    // return getUnique(playersArr, "playerSlug");
 }
 
 function getCompletedPlayersSucessfully(params) {
-    const { scores, journey, player } = params;
-    const zeroed = getZeroedScores({ scores, journey });
-    const allPlayers = getAllPlayers(scores, journey);
-    const blocked = getBlockedPlayers({ scores, journey }).map(
-        (player) => player.playerSlug
-    );
-    let completed = [];
-
-    allPlayers.map((player) => {
-        const zeroedScore = zeroed.filter(
-            (score) => score.playerSlug === player
-        );
-        if (zeroedScore.length === 0) {
-            completed.push(player);
-            return player;
-        }
-        return;
+    const { scores, journey, player, findings } = params;
+    const completed = getCompletedPlayers(params);
+    const blocked = getBlockedPlayers({
+        findings,
+        journey,
     });
+    const successfullyFinished = completed.filter(
+        ({ playerSlug: playerSlug_1 }) =>
+            !blocked.some(
+                ({ playerSlug: playerSlug_2 }) => playerSlug_2 === playerSlug_1
+            )
+    );
 
-    let success = completed.filter((player) => !blocked.includes(player));
-
-    return success;
+    return successfullyFinished;
 }
 function getCompletedPlayers(params) {
     const { scores, journey, player } = params;
@@ -182,13 +186,39 @@ function getCompletedPlayers(params) {
 }
 
 function getPlayerPercentage(params) {
-    const { scores, journey, player } = params;
+    const { scores, journey, playerSlug } = params;
 
-    const scoresByPlayer = getAllScores({
-        scores,
-        player,
-        journey,
-    });
+    const scoresByPlayer = scores.filter(
+        (player) => player.playerSlug === playerSlug
+    );
+    const scoresByPlayerByJourney = journey
+        ? scoresByPlayer.filter((score) => score.journeySlug === journey)
+        : scoresByPlayer;
+    const zeroedsByPlayer = scoresByPlayerByJourney.filter(
+        (score) => score.scoreValue === 0
+    );
+
+    const totalAmountOfScores = scoresByPlayerByJourney.length;
+    const totalAmountOfZeroedScores = zeroedsByPlayer.length;
+    const totalAmountOfZeroedScoresByJourney = scoresByPlayerByJourney.length;
+    const totalDone = totalAmountOfScores - totalAmountOfZeroedScores;
+    const percentageDone = (totalDone / totalAmountOfScores) * 100;
+    // const scoresByPlayer = scores.find(
+    //     (player) => player.playerSlug === playerSlug
+    // );
+
+    console.log("scoresByPlayer", scoresByPlayerByJourney);
+
+    return {
+        total: totalAmountOfScores,
+        done: totalDone,
+    };
+
+    // const scoresByPlayer = getAllScores({
+    //     scores,
+    //     player,
+    //     journey,
+    // });
 
     const zeroedPlayersScored = getZeroedScores({
         scores,
@@ -268,7 +298,12 @@ function getBlockedPlayers(params) {
     return playersWithBlockers;
 }
 
-function hasBlocker(playerObj) {
+function hasBlocker(params) {
+    const { findings, journey, player } = params;
+
+    const blocked = getBlockedPlayers({ findings, journey });
+    return blocked.some((bplayer) => bplayer.playerSlug === player.playerSlug);
+
     return playerObj.finding.some(
         (obj) => obj.findingObject.theType === "blocker"
     );
@@ -434,16 +469,6 @@ function Dashboard({ auth }) {
         };
     });
 
-    if ((!allScores, allJourneysLoading, allJourneysError)) {
-        return null;
-    }
-
-    const allJourneysSlug = allJourneysData?.journeys.map(
-        (journey) => journey.slug
-    );
-
-    console.log("allJourneysSlug", allJourneysSlug);
-
     const scoresMobile = getAllScores({
         scores: allScores,
         journey: "mobile",
@@ -461,11 +486,11 @@ function Dashboard({ auth }) {
 
     const doneAmout = scoresAmount - zeroedScores;
 
-    const getPercentageDone = function (player) {
+    const getPercentageDone = function (playerSlug) {
         const total = getPlayerPercentage({
             scores: allScores,
             journey,
-            player,
+            playerSlug,
         }).total;
 
         const sum = getPlayerPercentage({
@@ -497,6 +522,15 @@ function Dashboard({ auth }) {
     // if (loadingDash || loadingDash === undefined) {
     //     return <div>LOADING....</div>;
     // }
+    const allJourneysSlug = allJourneysData?.journeys.map(
+        (journey) => journey.slug
+    );
+
+    console.log("allJourneysSlug", allJourneysData);
+
+    if (!allScores || allJourneysLoading || allJourneysError) {
+        return null;
+    }
 
     return (
         <>
@@ -573,14 +607,23 @@ function Dashboard({ auth }) {
                                                 Done
                                             </div>
                                         </div>
-                                        {/* <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-green-600">
+                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-green-600">
                                             <div className="text-4xl font-bold">
-                                                {getSuccessDone().length}
+                                                {
+                                                    getCompletedPlayersSucessfully(
+                                                        {
+                                                            scores: allScores,
+                                                            journey,
+                                                            findings:
+                                                                allFindings,
+                                                        }
+                                                    ).length
+                                                }
                                             </div>
                                             <div className="text-xs md:text-md">
                                                 Successfully Done
                                             </div>
-                                        </div> */}
+                                        </div>
                                         <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px] text-red-500">
                                             <div className="text-4xl font-bold">
                                                 {
@@ -608,12 +651,236 @@ function Dashboard({ auth }) {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="flex gap-10">
+                                        <div className="flex flex-col gap-5 text-center items-center">
+                                            <Donnut
+                                                total={
+                                                    getAllScores({
+                                                        scores: allScores,
+                                                        journey: journey,
+                                                    }).length
+                                                }
+                                                sum={
+                                                    getAllScores({
+                                                        scores: allScores,
+                                                        journey: journey,
+                                                    }).length -
+                                                    getZeroedScores({
+                                                        scores: allScores,
+                                                        journey,
+                                                    }).length
+                                                }
+                                                radius={58}
+                                                thick={6}
+                                            ></Donnut>
+
+                                            <h3 className="font-bold text-xl">
+                                                Done
+                                            </h3>
+                                        </div>
+
+                                        <div className="flex flex-col gap-5 text-center items-center">
+                                            <Donnut
+                                                total={
+                                                    getAllPlayers(
+                                                        allScores,
+                                                        journey
+                                                    ).length
+                                                }
+                                                sum={
+                                                    getBlockedPlayers({
+                                                        findings: allFindings,
+                                                        journey,
+                                                    }).length
+                                                }
+                                                radius={58}
+                                                thick={6}
+                                                color={{
+                                                    base: "#ddd",
+                                                    primary: "red",
+                                                }}
+                                            ></Donnut>
+                                            <h3 className="font-bold text-xl">
+                                                Players with flags
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 
+                                
+                                    Progress By Player 
+                                    ----------------------------
+
+                                 */}
+
+                                <div className="grid grid-cols-3 mt-10">
+                                    <div className="col-span-3">
+                                        <h3 className="font-bold text-2xl text-center mt-20">
+                                            Progress by Player
+                                        </h3>
+
+                                        {/* <ul className="mt-10 mb-10 md:grid md:grid-cols-4 md:max-w-4xl mx-auto gap-5 flex-wrap">
+                                            {getAllPlayersObj({
+                                                scores: allScores,
+                                                journey,
+                                            }).map((player) => {
+                                                return (
+                                                    <li key={player.playerSlug}>
+                                                        {player.playerName}
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul> */}
+
+                                        <ul className="mt-10 mb-10 md:grid md:grid-cols-4 md:max-w-4xl mx-auto gap-5 flex-wrap">
+                                            {getAllPlayersObj({
+                                                scores: allScores,
+                                                journey,
+                                            }).map((player) => {
+                                                let playerColor;
+
+                                                if (
+                                                    hasBlocker({
+                                                        findings: allFindings,
+                                                        journey,
+                                                        player,
+                                                    })
+                                                ) {
+                                                    playerColor = "#ff0000";
+                                                } else if (
+                                                    getPlayerPercentage({
+                                                        scores: allScores,
+                                                        journey,
+                                                        playerSlug: "extra",
+                                                    }).total ===
+                                                    getPlayerPercentage({
+                                                        scores: allScores,
+                                                        journey,
+                                                        playerSlug: "extra",
+                                                    }).done
+                                                ) {
+                                                    playerColor = "#1cab1c";
+                                                } else {
+                                                    playerColor = "dodgerblue";
+                                                }
+
+                                                return (
+                                                    <li
+                                                        key={player.playerSlug}
+                                                        className={`col-span-1 flex gap-2 items-center border-r-0 border-r-[${playerColor}] py-3`}
+                                                    >
+                                                        <div>
+                                                            <div
+                                                                style={{
+                                                                    background:
+                                                                        playerColor,
+                                                                }}
+                                                                className={`p-1 bg-[${playerColor}] w-1 rounded-full hidden`}
+                                                            ></div>
+                                                        </div>
+                                                        <div className="flex-1 mr-2">
+                                                            <Progress
+                                                                amount={
+                                                                    getPlayerPercentage(
+                                                                        {
+                                                                            scores: allScores,
+                                                                            journey,
+                                                                            playerSlug:
+                                                                                player.playerSlug,
+                                                                        }
+                                                                    ).done
+                                                                }
+                                                                total={
+                                                                    getPlayerPercentage(
+                                                                        {
+                                                                            scores: allScores,
+                                                                            journey,
+                                                                            playerSlug:
+                                                                                player.playerSlug,
+                                                                        }
+                                                                    ).total
+                                                                }
+                                                                legend={
+                                                                    player.playerName
+                                                                }
+                                                                size="small"
+                                                                barColor={
+                                                                    playerColor
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
+                                    {/* <div className="col-span-2">
+                                        <h3>Player progress</h3>
+                                    </div> */}
                                 </div>
                             </li>
                         </ul>
                     </section>
                 </div>
             </div>
+            <h1>Percentage Done</h1>
+            <Debugg
+                data={getPlayerPercentage({
+                    scores: allScores,
+                    journey,
+                    playerSlug: "extra",
+                })}
+            />
+            <h1>Has blockers</h1>
+            <Debugg
+                data={hasBlocker({
+                    findings: allFindings,
+                    journey,
+                    player: {
+                        playerName: "Carrefour",
+                        playerSlug: "magalu",
+                    },
+                })}
+            />
+            <h1>All players</h1>
+            <Debugg
+                data={getAllPlayersObj({
+                    scores: allScores,
+                    journey,
+                })}
+            />
+            <h1>Scores by journey</h1>
+            <Debugg
+                data={
+                    getAllScores({
+                        scores: allScores,
+                        journey: journey,
+                    }).length
+                }
+            />
+            <h1>Blocked</h1>
+            <Debugg
+                data={getBlockedPlayers({
+                    findings: allFindings,
+                    journey,
+                })}
+            />
+            <h1>Completed</h1>
+            <Debugg
+                data={getCompletedPlayers({
+                    scores: allScores,
+                    journey,
+                })}
+            />
+            <h1>Successfully Completed</h1>
+            <Debugg
+                data={getCompletedPlayersSucessfully({
+                    scores: allScores,
+                    journey,
+                    findings: allFindings,
+                })}
+            />
             <Debugg data={allScores}></Debugg>
         </>
     );
@@ -638,7 +905,7 @@ function Dashboard({ auth }) {
                                 <div className="h-[5px] bg-primary w-10 mb-1"></div>
                                 Analysis progress
                             </h1>
-                            <div className="text-lg flex items-center gap-5">
+                            {/* <div className="text-lg flex items-center gap-5">
                                 <b className="whitespace-nowrap text-sm md:text-xl">
                                     {allScores.length - allScores.length.length}{" "}
                                     of{" "}
@@ -666,12 +933,12 @@ function Dashboard({ auth }) {
                                     radius={25}
                                     thick={3}
                                 ></Donnut>
-                            </div>
+                            </div> */}
                         </header>
 
                         <ul className="bg-white dark:bg-slate-800 pt-8 pb-1 px-4 pr-8 rounded-lg shadow-lg">
                             <li className=" mx-auto">
-                                <div>
+                                {/* <div>
                                     <SwitchMono
                                         options={[
                                             "overall",
@@ -682,7 +949,7 @@ function Dashboard({ auth }) {
                                         }
                                         selected={"overall"}
                                     />
-                                </div>
+                                </div> */}
 
                                 {/* 
                                     Big Numbers
@@ -691,7 +958,7 @@ function Dashboard({ auth }) {
 
                                 <div className="flex gap-10 flex-col items-center justify-center mt-20">
                                     <div className="flex flex-wrap gap-4 justify-between md:gap-10 text-center w-auto">
-                                        <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px]">
+                                        {/* <div className="flex flex-col gap-3 max-w-[80px] md:max-w-[200px]">
                                             <div className="text-4xl font-bold">
                                                 {
                                                     getCompletedPlayers({
@@ -737,11 +1004,11 @@ function Dashboard({ auth }) {
                                             <div className="text-xs md:text-md">
                                                 In Progress
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                     <div className="flex gap-10">
-                                        <div className="flex flex-col gap-5 text-center items-center">
+                                        {/* <div className="flex flex-col gap-5 text-center items-center">
                                             <Donnut
                                                 total={scoresAmount}
                                                 sum={doneAmout}
@@ -778,7 +1045,7 @@ function Dashboard({ auth }) {
                                             <h3 className="font-bold text-xl">
                                                 Players with flags
                                             </h3>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
 
