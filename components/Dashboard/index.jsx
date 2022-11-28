@@ -7,7 +7,7 @@ import Debugg from "../../lib/Debugg";
 import Donnut from "../Donnut";
 import Progress from "../Progress";
 import Switch, { SwitchMono } from "../Switch";
-import { getAllScoresApi } from "../../lib/utils";
+import { getAllScoresApi, getAllFindingsApi } from "../../lib/utils";
 
 // console.log(apiResult);
 const QUERY_SCORES_BY_PROJECT = gql`
@@ -65,16 +65,16 @@ function getZeroedScores(params) {
         zeroed = scores?.filter(
             (score) =>
                 score.scoreValue === 0 &&
-                score.player.slug === player &&
-                score.journey.slug === journey
+                score.playerSlug === player &&
+                score.journeySlug === journey
         );
     } else if (scores && journey) {
         zeroed = scores?.filter(
-            (score) => score.scoreValue === 0 && score.journey.slug === journey
+            (score) => score.scoreValue === 0 && score.journeySlug === journey
         );
     } else if (scores && player) {
         zeroed = scores?.filter(
-            (score) => score.scoreValue === 0 && score.player.slug === player
+            (score) => score.scoreValue === 0 && score.playerSlug === player
         );
     } else {
         zeroed = scores?.filter((score) => score.scoreValue === 0);
@@ -86,21 +86,21 @@ function getZeroedScores(params) {
 function getAllScores(params) {
     const { scores, journey, player } = params;
 
-    const scoresByJourneyAndPlayer = scores?.filter(
-        (score) =>
-            score.player.slug === player && score.journey.slug === journey
-    );
+    // const scoresByJourneyAndPlayer = scores?.filter(
+    //     (score) =>
+    //         score.playerSlug === player && score.journeySlug === journey
+    // );
 
     let allScores;
     if (scores && journey && player) {
         allScores = scores?.filter(
             (score) =>
-                score.playerName === player && score.journey.slug === journey
+                score.playerName === player && score.journeySlug === journey
         );
     } else if (scores && journey) {
-        allScores = scores?.filter((score) => score.journey.slug === journey);
+        allScores = scores?.filter((score) => score.journeySlug === journey);
     } else if (scores && player) {
-        allScores = scores?.filter((score) => score.player.slug === player);
+        allScores = scores?.filter((score) => score.playerSlug === player);
     } else {
         allScores = scores;
     }
@@ -113,7 +113,7 @@ function getAllPlayers(scores, journey) {
         scores,
         journey,
     });
-    const playersArr = scoresByJourney.map((score) => score.player.slug);
+    const playersArr = scoresByJourney.map((score) => score.playerSlug);
 
     return getUnique(playersArr);
 }
@@ -139,7 +139,7 @@ function getCompletedPlayersSucessfully(params) {
 
     allPlayers.map((player) => {
         const zeroedScore = zeroed.filter(
-            (score) => score.player.slug === player
+            (score) => score.playerSlug === player
         );
         if (zeroedScore.length === 0) {
             completed.push(player);
@@ -160,7 +160,7 @@ function getCompletedPlayers(params) {
 
     allPlayers.map((player) => {
         const zeroedScore = zeroed.filter(
-            (score) => score.player.slug === player
+            (score) => score.playerSlug === player
         );
         if (zeroedScore.length === 0) {
             completed.push(player);
@@ -214,7 +214,7 @@ function getPlayerPercentage(params) {
 function getUncompletedPlayers(params) {
     const { scores, journey } = params;
     const zeroed = getZeroedScores({ scores, journey });
-    let uncompleted = zeroed.map((score) => score.player.slug);
+    let uncompleted = zeroed.map((score) => score.playerSlug);
 
     return getUnique(uncompleted);
 }
@@ -237,7 +237,7 @@ function getBlockedPlayers(params) {
         );
         if (finding !== undefined) {
             blocked.push({
-                playerSlug: score.player.slug,
+                playerSlug: score.playerSlug,
                 theType: finding.findingObject.theType,
             });
         }
@@ -278,10 +278,10 @@ function getUnique(arr, key = null, subkey = null) {
 
 function getAllJourneys(allScores) {
     const _allJourneys = allScores.map((score) => {
-        return score.journey;
+        return score.journeySlug;
     });
 
-    return getUnique(_allJourneys, "slug");
+    return getUnique(_allJourneys, "journeySlug");
 }
 
 /**
@@ -316,9 +316,8 @@ function Dashboard({ auth }) {
                 setAllScores(getAllScoresApi(apiResult));
             });
         });
-    }, []);
-
-    console.log("apiResult", getAllScoresApi(apiResult));
+        console.log("apiResult", getAllFindingsApi(apiResult));
+    }, [apiResult, router.query.slug]);
 
     // useEffect(() => {
     // setLoadingDash(true);
@@ -656,10 +655,10 @@ function Dashboard({ auth }) {
                                                     playerColor = "#ff0000";
                                                 } else if (
                                                     getPercentageDone(
-                                                        player.slug
+                                                        playerSlug
                                                     ).sum ===
                                                     getPercentageDone(
-                                                        player.slug
+                                                        playerSlug
                                                     ).total
                                                 ) {
                                                     playerColor = "#1cab1c";
@@ -669,7 +668,7 @@ function Dashboard({ auth }) {
 
                                                 return (
                                                     <li
-                                                        key={player.slug}
+                                                        key={playerSlug}
                                                         className={`col-span-1 flex gap-2 items-center border-r-0 border-r-[${playerColor}] py-3`}
                                                     >
                                                         <div>
@@ -685,12 +684,12 @@ function Dashboard({ auth }) {
                                                             <Progress
                                                                 amount={
                                                                     getPercentageDone(
-                                                                        player.slug
+                                                                        playerSlug
                                                                     ).sum
                                                                 }
                                                                 total={
                                                                     getPercentageDone(
-                                                                        player.slug
+                                                                        playerSlug
                                                                     ).total
                                                                 }
                                                                 legend={
