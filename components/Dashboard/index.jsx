@@ -196,30 +196,15 @@ function getBlockedPlayers(params) {
         };
     });
 
-    // let selectedScores;
-    // let blocked = [];
+    // return all unique players without any duplicates
 
-    // if (journey) {
-    //     selectedScores = getAllScores({ scores, journey });
-    // } else {
-    //     selectedScores = scores;
-    // }
+    return [
+        ...new Map(
+            playersWithBlockers.map((player) => [player.playerSlug, player])
+        ).values(),
+    ];
 
-    // selectedScores.map((score) => {
-    //     const finding = score.player.finding.find(
-    //         (found) => found.findingObject.theType === "blocker"
-    //     );
-    //     if (finding !== undefined) {
-    //         blocked.push({
-    //             playerSlug: score.playerSlug,
-    //             theType: finding.findingObject.theType,
-    //         });
-    //     }
-    // });
-
-    // return getUnique(blocked, "playerSlug");
-
-    return playersWithBlockers;
+    // return playersWithBlockers;
 }
 
 function hasBlocker(params) {
