@@ -203,7 +203,7 @@ function GroupContainer({ data }) {
     const [validJourney, setValidJourney] = useState(true);
     const [groups, setGroups] = useState(null);
     const [newScores, setNewScores] = useState([]);
-    const { getNewScores } = useScoresContext();
+    const { getNewScores, allScores: allScoresContext } = useScoresContext();
     const { userType } = useCredentialsContext();
     const [allScores, setAllScores] = useState(null);
     const {
@@ -256,6 +256,7 @@ function GroupContainer({ data }) {
 
     useEffect(() => {
         // setEmpty(true);
+        /*
         getNewScores().then((dataScores) => {
             // console.log("newscores");
 
@@ -268,6 +269,19 @@ function GroupContainer({ data }) {
                 // debCreateNewScores(data, router);
             }
         });
+        */
+
+        if (allScoresContext !== null) {
+            if (allScoresContext.length > 0) {
+                // console.log("newscoreswwww", dataScores);
+                setEmpty(false);
+                setAllScores(allScoresContext);
+            } else {
+                // Descomentar quando for adicionar novos scores
+                // createNewScores();
+                // debCreateNewScores(data, router);
+            }
+        }
 
         function createNewScores() {
             if (dataJourneys) {
