@@ -3,6 +3,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useProjectContext } from "../../context/project";
 import { useRouter } from "next/router";
+import client from "../../lib/apollo";
 
 // import { useDetectOutsideClick } from "../../lib/useDetectOutsideClick";
 
@@ -39,36 +40,60 @@ const modal_style = {
     },
 };
 
+function getPlayers(currentProject, setPlayersData) {
+    client
+        .query({
+            query: QUERY_PLAYERS,
+            variables: {
+                projectSlug: currentProject.slug,
+            },
+            fetchPolicy: "network-only",
+        })
+        .then(({ data }) => {
+            setPlayersData(data);
+        });
+}
+
+/**
+ *
+ * Component
+ */
+
 function PlayerSelect({ compact }) {
     const [selected, setSelected] = useState(null);
+    const [playersData, setPlayersData] = useState(null);
     const router = useRouter();
     const { currentProject } = useProjectContext();
-    const { data, loading, error } = useQuery(QUERY_PLAYERS, {
-        variables: {
-            projectSlug: currentProject.slug,
-        },
-    });
+    // const { data, loading, error } = useQuery(QUERY_PLAYERS, {
+    //     variables: {
+    //         projectSlug: currentProject.slug,
+    //     },
+    // });
 
     const modalRef = useRef(null);
     // const [modalOpen, setModalOpen] = useDetectOutsideClick(modalRef, true);
+    useEffect(() => {
+        console.log("PlayerSelect loading");
+        getPlayers(currentProject, setPlayersData);
+    }, [currentProject]);
 
     useEffect(() => {
         if (router.query.player) {
-            const selected = data?.project?.players.find(
+            const selected = playersData?.project?.players.find(
                 (player) => player.slug === router.query.player
             );
             console.log("selected", router.query.player);
             setSelected(selected);
         } else {
-            setSelected(data?.project?.players[0]);
+            setSelected(playersData?.project?.players[0]);
             router.replace({
                 query: {
                     ...router.query,
-                    player: data?.project?.players[0].slug,
+                    player: playersData?.project?.players[0].slug,
                 },
             });
         }
-    }, [data, router]);
+    }, [playersData, router]);
 
     const handleSelectPlayer = useCallback(
         (player) => {
@@ -114,13 +139,13 @@ function PlayerSelect({ compact }) {
         }, 300);
     }
 
-    if (loading) {
+    if (playersData === null) {
         return <div>LOADING PLAYER SELECT</div>;
     }
 
-    if (error) {
-        return <div>SOMETHING WENT WRONG: {error.message}</div>;
-    }
+    // if (error) {
+    //     return <div>SOMETHING WENT WRONG: {error.message}</div>;
+    // }
 
     return (
         <div>
@@ -175,7 +200,7 @@ function PlayerSelect({ compact }) {
                         className="bg-white dark:bg-slate-700 flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5 border-l-1 border border-y-0 border-r-0"
                         style={{ maxHeight: "calc(100vh - 100px)" }}
                     >
-                        {data?.project?.players?.map((player, index) => (
+                        {playersData?.project?.players?.map((player, index) => (
                             <li
                                 className="flex-1 min-w-[200px]"
                                 key={player.slug}

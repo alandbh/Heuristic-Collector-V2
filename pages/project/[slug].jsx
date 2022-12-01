@@ -29,6 +29,8 @@ function Project() {
     const [user, loadingUser] = useAuthState(auth);
     const { slug, tab, player } = router.query || "";
 
+    console.log("slugloading");
+
     const { data, loading, error } = useQuery(QUERY_PROJECTS, {
         variables: {
             slug,

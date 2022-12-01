@@ -8,7 +8,7 @@ import ToggleTheme from "../ToggleTheme";
 import LoggedUser from "../LoggedUser";
 // import { useCredentialsContext } from "../../context/credentials";
 import { useScroll } from "../../lib/utils";
-import { useRef } from "react";
+import React, { useRef } from "react";
 
 function Header({ routes, className, auth }) {
     const router = useRouter();
@@ -224,4 +224,4 @@ function Header({ routes, className, auth }) {
     }
 }
 
-export default Header;
+export default React.memo(Header);

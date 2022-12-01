@@ -42,6 +42,7 @@ const QUERY_GROUPS = gql`
 `;
 
 function Evaluation() {
+    console.log("Evaluation loading");
     const { currentProject } = useProjectContext();
     const router = useRouter();
 
@@ -66,7 +67,7 @@ function Evaluation() {
     }
 
     if (error) {
-        return <div>SOMETHING WENT WRONG: {error.message}</div>;
+        return <div>SOMETHING WENT WRONG: Evaluation {error.message}</div>;
     }
     if (data === undefined) {
         return null;
