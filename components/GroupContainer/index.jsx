@@ -277,7 +277,7 @@ function GroupContainer({ data }) {
                 setEmpty(false);
                 setAllScores(allScoresContext);
             } else {
-                // Descomentar quando for adicionar novos scores
+                // Descomentar quando for adicionar novos scores (Fashion OK)
                 // createNewScores();
                 // debCreateNewScores(data, router);
             }
