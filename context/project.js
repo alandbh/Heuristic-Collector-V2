@@ -1,6 +1,7 @@
-import { createContext, useContext } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { createContext, useContext, useEffect, useState } from "react";
+import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
+import client from "../lib/apollo";
 
 const QUERY_CURRENT_PLAYER = gql`
     query getCurrentPlayer($projectSlug: String, $playerSlug: String) {
@@ -27,31 +28,88 @@ const QUERY_CURRENT_JOURNEY = gql`
     }
 `;
 
+async function doTheQuery(queryString, variables, setStateFunction) {
+    console.log("project - querying");
+
+    const result = await client.query({
+        query: queryString,
+        variables,
+        fetchPolicy: "network-only",
+    });
+
+    const data = result.data,
+        loading = result.loading,
+        error = result.error;
+
+    setStateFunction({ data, loading, error });
+}
+
 const ProjectContext = createContext();
 
 export function ProjectWrapper({ children, data }) {
+    const [currentPlayerData, setCurrentPlayerData] = useState(null);
+    const [currentJourneyData, setCurrentJourneyData] = useState(null);
     const router = useRouter();
 
     const { slug, tab, player, journey } = router.query || "";
 
-    const { data: currentPlayer, loading: loadingCurrentPlayer } = useQuery(
-        QUERY_CURRENT_PLAYER,
-        {
-            variables: {
-                playerSlug: player,
-                projectSlug: slug,
-            },
+    // const { data: currentPlayer, loading: loadingCurrentPlayer } = useQuery(
+    //     QUERY_CURRENT_PLAYER,
+    //     {
+    //         variables: {
+    //             playerSlug: player,
+    //             projectSlug: slug,
+    //         },
+    //     }
+    // );
+
+    // Querying Current Player
+    useEffect(() => {
+        if ((player, slug)) {
+            doTheQuery(
+                QUERY_CURRENT_PLAYER,
+                {
+                    playerSlug: player,
+                    projectSlug: slug,
+                },
+                setCurrentPlayerData
+            );
         }
-    );
-    const { data: currentJourney, loading: loadingCurrentJourney } = useQuery(
-        QUERY_CURRENT_JOURNEY,
-        {
-            variables: {
-                journeySlug: journey,
-                projectSlug: slug,
-            },
+    }, [player, slug]);
+
+    // Querying Current Journey
+    useEffect(() => {
+        if ((journey, slug)) {
+            doTheQuery(
+                QUERY_CURRENT_JOURNEY,
+                {
+                    journeySlug: journey,
+                    projectSlug: slug,
+                },
+                setCurrentJourneyData
+            );
         }
-    );
+    }, [journey, slug]);
+
+    if (currentPlayerData === null || currentJourneyData === null) {
+        return null;
+    }
+
+    const { data: currentPlayer, loading: loadingCurrentPlayer } =
+        currentPlayerData;
+
+    const { data: currentJourney, loading: loadingCurrentJourney } =
+        currentJourneyData;
+
+    // const { data: currentJourney, loading: loadingCurrentJourney } = useQuery(
+    //     QUERY_CURRENT_JOURNEY,
+    //     {
+    //         variables: {
+    //             journeySlug: journey,
+    //             projectSlug: slug,
+    //         },
+    //     }
+    // );
 
     if (
         loadingCurrentPlayer ||
