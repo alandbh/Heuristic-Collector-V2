@@ -31,7 +31,7 @@ function SearchBox(data) {
         distance: 2000,
     };
 
-    if (data) {
+    if (data && currentJourney) {
         const heuristicsByJourney = data.data.filter((heuristic) => {
             // Filtering the heuristics by the current journey and if journey is empty.
             return (
