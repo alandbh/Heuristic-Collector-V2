@@ -1,5 +1,6 @@
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
+import client from "../../lib/apollo";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useProjectContext } from "../../context/project";
 import { useRouter } from "next/router";
@@ -23,39 +24,75 @@ const QUERY_JOURNEYS = gql`
     }
 `;
 
+async function getJourneys(projectSlug, playerSlug, setJourneysData) {
+    console.log("journey select - querying journeys");
+
+    const result = await client.query({
+        query: QUERY_JOURNEYS,
+        variables: {
+            projectSlug,
+            playerSlug,
+        },
+        fetchPolicy: "network-only",
+    });
+
+    const data = result.data,
+        loading = result.loading,
+        error = result.error;
+
+    setJourneysData({ data, loading, error });
+}
+
 function JourneySelect({ compact = false }) {
+    const [journeysData, setJourneysData] = useState(null);
     const [selected, setSelected] = useState(null);
     const router = useRouter();
     const { currentProject, currentPlayer, currentJourney } =
         useProjectContext();
-    const { data, loading, error } = useQuery(QUERY_JOURNEYS, {
-        variables: {
-            playerSlug: currentPlayer?.slug,
-            projectSlug: currentProject?.slug,
-        },
-    });
+    // const { data, loading, error } = useQuery(QUERY_JOURNEYS, {
+    //     variables: {
+    //         playerSlug: currentPlayer?.slug,
+    //         projectSlug: currentProject?.slug,
+    //     },
+    // });
+
+    console.log("journey select - load components");
+
+    useEffect(() => {
+        if (currentProject && currentPlayer) {
+            getJourneys(
+                currentProject.slug,
+                currentPlayer.slug,
+                setJourneysData
+            );
+        }
+    }, [currentProject, currentPlayer]);
 
     const modalRef = useRef(null);
     // const [modalOpen, setModalOpen] = useDetectOutsideClick(modalRef, true);
     useEffect(() => {
-        if (router.query.journey) {
-            const selected = data?.journeys?.find(
-                (journey) => journey.slug === router.query.journey
-            );
-            setSelected(selected);
-        } else {
-            setSelected(data?.journeys[0]);
+        if (journeysData !== null) {
+            const { data } = journeysData;
+            if (router.query.journey) {
+                const { data } = journeysData;
+                const selected = data?.journeys?.find(
+                    (journey) => journey.slug === router.query.journey
+                );
+                setSelected(selected);
+            } else {
+                setSelected(data?.journeys[0]);
 
-            if (data?.journeys[0]) {
-                router.replace({
-                    query: {
-                        ...router.query,
-                        journey: data?.journeys[0].slug,
-                    },
-                });
+                if (data?.journeys[0]) {
+                    router.replace({
+                        query: {
+                            ...router.query,
+                            journey: data?.journeys[0].slug,
+                        },
+                    });
+                }
             }
         }
-    }, [data, router]);
+    }, [journeysData, router]);
 
     const handleSelectPlayer = useCallback(
         (journey) => {
@@ -100,7 +137,14 @@ function JourneySelect({ compact = false }) {
         }, 300);
     }
 
-    if (loading) {
+    if (journeysData === null) {
+        return null;
+    }
+    if (journeysData.data === undefined) {
+        return null;
+    }
+
+    if (journeysData.loading) {
         return (
             <div className="pt-3">
                 <Spinner radius={10} thick={3} />
@@ -108,11 +152,8 @@ function JourneySelect({ compact = false }) {
         );
     }
 
-    if (error) {
+    if (journeysData.error) {
         return <div>SOMETHING WENT WRONG: Please, reload the page.</div>;
-    }
-    if (data === undefined) {
-        return null;
     }
 
     return (
@@ -163,7 +204,7 @@ function JourneySelect({ compact = false }) {
                         className="bg-white dark:bg-slate-700 flex flex-wrap max-w-4xl overflow-y-auto justify-around my-5 border-l-1 border border-y-0 border-r-0"
                         style={{ maxHeight: "calc(100vh - 40px)" }}
                     >
-                        {data?.journeys?.map((journey) => (
+                        {journeysData.data?.journeys?.map((journey) => (
                             <li
                                 className="flex-1 min-w-[200px]"
                                 key={journey.slug}
