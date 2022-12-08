@@ -279,6 +279,7 @@ function GroupContainer({ data }) {
             } else {
                 // Descomentar quando for adicionar novos scores (Fashion OK)
                 // createNewScores();
+                //Este abaixo já estava comentado antes
                 // debCreateNewScores(data, router);
             }
         }
@@ -328,6 +329,7 @@ function GroupContainer({ data }) {
         currentProject,
         currentPlayer,
         currentJourney,
+        allScoresContext,
     ]);
 
     const [allHeuristics, setAllHeuristics] = useState([]);
