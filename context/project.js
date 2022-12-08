@@ -53,7 +53,12 @@ export function ProjectWrapper({ children, data }) {
         }
     );
 
-    if (loadingCurrentPlayer || loadingCurrentJourney) {
+    if (
+        loadingCurrentPlayer ||
+        loadingCurrentJourney ||
+        currentPlayer === undefined ||
+        currentPlayer === null
+    ) {
         return null;
     }
 
