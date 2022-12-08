@@ -1,9 +1,10 @@
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useProjectContext } from "../../context/project";
 import { useRouter } from "next/router";
 import client from "../../lib/apollo";
+import Spinner from "../Spinner";
 
 // import { useDetectOutsideClick } from "../../lib/useDetectOutsideClick";
 
@@ -140,7 +141,11 @@ function PlayerSelect({ compact }) {
     }
 
     if (playersData === null) {
-        return <div>LOADING PLAYER SELECT</div>;
+        return (
+            <div className="pt-3">
+                <Spinner radius={10} thick={3} colorClass="primary" />
+            </div>
+        );
     }
 
     // if (error) {
