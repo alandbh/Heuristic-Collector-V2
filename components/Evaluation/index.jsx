@@ -2,11 +2,13 @@ import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import Spinner from "../Spinner";
 import { ScoresWrapper } from "../../context/scores";
+import client from "../../lib/apollo";
 
 import { useProjectContext } from "../../context/project";
 // import { useCredentialsContext } from "../../context/credentials";
 import HeuristicGroup from "../HeuristicGroup";
 import GroupContainer from "../GroupContainer";
+import { useEffect, useState } from "react";
 
 const QUERY_GROUPS = gql`
     query GetGroups($projectSlug: String, $journeySlug: String) {
@@ -41,23 +43,56 @@ const QUERY_GROUPS = gql`
     }
 `;
 
+async function getGroups(projectSlug, journeySlug, setGroupsData) {
+    console.log("Evaluation - querying groups");
+
+    const result = await client.query({
+        query: QUERY_GROUPS,
+        variables: {
+            projectSlug,
+            journeySlug,
+        },
+        fetchPolicy: "network-only",
+    });
+
+    const data = result.data,
+        loading = result.loading,
+        error = result.error;
+
+    setGroupsData({ data, loading, error });
+}
+
 function Evaluation() {
-    console.log("Evaluation loading");
+    console.log("Evaluation - loading");
     const { currentProject } = useProjectContext();
     const router = useRouter();
+    const [groupsData, setGroupsData] = useState(null);
 
-    const { data, loading, error } = useQuery(QUERY_GROUPS, {
-        variables: {
-            projectSlug: currentProject.slug,
-            journeySlug: router.query.journey,
-        },
-    });
+    // const { data, loading, error } = useQuery(QUERY_GROUPS, {
+    //     variables: {
+    //         projectSlug: currentProject.slug,
+    //         journeySlug: router.query.journey,
+    //     },
+    // });
+
+    useEffect(() => {
+        if (currentProject.slug && router.query.journey) {
+            getGroups(currentProject.slug, router.query.journey, setGroupsData);
+        }
+    }, [currentProject.slug, router.query.journey]);
 
     // const dataToPass = useMemo(() => data, [data]);
 
     // console.log("Evaluation", useCredentialsContext());
 
-    if (loading) {
+    if (groupsData === null) {
+        return null;
+    }
+    if (groupsData.data === undefined) {
+        return null;
+    }
+
+    if (groupsData.loading) {
         return (
             <div className="h-[calc(100vh_-_126px)] flex flex-col items-center justify-center">
                 <Spinner radius={50} thick={7} colorClass="primary" />
@@ -66,18 +101,19 @@ function Evaluation() {
         return <div className="text-red-500">LOADING EVALUATION</div>;
     }
 
-    if (error) {
-        return <div>SOMETHING WENT WRONG: Evaluation {error.message}</div>;
-    }
-    if (data === undefined) {
-        return null;
+    if (groupsData.error) {
+        return (
+            <div>
+                SOMETHING WENT WRONG: Evaluation {groupsData.error.message}
+            </div>
+        );
     }
 
-    // console.log({ data });
+    console.log("Evaluation loads groups successfully");
 
     return (
         <ScoresWrapper>
-            <GroupContainer data={data}></GroupContainer>
+            <GroupContainer data={groupsData.data}></GroupContainer>
         </ScoresWrapper>
     );
 }
