@@ -1430,7 +1430,7 @@
                     "evidenceUrl": "Video-1"
                 },
                 "h_1.4": {
-                    "scoreValue": 4,
+                    "scoreValue": 1,
                     "note": "Não usa geolocation para o frete e ainda não encontrei onde digita o CEP. (Video h14)\nMas funciona bem para a página \"Nossas lojas\" (Video 14a)",
                     "evidenceUrl": "Video h14 e Video h14a"
                 },
