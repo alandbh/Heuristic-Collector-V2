@@ -7,7 +7,7 @@ import React from "react";
 
 function Card({ data }) {
     return (
-        <div className="md:max-w-[300px] max-w-[150px] transition-shadow rounded overflow-hidden shadow-md hover:shadow-xl dark:bg-slate-800">
+        <div className="md:max-w-[310px] max-w-[150px] transition-shadow rounded overflow-hidden shadow-md hover:shadow-xl dark:bg-slate-800">
             <Link
                 href={`/project/${data.slug}?player=${data.players[0].slug}&journey=${data.journeys[0].slug}`}
             >
@@ -22,7 +22,8 @@ function Card({ data }) {
                     />
                     <div className="px-3 py-2 md:px-6 md:py-4">
                         <div className="font-bold dark:text-white/70 text-md md:text-xl mb-2">
-                            {data.name}
+                            {data.name} <br />{" "}
+                            {process.env.NEXT_PUBLIC_DEP?.toUpperCase()}
                         </div>
                         <div className="text-md dark:text-white/50">
                             {data.year}
