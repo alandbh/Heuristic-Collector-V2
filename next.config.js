@@ -12,6 +12,10 @@ const nextConfig = {
     images: {
         domains: ["media.graphassets.com", "lh3.googleusercontent.com"],
     },
+    experimental: {
+        workerThreads: false,
+        cpus: 1,
+    },
 };
 
 module.exports = withPWA(nextConfig);
