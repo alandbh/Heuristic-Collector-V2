@@ -2,6 +2,7 @@ import marketplace from "./results/marketplace.json";
 import fashion from "./results/fashion.json";
 import beauty from "./results/beauty.json";
 // import supermarket from "./results/supermarket.json";
+// Deploying MKT in Vercel
 
 const results = [...marketplace, ...fashion, ...beauty];
 
