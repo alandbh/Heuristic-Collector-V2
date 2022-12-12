@@ -1,7 +1,8 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { gql, useQuery } from "@apollo/client";
+import client from "../../lib/apollo";
 
 import Dashboard from "../../components/Dashboard";
 import Evaluation from "../../components/Evaluation";
@@ -24,18 +25,53 @@ const QUERY_PROJECTS = gql`
     }
 `;
 
+async function doTheQuery(queryString, variables, setStateFunction) {
+    console.log("projectEffect - querying", variables);
+
+    const result = await client.query({
+        query: queryString,
+        variables,
+        fetchPolicy: "network-only",
+    });
+
+    const data = result.data,
+        loading = result.loading,
+        error = result.error;
+
+    setStateFunction({ data, loading, error });
+}
+
 function Project() {
     const router = useRouter();
     const [user, loadingUser] = useAuthState(auth);
-    const { slug, tab, player } = router.query || "";
+    const [projectData, setProjectData] = useState(null);
+    const { slug, tab, player } = router.query;
 
     console.log("slugloading");
 
-    const { data, loading, error } = useQuery(QUERY_PROJECTS, {
-        variables: {
-            slug,
-        },
-    });
+    // const { data, loading, error } = useQuery(QUERY_PROJECTS, {
+    //     variables: {
+    //         slug,
+    //     },
+    // });
+
+    useEffect(() => {
+        if (slug !== undefined) {
+            doTheQuery(
+                QUERY_PROJECTS,
+                {
+                    slug,
+                },
+                setProjectData
+            );
+        }
+    }, [slug]);
+
+    if (projectData === null) {
+        return null;
+    }
+
+    console.log("projectData", projectData);
 
     if (slug === undefined) {
         return (
@@ -45,20 +81,20 @@ function Project() {
         );
     }
 
-    if (loading) {
+    if (projectData?.loading) {
         // return null;
         return (
             <header>
                 <div className="bg-primary flex justify-between px-5 items-center h-12"></div>
                 <div className="bg-white shadow-md px-5 py-3 h-20"></div>
                 <main className="flex bg-slate-100 items-center h-[calc(100vh_-_126px)]">
-                    {/* Loading ptoject... */}
+                    Loading ptoject...
                 </main>
             </header>
         );
     }
 
-    if (error) {
+    if (projectData.error) {
         return (
             <div>
                 Something went wrong in loading this project {error.message}
@@ -66,11 +102,11 @@ function Project() {
         );
     }
 
-    if (data?.project === null) {
+    if (projectData?.project === null) {
         return <div>PROJECT NOT FOUND</div>;
     }
 
-    if (data?.project.slug !== slug) {
+    if (projectData?.data.project.slug !== slug) {
         return <div>NOT FOUND</div>;
     }
 
@@ -117,7 +153,7 @@ function Project() {
                 </Head>
             </Head>
             <CredentialsWrapper>
-                <ProjectWrapper data={data}>
+                <ProjectWrapper data={projectData.data}>
                     <Header
                         // className="mt-20"
                         // project={data?.project.name}
