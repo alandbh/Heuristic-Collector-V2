@@ -8,7 +8,7 @@ import { useProjectContext } from "../../context/project";
 // import { useCredentialsContext } from "../../context/credentials";
 import HeuristicGroup from "../HeuristicGroup";
 import GroupContainer from "../GroupContainer";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const QUERY_GROUPS = gql`
     query GetGroups($projectSlug: String, $journeySlug: String) {
@@ -75,11 +75,24 @@ function Evaluation() {
     //     },
     // });
 
+    const projectSlugMemo = useMemo(
+        () => currentProject.slug,
+        [currentProject.slug]
+    );
+    const journeySlugMemo = useMemo(
+        () => router.query.journey,
+        [router.query.journey]
+    );
+
     useEffect(() => {
-        if (currentProject.slug && router.query.journey) {
-            getGroups(currentProject.slug, router.query.journey, setGroupsData);
+        console.log("testeEffect", {
+            project: projectSlugMemo,
+            router: journeySlugMemo,
+        });
+        if (projectSlugMemo && journeySlugMemo !== undefined) {
+            getGroups(projectSlugMemo, journeySlugMemo, setGroupsData);
         }
-    }, [currentProject.slug, router.query.journey]);
+    }, [projectSlugMemo, journeySlugMemo]);
 
     // const dataToPass = useMemo(() => data, [data]);
 
