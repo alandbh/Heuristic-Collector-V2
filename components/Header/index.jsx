@@ -66,11 +66,6 @@ function Header({ routes, className, auth }) {
                                 <div className="block sm:hidden bg-red-600 h-6 w-6"></div>
                             </a>
                         </Link>
-
-                        <div className="text-white font-bold flex items-center">
-                            {" / "}
-                            {process.env.NEXT_PUBLIC_DEP}
-                        </div>
                     </div>
                     <div className="flex gap-3 md:gap-5 items-center ">
                         <nav className="border-white/50 border rounded-full flex font-bold text-white">
