@@ -142,37 +142,46 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
             MUTATION_SCORE_OBJ
         );
 
-        // let dataNew;
-
         async function getNewData() {
-            return await waitForNewData();
+            let newData = await waitForNewData();
+
+            updateAllScoresObj(newData);
         }
 
-        console.log("NEW PROMISE", getNewData());
-        setEnable(true);
+        getNewData();
 
-        console.log("atualizando", allScores);
-        console.log("atualizando obj state value", scoreValue);
+        function updateAllScoresObj(newData) {
+            console.log("atualizando promisse", newData);
+            setEnable(true);
 
-        let newScores = allScoresObj.map((score) =>
-            score.heuristic.heuristicNumber === heuristic.heuristicNumber
-                ? { ...score, scoreValue: scoreValue }
-                : score
-        );
-        console.log("atualizando obj new", newScores);
+            console.log("atualizando", allScores);
+            console.log("atualizando obj state value", scoreValue);
+            console.log(
+                "atualizando heuristicNumber",
+                heuristic.heuristicNumber
+            );
 
-        // setAllScores(newScores);
+            let newScores = allScoresObj.map((score) =>
+                String(score.heuristic.heuristicNumber) ===
+                String(heuristic.heuristicNumber)
+                    ? { ...score, scoreValue: scoreValue }
+                    : score
+            );
+            console.log("atualizando obj new", newScores);
 
-        setToast({
-            open: true,
-            text: `Heuristic ${currentScore.heuristic.heuristicNumber} updated!`,
-        });
-        setTimeout(() => {
+            setAllScoresObj(newScores);
+
             setToast({
-                open: false,
-                text: "",
+                open: true,
+                text: `Heuristic ${currentScore.heuristic.heuristicNumber} updated!`,
             });
-        }, 4000);
+            setTimeout(() => {
+                setToast({
+                    open: false,
+                    text: "",
+                });
+            }, 4000);
+        }
     }, [scoreValue]);
 
     function handleChangeRange(ev) {
