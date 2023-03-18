@@ -1,6 +1,7 @@
 import React from "react";
 import HeuristicItem from "../HeuristicItem";
 import { useScoresContext } from "../../context/scores";
+import { useScoresObjContext } from "../../context/scoresObj";
 import Donnut from "../Donnut";
 import { useRouter } from "next/router";
 
@@ -27,6 +28,7 @@ function isPresentInThisJourney(heuristic, journeySlug) {
 
 function HeuristicGroup({ group, allScoresJson }) {
     const { allScores } = useScoresContext();
+    const { allScoresObj } = useScoresObjContext();
     const router = useRouter();
 
     const heuristicsToMap = group.heuristic
@@ -37,12 +39,12 @@ function HeuristicGroup({ group, allScoresJson }) {
         )
         .sort((a, b) => a.heuristicNumber - b.heuristicNumber);
 
-    if (!allScores) {
+    if (!allScoresObj) {
         return null;
     }
 
-    const groupSores = allScores?.filter(
-        (score) => score.heuristic.group.name === group.name
+    const groupSores = allScoresObj?.filter(
+        (score) => score.group.name === group.name
     );
     const groupTotalSore = groupSores.reduce(
         (acc, current) => acc + current.scoreValue,
