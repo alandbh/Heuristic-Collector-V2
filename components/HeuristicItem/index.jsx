@@ -123,8 +123,8 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
         console.log("atualizando value", scoreValue);
         // return;
         let allScoresObjJson = JSON.stringify(allScoresJson);
-        let allScoresObjClone = JSON.parse(allScoresObjJson);
-        allScoresObjClone[router.query.journey].map((item) => {
+        let allScoresObjJsonClone = JSON.parse(allScoresObjJson);
+        allScoresObjJsonClone[router.query.journey].map((item) => {
             if (item.id === currentScore.id) {
                 item.scoreValue = scoreValue;
             }
@@ -132,12 +132,12 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
             return item;
         });
 
-        console.log("saving allScoresUpdated", allScoresObjClone);
+        console.log("saving allScoresUpdated", allScoresObjJsonClone);
         processChange(
             client,
             {
                 playerId: currentPlayer.id,
-                scoresObj: allScoresObjClone,
+                scoresObj: allScoresObjJsonClone,
             },
             MUTATION_SCORE_OBJ
         );
