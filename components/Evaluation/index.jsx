@@ -2,6 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import Spinner from "../Spinner";
 import { ScoresWrapper } from "../../context/scores";
+import { ScoresObjWrapper } from "../../context/scoresObj";
 import client from "../../lib/apollo";
 
 import { useProjectContext } from "../../context/project";
@@ -126,7 +127,9 @@ function Evaluation() {
 
     return (
         <ScoresWrapper>
-            <GroupContainer data={groupsData.data}></GroupContainer>
+            <ScoresObjWrapper>
+                <GroupContainer data={groupsData.data}></GroupContainer>
+            </ScoresObjWrapper>
         </ScoresWrapper>
     );
 }

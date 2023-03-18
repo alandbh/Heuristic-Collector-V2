@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { gql } from "@apollo/client";
 
+import { useProjectContext } from "../../context/project";
 import { useScoresContext } from "../../context/scores";
+import { useScoresObjContext } from "../../context/scoresObj";
 import { useCredentialsContext } from "../../context/credentials";
 
 import { useRouter } from "next/router";
@@ -18,6 +20,7 @@ import {
 } from "../../lib/utils";
 import {
     MUTATION_SCORE,
+    MUTATION_SCORE_OBJ,
     MUTATION_EVIDENCE,
     MUTATION_CREATE_SCORE,
 } from "../../lib/mutations";
@@ -43,68 +46,6 @@ function getUnicScores(arr) {
     return unique;
 }
 
-let stringCreateFunc = (
-    projectSlug,
-    playerSlug,
-    journeySlug,
-    heuristicId
-) => `createScore(
-    data: {
-        scoreValue: 0
-        project: { connect: { slug: "${projectSlug}" } }
-        player: { connect: { slug: "${playerSlug}" } }
-        journey: { connect: { slug: "${journeySlug}" } }
-        evidenceUrl: ""
-        note: ""
-        heuristic: { connect: { id: "${heuristicId}" } }
-    }
-) {
-    scoreValue
-    id
-},
-
-`;
-
-let multiString = "";
-
-let stringCreate = "";
-
-let MUTATION_CREATE_MANY_SCORE;
-
-// const writeNewScores = debounce(async () => {
-//     const newEmptyScoresArray = getUnicScores(newEmptyScores);
-//     // console.log("NEW", getUnicScores(newEmptyScores));
-
-//     // console.log(newEmptyScores);
-//     newEmptyScoresArray.forEach((score) => {
-//         return (multiString =
-//             multiString +
-//             stringCreateFunc(
-//                 score.projectSlug,
-//                 score.playerSlug,
-//                 score.journeySlug,
-//                 score.heuristicId
-//             ));
-//     });
-
-//     stringCreate = `
-//     mutation createMultipleScores {
-//        ${multiString}
-//     }
-//     `;
-
-//     const stringMut = stringCreate.replace(/  |\r\n|\n|\r/gm, "");
-//     // console.log("stringCreate", stringCreate);
-
-//     MUTATION_CREATE_MANY_SCORE = gql(stringCreate);
-
-//     const { data } = await client.mutate({
-//         mutation: MUTATION_CREATE_MANY_SCORE,
-//     });
-
-//     console.log("SALVOUUUU", data);
-// }, 3000);
-
 /**
  *
  *
@@ -113,14 +54,17 @@ let MUTATION_CREATE_MANY_SCORE;
  *
  */
 
-function HeuristicItem({ heuristic, id }) {
-    const [score, setScore] = useState(0);
+function HeuristicItem({ heuristic, id, allScoresJson }) {
+    const { currentPlayer } = useProjectContext();
+    const [scoreValue, setScoreValue] = useState(0);
     const [empty, setEmpty] = useState(false);
     const [text, setText] = useState(currentScore?.note || "");
     const [evidenceUrl, setEvidenceUrl] = useState(
         currentScore?.evidenceUrl || ""
     );
     const { allScores, setAllScores } = useScoresContext();
+    const { getNewScoresObj, setAllScoresObj, allScoresObj } =
+        useScoresObjContext();
     const [boxOpen, setBoxOpen] = useState(false);
     const router = useRouter();
     const { user, userType } = useCredentialsContext();
@@ -128,46 +72,41 @@ function HeuristicItem({ heuristic, id }) {
     // console.log("aaaaaaa", userType);
 
     // debugger;
-    // console.log("scores", allScores);
+    console.log("allScoresObj currentPlayer", currentPlayer);
+    console.log("allScoresObj Number", heuristic.heuristicNumber);
 
-    const currentScore = allScores.find(
+    const currentScore = allScoresObj?.find(
         (someScore) =>
-            someScore.heuristic.heuristicNumber === heuristic.heuristicNumber
+            Number(someScore.heuristic.heuristicNumber) ===
+            Number(heuristic.heuristicNumber)
     );
 
     useEffect(() => {
         // debugger;
         // console.log("HAS SCORE", currentScore);
-        if (currentScore !== undefined) {
-            setScore(currentScore.scoreValue);
+        if (currentScore !== undefined && allScoresObj !== null) {
+            console.log("allScoresObj", "NOT EMPTY");
+            setScoreValue(currentScore.scoreValue);
             setText(currentScore.note);
             setEvidenceUrl(currentScore.evidenceUrl);
             if (currentScore.note || currentScore.scoreValue > 0) {
                 setEnable(true);
-                if (userType === "tester") {
-                }
             }
             setEmpty(false);
         } else {
+            console.log("allScoresObj", "YESSSS EMPTY");
             setEmpty(true);
-            setScore(0);
-            const newEmptyScore = {
-                projectSlug: router.query.slug,
-                playerSlug: router.query.player,
-                journeySlug: router.query.journey,
-                heuristicId: heuristic.id,
-                scoreValue: 0,
-            };
-
-            // newEmptyScores.push(newEmptyScore);
-            // localStorage.setItem(
-            //     "new_empty_scores",
-            //     JSON.stringify(newEmptyScores)
-            // );
-            // writeNewScores();
-            // console.log("Undefined????");
+            setScoreValue(0);
+            // DELETAR
+            // const newEmptyScore = {
+            //     projectSlug: router.query.slug,
+            //     playerSlug: router.query.player,
+            //     journeySlug: router.query.journey,
+            //     heuristicId: heuristic.id,
+            //     scoreValue: 0,
+            // };
         }
-    }, [currentScore, router, heuristic, userType]);
+    }, [currentScore, router, heuristic, userType, allScoresObj]);
 
     /**
      *
@@ -181,39 +120,34 @@ function HeuristicItem({ heuristic, id }) {
     const [toast, setToast] = useState({ open: false, text: "" });
 
     async function handleChangeRange(ev) {
-        setScore(Number(ev.target.value));
+        setScoreValue(Number(ev.target.value));
         // let newScores = [...allScores];
         // debugger;
 
         saveValue();
 
         function saveValue() {
-            if (empty) {
-                // debugger;
-                // return;
-                // processChange(
-                //     client,
-                //     {
-                //         projectSlug: router.query.slug,
-                //         playerSlug: router.query.player,
-                //         journeySlug: router.query.journey,
-                //         heuristicId: heuristic.id,
-                //         scoreValue: Number(ev.target.value),
-                //     },
-                //     MUTATION_CREATE_SCORE,
-                //     true
-                // );
-            } else {
-                processChange(
-                    client,
-                    {
-                        scoreId: currentScore.id,
-                        scoreValue: Number(ev.target.value),
-                        scoreNote: currentScore.note,
-                    },
-                    MUTATION_SCORE
-                );
-            }
+            console.log("allScoresObj", allScoresObj);
+            // return;
+            let allScoresObjJson = JSON.stringify(allScoresJson);
+            let allScoresObjClone = JSON.parse(allScoresObjJson);
+            allScoresObjClone[router.query.journey].map((item) => {
+                if (item.id === currentScore.id) {
+                    item.scoreValue = Number(ev.target.value);
+                }
+
+                return item;
+            });
+
+            console.log("saving allScoresUpdated", allScoresObjClone);
+            processChange(
+                client,
+                {
+                    playerId: currentPlayer.id,
+                    scoresObj: allScoresObjClone,
+                },
+                MUTATION_SCORE_OBJ
+            );
         }
 
         let dataNew = await waitForNewData();
@@ -235,7 +169,7 @@ function HeuristicItem({ heuristic, id }) {
 
         setToast({
             open: true,
-            text: `Heuristic ${dataNew.heuristic.heuristicNumber} updated!`,
+            text: `Heuristic ${currentScore.heuristic.heuristicNumber} updated!`,
         });
         setTimeout(() => {
             setToast({
@@ -344,15 +278,17 @@ function HeuristicItem({ heuristic, id }) {
                             id={id}
                             min={0}
                             max={5}
-                            value={score}
+                            value={scoreValue}
                             onChange={(ev) => handleChangeRange(ev)}
                             disabled={userType !== "tester"}
                         />
                         <p
                             className="text-sm text-slate-500"
-                            style={{ color: scoreDescription[score].color }}
+                            style={{
+                                color: scoreDescription[scoreValue].color,
+                            }}
                         >
-                            {scoreDescription[score].text}
+                            {scoreDescription[scoreValue].text}
                         </p>
                     </div>
                     <button

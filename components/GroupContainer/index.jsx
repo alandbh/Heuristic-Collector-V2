@@ -6,6 +6,7 @@ import { Link as Scroll } from "react-scroll";
 
 import HeuristicGroup from "../HeuristicGroup";
 import { useScoresContext } from "../../context/scores";
+import { useScoresObjContext } from "../../context/scoresObj";
 import { useProjectContext } from "../../context/project";
 import { getUnicItem, debounce, useScroll } from "../../lib/utils";
 import Findings from "../Findings";
@@ -204,6 +205,11 @@ function GroupContainer({ data }) {
     const [groups, setGroups] = useState(null);
     const [newScores, setNewScores] = useState([]);
     const { getNewScores, allScores: allScoresContext } = useScoresContext();
+    const {
+        getNewScoresObj,
+        allScoresJson,
+        allScoresObj: allScoresObjContext,
+    } = useScoresObjContext();
     const { userType } = useCredentialsContext();
     const [allScores, setAllScores] = useState(null);
     const {
@@ -216,6 +222,8 @@ function GroupContainer({ data }) {
             projectSlug: router.query.slug,
         },
     });
+
+    // console.log("contextObj", useScoresObjContext());
 
     function getFindings() {
         client
@@ -271,11 +279,11 @@ function GroupContainer({ data }) {
         });
         */
 
-        if (allScoresContext !== null) {
+        if (allScoresContext !== null && allScoresObjContext !== null) {
+            console.log("allScoresObjContext", allScoresObjContext);
             if (allScoresContext.length > 0) {
-                // console.log("newscoreswwww", dataScores);
                 setEmpty(false);
-                setAllScores(allScoresContext);
+                setAllScores(allScoresObjContext);
             } else {
                 // Descomentar quando for adicionar novos scores (Fashion OK)
                 // createNewScores();
@@ -366,7 +374,11 @@ function GroupContainer({ data }) {
             <div className="gap-5 max-w-5xl mx-auto flex flex-col-reverse md:grid md:grid-cols-3 ">
                 <div className="md:col-span-2 flex flex-col gap-20">
                     {data.groups.map((group) => (
-                        <HeuristicGroup group={group} key={group.id} />
+                        <HeuristicGroup
+                            allScoresJson={allScoresJson}
+                            group={group}
+                            key={group.id}
+                        />
                     ))}
 
                     <Findings

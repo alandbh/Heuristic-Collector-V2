@@ -25,7 +25,7 @@ function isPresentInThisJourney(heuristic, journeySlug) {
  *
  */
 
-function HeuristicGroup({ group }) {
+function HeuristicGroup({ group, allScoresJson }) {
     const { allScores } = useScoresContext();
     const router = useRouter();
 
@@ -76,6 +76,7 @@ function HeuristicGroup({ group }) {
                             key={heuristicItem.id}
                             id={heuristicItem.id}
                             heuristic={heuristicItem}
+                            allScoresJson={allScoresJson}
                         />
                     );
                 })}
