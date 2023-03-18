@@ -449,14 +449,14 @@ function GroupContainer({ data }) {
 
                             <div className="flex justify-center items-center flex-col">
                                 <Donnut
-                                    total={getTotals(allScores).total}
-                                    sum={getTotals(allScores).sum}
+                                    total={getTotals(allScoresObjContext).total}
+                                    sum={getTotals(allScoresObjContext).sum}
                                     radius={60}
                                 />
 
                                 <p className="font-bold">
-                                    {getTotals(allScores).sum} of{" "}
-                                    {getTotals(allScores).total}
+                                    {getTotals(allScoresObjContext).sum} of{" "}
+                                    {getTotals(allScoresObjContext).total}
                                 </p>
                             </div>
                         </aside>
