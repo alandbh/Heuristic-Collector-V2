@@ -119,53 +119,49 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
     const [enable, setEnable] = useState(false);
     const [toast, setToast] = useState({ open: false, text: "" });
 
-    async function handleChangeRange(ev) {
-        setScoreValue(Number(ev.target.value));
-        // let newScores = [...allScores];
-        // debugger;
+    useEffect(() => {
+        console.log("atualizando value", scoreValue);
+        // return;
+        let allScoresObjJson = JSON.stringify(allScoresJson);
+        let allScoresObjClone = JSON.parse(allScoresObjJson);
+        allScoresObjClone[router.query.journey].map((item) => {
+            if (item.id === currentScore.id) {
+                item.scoreValue = scoreValue;
+            }
 
-        saveValue();
+            return item;
+        });
 
-        function saveValue() {
-            console.log("allScoresObj", allScoresObj);
-            // return;
-            let allScoresObjJson = JSON.stringify(allScoresJson);
-            let allScoresObjClone = JSON.parse(allScoresObjJson);
-            allScoresObjClone[router.query.journey].map((item) => {
-                if (item.id === currentScore.id) {
-                    item.scoreValue = Number(ev.target.value);
-                }
+        console.log("saving allScoresUpdated", allScoresObjClone);
+        processChange(
+            client,
+            {
+                playerId: currentPlayer.id,
+                scoresObj: allScoresObjClone,
+            },
+            MUTATION_SCORE_OBJ
+        );
 
-                return item;
-            });
+        // let dataNew;
 
-            console.log("saving allScoresUpdated", allScoresObjClone);
-            processChange(
-                client,
-                {
-                    playerId: currentPlayer.id,
-                    scoresObj: allScoresObjClone,
-                },
-                MUTATION_SCORE_OBJ
-            );
+        async function getNewData() {
+            return await waitForNewData();
         }
 
-        let dataNew = await waitForNewData();
-
-        console.log("NEW PROMISE", dataNew);
+        console.log("NEW PROMISE", getNewData());
         setEnable(true);
 
-        if (empty) {
-            setAllScores([...allScores, dataNew]);
-        } else {
-            let newScores = allScores.map((score) =>
-                score.heuristic.heuristicNumber === heuristic.heuristicNumber
-                    ? { ...score, scoreValue: Number(ev.target.value) }
-                    : score
-            );
+        console.log("atualizando", allScores);
+        console.log("atualizando obj state value", scoreValue);
 
-            setAllScores(newScores);
-        }
+        let newScores = allScoresObj.map((score) =>
+            score.heuristic.heuristicNumber === heuristic.heuristicNumber
+                ? { ...score, scoreValue: scoreValue }
+                : score
+        );
+        console.log("atualizando obj new", newScores);
+
+        // setAllScores(newScores);
 
         setToast({
             open: true,
@@ -177,6 +173,19 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
                 text: "",
             });
         }, 4000);
+    }, [scoreValue]);
+
+    function handleChangeRange(ev) {
+        setScoreValue(Number(ev.target.value));
+
+        // let newScores = [...allScores];
+        // debugger;
+
+        // setTimeout(() => {
+        //     saveValue();
+        // }, 300);
+
+        function saveValue() {}
     }
 
     /**
@@ -273,13 +282,23 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
 
                 <div className="flex flex-col gap-3 justify-between">
                     <div className="max-w-sm">
+                        {/* <input
+                            type="range"
+                            name="score"
+                            id="score"
+                            min={0}
+                            max={5}
+                            value={scoreValue}
+                            onChange={handleChangeRange}
+                        /> */}
+                        {/* {scoreValue} */}
                         <Range
                             type={"range"}
                             id={id}
                             min={0}
                             max={5}
                             value={scoreValue}
-                            onChange={(ev) => handleChangeRange(ev)}
+                            onChange={handleChangeRange}
                             disabled={userType !== "tester"}
                         />
                         <p
