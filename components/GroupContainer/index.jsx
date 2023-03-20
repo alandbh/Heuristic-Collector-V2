@@ -8,7 +8,13 @@ import HeuristicGroup from "../HeuristicGroup";
 import { useScoresContext } from "../../context/scores";
 import { useScoresObjContext } from "../../context/scoresObj";
 import { useProjectContext } from "../../context/project";
-import { getUnicItem, debounce, useScroll } from "../../lib/utils";
+import {
+    getUnicItem,
+    debounce,
+    useScroll,
+    processChange,
+} from "../../lib/utils";
+import { MUTATION_SCORE_OBJ } from "../../lib/mutations";
 import Findings from "../Findings";
 import client from "../../lib/apollo";
 import SearchBox from "../SearchBox";
@@ -279,65 +285,89 @@ function GroupContainer({ data }) {
         });
         */
 
-        if (allScoresContext !== null && allScoresObjContext !== null) {
-            console.log("allScoresObjContext", allScoresObjContext);
-            if (allScoresContext.length > 0) {
-                setEmpty(false);
-                setAllScores(allScoresObjContext);
-            } else {
-                // Descomentar quando for adicionar novos scores (Fashion OK)
-                // createNewScores();
-                //Este abaixo já estava comentado antes
-                // debCreateNewScores(data, router);
-            }
+        console.log("singleScore allScoresObjContext", allScoresObjContext);
+        console.log("singleScore allScoresJson", allScoresJson);
+
+        // if (allScoresContext !== null && allScoresObjContext !== null) {
+        //     if (allScoresContext.length > 0) {
+        //         setEmpty(false);
+        //         setAllScores(allScoresObjContext);
+        //     } else {
+        //         // Descomentar quando for adicionar novos scores (Fashion OK)
+        //         // createNewScores();
+        //         //Este abaixo já estava comentado antes
+        //         // debCreateNewScores(data, router);
+        //     }
+        // }
+        // se não tiver scores registrados
+        if (allScoresObjContext?.length === 0 && allScoresJson !== null) {
+            createNewScores();
+            console.log("singleScore contect", allScoresObjContext);
         }
 
         function createNewScores() {
-            if (dataJourneys) {
-                console.log("invalid");
+            let allScoresObjJson = JSON.stringify(allScoresJson);
+            let allScoresObjJsonClone = JSON.parse(allScoresObjJson);
 
-                if (dataJourneys.journeys.length > 0) {
+            console.log("singleScore clone zero", allScoresObjJsonClone);
+            // return;
+
+            data.groups.forEach((group) => {
+                group.heuristic.forEach((heuristic) => {
+                    let singleScore = {};
                     if (
-                        !dataJourneys.journeys.find(
-                            (journeyObj) =>
-                                journeyObj.slug === router.query.journey
-                        )
+                        isANotApplicableHeuristic(heuristic, currentPlayer.slug)
                     ) {
-                        console.log("nao tem", dataJourneys.journeys);
-                        router.replace("/project/", {
-                            query: {
-                                slug: router.query.slug,
-                                player: router.query.player,
-                                journey: dataJourneys.journeys[0].slug,
-                            },
-                            shallow: true,
-                        });
-                        setValidJourney(false);
                         return;
                     }
-                }
-            }
 
-            debCreateNewScores(
-                data,
-                currentProject,
-                currentPlayer,
-                currentJourney,
-                () => {
-                    console.log("debCreateNewScores");
-                    setEmpty(false);
-                }
+                    if (
+                        !isPresentInThisJourney(heuristic, currentJourney.slug)
+                    ) {
+                        return;
+                    }
+
+                    singleScore.id = `${router.query.player}-${router.query.journey}-h${heuristic.heuristicNumber}`;
+                    singleScore.note = "";
+                    singleScore.group = { name: group.name };
+                    singleScore.heuristic = {
+                        heuristicNumber: heuristic.heuristicNumber,
+                    };
+                    singleScore.scoreValue = 0;
+                    singleScore.evidenceUrl = "";
+
+                    // console.log("singleScore", singleScore);
+
+                    allScoresObjJsonClone[router.query.journey].push(
+                        singleScore
+                    );
+
+                    // return;
+                });
+            });
+            console.log(
+                "singleScore allScoresObjJsonClone",
+                allScoresObjJsonClone
+            );
+            // console.log("singleScore OBJ", scoresObjModel);
+
+            processChange(
+                client,
+                {
+                    playerId: currentPlayer.id,
+                    scoresObj: allScoresObjJsonClone,
+                },
+                MUTATION_SCORE_OBJ,
+                true
             );
         }
     }, [
-        getNewScores,
         data,
         router,
-        dataJourneys,
-        currentProject,
         currentPlayer,
         currentJourney,
-        allScoresContext,
+        allScoresJson,
+        allScoresObjContext,
     ]);
 
     const [allHeuristics, setAllHeuristics] = useState([]);

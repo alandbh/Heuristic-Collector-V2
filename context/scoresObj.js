@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import client from "../lib/apollo";
+import { processChange, waitForNewData } from "../lib/utils";
+import { MUTATION_SCORE_OBJ } from "../lib/mutations";
 import Spinner from "../components/Spinner";
 
 import { gql, useQuery } from "@apollo/client";
@@ -16,7 +18,12 @@ const QUERY_SCORES = gql`
 const QUERY_SCORES_FROM_PLAYER = gql`
     query GetScoresFromPlayer($projectSlug: String, $playerSlug: String) {
         players(where: { slug: $playerSlug, project: { slug: $projectSlug } }) {
+            id
             scoresObject
+            journeys {
+                id
+                slug
+            }
         }
     }
 `;
@@ -56,11 +63,42 @@ export function ScoresObjWrapper({ children }) {
     };
 
     useEffect(() => {
-        if (data) {
+        if (data && data.players[0]["scoresObject"] !== null) {
             setAllScoresObj(
                 data.players[0]["scoresObject"][router.query.journey]
             );
             setAllScoresJson(data.players[0]["scoresObject"]);
+            console.log("InitialScores", allScoresJson);
+        } else if (data && data.players[0]["scoresObject"] === null) {
+            let scoresObjModel = {};
+
+            data?.players[0]["journeys"].map((journey) => {
+                scoresObjModel[journey.slug] = [];
+            });
+            console.log("InitialScores", data.players[0]["scoresObject"]);
+
+            setAllScoresJson(JSON.stringify(scoresObjModel));
+
+            let allScoresObjJson = JSON.stringify(scoresObjModel);
+            let allScoresObjJsonClone = JSON.parse(allScoresObjJson);
+
+            processChange(
+                client,
+                {
+                    playerId: data.players[0].id,
+                    scoresObj: allScoresObjJsonClone,
+                },
+                MUTATION_SCORE_OBJ,
+                true
+            );
+
+            // console.log("InitialScores SALVOUU", newData);
+            // async function getNewData() {
+            //     let newData = await waitForNewData();
+
+            // }
+
+            // getNewData();
         }
     }, [data]);
 
@@ -85,7 +123,9 @@ export function ScoresObjWrapper({ children }) {
     if (!data) {
         return null;
     }
-    window.scoresObj = data?.players[0]["scoresObject"][router.query.journey];
+    window.scoresObj = data?.players[0]["scoresObject"]
+        ? data?.players[0]["scoresObject"][router.query.journey]
+        : null;
 
     return (
         <ScoresObjContext.Provider

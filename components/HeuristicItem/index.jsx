@@ -72,7 +72,7 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
     // console.log("aaaaaaa", userType);
 
     // debugger;
-    console.log("allScoresObj currentPlayer", currentPlayer);
+    console.log("allScoresObj currentPlayer", allScoresObj);
     console.log("allScoresObj Number", heuristic.heuristicNumber);
 
     const currentScore = allScoresObj?.find(
@@ -80,16 +80,21 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
             Number(someScore.heuristic.heuristicNumber) ===
             Number(heuristic.heuristicNumber)
     );
+    console.log("allScoresObj currentScore", currentScore);
 
     useEffect(() => {
         // debugger;
         // console.log("HAS SCORE", currentScore);
-        if (currentScore !== undefined && allScoresObj !== null) {
+        if (
+            currentScore !== undefined &&
+            allScoresObj !== null &&
+            allScoresObj.length > 0
+        ) {
             console.log("allScoresObj", "NOT EMPTY");
             setScoreValue(currentScore.scoreValue);
             setText(currentScore.note);
             setEvidenceUrl(currentScore.evidenceUrl);
-            if (currentScore.note || currentScore.scoreValue > 0) {
+            if (currentScore.note.length > 0 || currentScore.scoreValue > 0) {
                 setEnable(true);
             }
             setEmpty(false);
@@ -120,6 +125,9 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
     const [toast, setToast] = useState({ open: false, text: "" });
 
     useEffect(() => {
+        if (empty || currentScore === undefined) {
+            return;
+        }
         console.log("atualizando value", scoreValue);
         // return;
         let allScoresObjJson = JSON.stringify(allScoresJson);

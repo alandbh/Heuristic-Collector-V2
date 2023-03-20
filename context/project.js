@@ -9,6 +9,10 @@ const QUERY_CURRENT_PLAYER = gql`
             id
             name
             slug
+            journeys {
+                id
+                slug
+            }
         }
     }
 `;
