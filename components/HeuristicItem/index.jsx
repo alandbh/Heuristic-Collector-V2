@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
-import { gql } from "@apollo/client";
+import { useCallback, useEffect, useState } from "react";
 
 import { useProjectContext } from "../../context/project";
-import { useScoresContext } from "../../context/scores";
 import { useScoresObjContext } from "../../context/scoresObj";
 import { useCredentialsContext } from "../../context/credentials";
 
@@ -10,41 +8,8 @@ import { useRouter } from "next/router";
 import Range from "../Range";
 import Evidence from "../Evidence";
 import client from "../../lib/apollo";
-import {
-    debounce,
-    throttle,
-    processChange,
-    processChangeEvidence,
-    waitForNewData,
-    standByData,
-} from "../../lib/utils";
-import {
-    MUTATION_SCORE,
-    MUTATION_SCORE_OBJ,
-    MUTATION_EVIDENCE,
-    MUTATION_CREATE_SCORE,
-} from "../../lib/mutations";
-
-// const newEmptyScores = [];
-
-const uniqueScores = [];
-
-function getUnicScores(arr) {
-    let unique = null;
-    unique = arr.filter((element) => {
-        const isDuplicate = uniqueScores.includes(element.heuristicId);
-
-        if (!isDuplicate) {
-            uniqueScores.push(element.heuristicId);
-
-            return true;
-        }
-
-        return false;
-    });
-
-    return unique;
-}
+import { processChange, waitForNewData, standByData } from "../../lib/utils";
+import { MUTATION_SCORE_OBJ } from "../../lib/mutations";
 
 /**
  *
@@ -62,12 +27,14 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
     const [evidenceUrl, setEvidenceUrl] = useState(
         currentScore?.evidenceUrl || ""
     );
-    const { allScores, setAllScores } = useScoresContext();
     const { getNewScoresObj, setAllScoresObj, allScoresObj } =
         useScoresObjContext();
     const [boxOpen, setBoxOpen] = useState(false);
     const router = useRouter();
     const { user, userType } = useCredentialsContext();
+    const [scoreHasChanged, setScoreHasChanged] = useState(false);
+    const [enable, setEnable] = useState(false);
+    const [toast, setToast] = useState({ open: false, text: "" });
 
     // console.log("aaaaaaa", userType);
 
@@ -81,6 +48,10 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
             Number(heuristic.heuristicNumber)
     );
     console.log("allScoresObj currentScore", currentScore);
+
+    useEffect(() => {
+        getNewScoresObj();
+    }, [router.query.journey]);
 
     useEffect(() => {
         // debugger;
@@ -116,31 +87,19 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
     /**
      *
      *
-     * Setting the Score
-     * -----------------------
+     * Fires the change in the score Object and updates the database
+     * ----------------------------------------------------------------
      *
      */
 
-    const [enable, setEnable] = useState(false);
-    const [toast, setToast] = useState({ open: false, text: "" });
-
-    useEffect(() => {
-        if (empty || currentScore === undefined) {
-            return;
-        }
-        console.log("atualizando value", scoreValue);
-        // return;
-        let allScoresObjJson = JSON.stringify(allScoresJson);
-        let allScoresObjJsonClone = JSON.parse(allScoresObjJson);
-        allScoresObjJsonClone[router.query.journey].map((item) => {
-            if (item.id === currentScore.id) {
-                item.scoreValue = scoreValue;
-            }
-
-            return item;
-        });
-
-        console.log("saving allScoresUpdated", allScoresObjJsonClone);
+    const doTheChangeInScoreObj = (
+        allScoresObjJsonClone,
+        customMessage,
+        callBack
+    ) => {
+        const message =
+            customMessage ||
+            `Heuristic ${currentScore.heuristic.heuristicNumber} updated!`;
         processChange(
             client,
             {
@@ -152,57 +111,66 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
 
         async function getNewData() {
             let newData = await waitForNewData();
+            console.log("allScoresObjChange", allScoresObj);
 
-            updateAllScoresObj(newData);
+            if (callBack) {
+                callBack();
+            }
+
+            toastMessage(message);
         }
 
         getNewData();
+    };
 
-        function updateAllScoresObj(newData) {
-            console.log("atualizando promisse", newData);
-            setEnable(true);
-
-            console.log("atualizando", allScores);
-            console.log("atualizando obj state value", scoreValue);
-            console.log(
-                "atualizando heuristicNumber",
-                heuristic.heuristicNumber
-            );
-
-            let newScores = allScoresObj.map((score) =>
-                String(score.heuristic.heuristicNumber) ===
-                String(heuristic.heuristicNumber)
-                    ? { ...score, scoreValue: scoreValue }
-                    : score
-            );
-            console.log("atualizando obj new", newScores);
-
-            setAllScoresObj(newScores);
-
+    const toastMessage = useCallback((message) => {
+        setToast({
+            open: true,
+            text: message,
+        });
+        setTimeout(() => {
             setToast({
-                open: true,
-                text: `Heuristic ${currentScore.heuristic.heuristicNumber} updated!`,
+                open: false,
+                text: "",
             });
-            setTimeout(() => {
-                setToast({
-                    open: false,
-                    text: "",
-                });
-            }, 4000);
+        }, 4000);
+    }, []);
+
+    /**
+     *
+     * Listening the change of the Score Value
+     * ------------------------
+     */
+
+    useEffect(() => {
+        if (empty || currentScore === undefined || !scoreHasChanged) {
+            return;
         }
-    }, [scoreValue]);
+        // return;
+        let allScoresObjJson = JSON.stringify(allScoresJson);
+        let allScoresObjJsonClone = JSON.parse(allScoresObjJson);
+        allScoresObjJsonClone[router.query.journey].map((item) => {
+            if (item.id === currentScore.id) {
+                item.scoreValue = scoreValue;
+            }
+
+            return item;
+        });
+
+        doTheChangeInScoreObj(allScoresObjJsonClone);
+    }, [scoreValue, scoreHasChanged]);
+
+    /**
+     *
+     *
+     * Setting the Score Value
+     * ------------------------
+     *
+     */
 
     function handleChangeRange(ev) {
         setScoreValue(Number(ev.target.value));
-
-        // let newScores = [...allScores];
-        // debugger;
-
-        // setTimeout(() => {
-        //     saveValue();
-        // }, 300);
-
-        function saveValue() {}
+        setScoreHasChanged(true);
     }
 
     /**
@@ -233,44 +201,42 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
     const [status, setStatus] = useState("saved");
 
     async function onSaveEvidence() {
-        let scoreId, scoreData;
+        // DELETAR
+        // let scoreId, scoreData;
 
-        if (empty) {
-            scoreData = await standByData();
-            console.log("standByIdUrl", scoreData);
+        // if (empty) {
+        //     scoreData = await standByData();
+        //     console.log("standByIdUrl", scoreData);
 
-            scoreId = scoreData.id;
-        } else {
-            scoreId = currentScore.id;
-        }
+        //     scoreId = scoreData.id;
+        // } else {
+        //     scoreId = currentScore.id;
+        // }
 
         setStatus("loading");
 
-        processChangeEvidence(
-            client,
-            {
-                scoreId,
-                evidenceUrl: evidenceUrl,
-                scoreNote: text,
-            },
-            MUTATION_EVIDENCE
-        );
+        // console.log("atualizando text", text);
+        // return;
+        let allScoresObjJson = JSON.stringify(allScoresJson);
+        let allScoresObjJsonClone = JSON.parse(allScoresObjJson);
+        allScoresObjJsonClone[router.query.journey].map((item) => {
+            if (item.id === currentScore.id) {
+                item.note = text;
+                item.evidenceUrl = evidenceUrl;
+            }
 
-        let dataNew = await waitForNewData();
-
-        setStatus("saved");
-
-        setToast({
-            open: true,
-            text: `Evidence for Heuristic ${dataNew.heuristic.heuristicNumber} updated!`,
+            return item;
         });
-        // console.log("toastText", dataNew.note);
-        setTimeout(() => {
-            setToast({
-                open: false,
-                text: "",
-            });
-        }, 4000);
+
+        console.log("saving allScoresUpdated", allScoresObjJsonClone);
+
+        doTheChangeInScoreObj(
+            allScoresObjJsonClone,
+            `Evidence for Heuristic ${currentScore.heuristic.heuristicNumber} updated!`,
+            () => {
+                setStatus("saved");
+            }
+        );
     }
 
     const scoreDescription = {
@@ -299,16 +265,6 @@ function HeuristicItem({ heuristic, id, allScoresJson }) {
 
                 <div className="flex flex-col gap-3 justify-between">
                     <div className="max-w-sm">
-                        {/* <input
-                            type="range"
-                            name="score"
-                            id="score"
-                            min={0}
-                            max={5}
-                            value={scoreValue}
-                            onChange={handleChangeRange}
-                        /> */}
-                        {/* {scoreValue} */}
                         <Range
                             type={"range"}
                             id={id}
