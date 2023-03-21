@@ -26,18 +26,7 @@ const QUERY_ALL = gql`
             name
             slug
             department
-            scores(first: 10000) {
-                journey {
-                    name
-                    slug
-                }
-                heuristic {
-                    heuristicNumber
-                }
-                scoreValue
-                note
-                evidenceUrl
-            }
+            scoresObject
             finding {
                 journey {
                     slug
@@ -77,57 +66,78 @@ export default async function handler(req, res) {
     // console.log(allPlayers.data.players[0].finding);
 
     const newPlayerArr = allPlayers.data.players.map(
-        ({ id, name, slug, department, scores, finding }) => {
+        ({ id, name, slug, department, scoresObject, finding }) => {
             const playerOb = {};
             playerOb.id = id;
             playerOb.name = name;
             playerOb.slug = slug;
             playerOb.department = department;
+            playerOb.scores = {};
 
-            const journeys = {};
+            if (scoresObject === null) {
+                return;
+            }
+
+            // const journeys = {};
+
+            // const scores = JSON.parse(scoresObject);
 
             allJourneys.data.journeys.map((jou) => {
-                journeys[jou.slug] = {};
-
-                const scoresByJourney = scores
-                    .filter((score) => {
-                        return score.journey.slug === jou.slug;
-                    })
-                    .map((score) => {
-                        return {
-                            journey: score.journey.slug,
-                            heuristic: "h_" + score.heuristic.heuristicNumber,
-                            scoreValue: score.scoreValue,
-                            note: score.note,
-                            evidenceUrl: score.evidenceUrl,
-                        };
-                    });
-
-                scoresByJourney.sort((a, b) => {
-                    const nameA = a.heuristic.toUpperCase(); // ignore upper and lowercase
-                    const nameB = b.heuristic.toUpperCase(); // ignore upper and lowercase
-                    if (nameA < nameB) {
-                        return -1;
-                    }
-                    if (nameA > nameB) {
-                        return 1;
-                    }
-
-                    // names must be equal
-                    return 0;
+                playerOb.scores[jou.slug] = {};
+                scoresObject[jou.slug].map((score) => {
+                    playerOb.scores[jou.slug][
+                        "h_" + score.heuristic.heuristicNumber
+                    ] = {
+                        scoreValue: score.scoreValue,
+                        note: score.note,
+                        evidenceUrl: score.evidenceUrl,
+                    };
                 });
-
-                scoresByJourney.map((score) => {
-                    journeys[jou.slug][score.heuristic] = {};
-                    journeys[jou.slug][score.heuristic].scoreValue =
-                        score.scoreValue;
-                    journeys[jou.slug][score.heuristic].note = score.note;
-                    journeys[jou.slug][score.heuristic].evidenceUrl =
-                        score.evidenceUrl;
-                });
-
-                playerOb.scores = journeys;
             });
+
+            // allJourneys.data.journeys.map((jou) => {
+            //     journeys[jou.slug] = {};
+
+            //     // const scoresByJourney = scores
+            //     //     .filter((score) => {
+            //     //         return score.journey.slug === jou.slug;
+            //     //     })
+            //     //     .map((score) => {
+            //     //         return {
+            //     //             journey: score.journey.slug,
+            //     //             heuristic: "h_" + score.heuristic.heuristicNumber,
+            //     //             scoreValue: score.scoreValue,
+            //     //             note: score.note,
+            //     //             evidenceUrl: score.evidenceUrl,
+            //     //         };
+            //     //     });
+
+            //     // scoresByJourney.sort((a, b) => {
+            //     //     const nameA = a.heuristic.toUpperCase(); // ignore upper and lowercase
+            //     //     const nameB = b.heuristic.toUpperCase(); // ignore upper and lowercase
+            //     //     if (nameA < nameB) {
+            //     //         return -1;
+            //     //     }
+            //     //     if (nameA > nameB) {
+            //     //         return 1;
+            //     //     }
+
+            //     //     // names must be equal
+            //     //     return 0;
+            //     // });
+
+            //     // scoresByJourney.map((score) => {
+            //     //     journeys[jou.slug][score.heuristic] = {};
+            //     //     journeys[jou.slug][score.heuristic].scoreValue =
+            //     //         score.scoreValue;
+            //     //     journeys[jou.slug][score.heuristic].note = score.note;
+            //     //     journeys[jou.slug][score.heuristic].evidenceUrl =
+            //     //         score.evidenceUrl;
+            //     // });
+
+            //     playerOb.scores = JSON.parse(scoresObject);
+            // });
+            // playerOb.scores = scoresObject;
 
             playerOb.findings = {};
 
