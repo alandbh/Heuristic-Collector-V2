@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import FindingBlock from "../FindingBlock";
-import { BtnSmallPrimary } from "../Button";
+import { BtnLargePrimary, BtnSmallPrimary } from "../Button";
 import client from "../../lib/apollo";
 
 const MUTATION_FINDINGS = gql`
@@ -156,7 +156,7 @@ function Findings({
                         {addButtonText}
                     </button> */}
 
-                    <BtnSmallPrimary
+                    <BtnLargePrimary
                         status={addButtonStatus}
                         textActive={addButtonText}
                         onClick={handleAddOneMoreFinding}
