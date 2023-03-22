@@ -51,15 +51,16 @@ export function ScoresObjWrapper({ children }) {
             fetchPolicy: "network-only",
         });
 
-        setAllScoresObj(
-            newData.players[0]["scoresObject"][router.query.journey]
-        );
-        console.log(
-            "SETTING NEW ALL SCORES OBJ",
-            newData.players[0]["scoresObject"]
-        );
-
-        return newData.players[0]["scoresObject"][router.query.journey];
+        if (newData.players[0]["scoresObject"] !== null) {
+            setAllScoresObj(
+                newData.players[0]["scoresObject"][router.query.journey]
+            );
+            console.log(
+                "SETTING NEW ALL SCORES OBJ",
+                newData.players[0]["scoresObject"]
+            );
+            return newData.players[0]["scoresObject"][router.query.journey];
+        }
     };
 
     useEffect(() => {

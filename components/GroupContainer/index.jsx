@@ -338,7 +338,7 @@ function GroupContainer({ data }) {
 
                     // console.log("singleScore", singleScore);
 
-                    allScoresObjJsonClone[router.query.journey].push(
+                    allScoresObjJsonClone[router.query.journey]?.push(
                         singleScore
                     );
 

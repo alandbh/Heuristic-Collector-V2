@@ -91,6 +91,7 @@ function Evaluation() {
             router: journeySlugMemo,
         });
         if (projectSlugMemo && journeySlugMemo !== undefined) {
+            //DELAY
             getGroups(projectSlugMemo, journeySlugMemo, setGroupsData);
         }
     }, [projectSlugMemo, journeySlugMemo]);

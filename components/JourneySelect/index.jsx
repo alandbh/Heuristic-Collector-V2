@@ -59,7 +59,8 @@ function JourneySelect({ compact = false }) {
     console.log("journey select - load components");
 
     useEffect(() => {
-        if (currentProject && currentPlayer) {
+        console.log("currentAAA", { currentProject, currentPlayer });
+        if (currentProject.id && currentPlayer.id) {
             getJourneys(
                 currentProject.slug,
                 currentPlayer.slug,
