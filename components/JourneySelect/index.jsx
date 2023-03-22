@@ -60,7 +60,7 @@ function JourneySelect({ compact = false }) {
 
     useEffect(() => {
         console.log("currentAAA", { currentProject, currentPlayer });
-        if (currentProject.id && currentPlayer.id) {
+        if (currentProject?.id && currentPlayer?.id) {
             getJourneys(
                 currentProject.slug,
                 currentPlayer.slug,
