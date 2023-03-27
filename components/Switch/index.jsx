@@ -149,13 +149,13 @@ function SwitchMono({ onChange, options, selected, disable = false }) {
 
     function getBubblePosition() {
         if (option === options[0]) {
-            return "translate-x-[2px] w-[100px] border border-blue-500 bg-blue-100";
+            return "translate-x-[2px] w-[150px] border border-blue-500 bg-blue-100";
         } else if (option === options[1]) {
-            return "translate-x-[102px] w-[100px] border border-blue-500 bg-blue-100";
+            return "translate-x-[152px] w-[150px] border border-blue-500 bg-blue-100";
         } else if (option === options[2]) {
-            return "translate-x-[202px] w-[100px] border border-blue-500 bg-blue-100";
+            return "translate-x-[302px] w-[150px] border border-blue-500 bg-blue-100";
         } else {
-            return "translate-x-[302px] w-[100px] border border-blue-500 bg-blue-100";
+            return "translate-x-[452px] w-[150px] border border-blue-500 bg-blue-100";
         }
     }
 
@@ -172,9 +172,9 @@ function SwitchMono({ onChange, options, selected, disable = false }) {
                 >
                     {options.map((_option, index) => (
                         <label
-                            style={{ flex: "0 0 100px" }}
+                            style={{ flex: "0 0 150px" }}
                             key={index}
-                            className="flex w-[100px] items-center justify-center cursor-pointer"
+                            className="flex w-[150px] items-center justify-center cursor-pointer"
                         >
                             <input
                                 type="radio"
